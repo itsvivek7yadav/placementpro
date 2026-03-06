@@ -1,0 +1,96 @@
+<nav class="sidebar">
+
+  <!-- Institute block -->
+  <div class="sidebar-header">
+    <div class="institute-badge">S</div>
+    <div class="institute-info">
+      <div class="institute-name">SICSR</div>
+      <div class="institute-sub">PlacementPro</div>
+    </div>
+  </div>
+
+  <!-- Nav label -->
+  <div class="nav-label">Main Menu</div>
+
+  <ul class="menu">
+
+    <li class="menu-item" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+      <div class="menu-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <span>Dashboard</span>
+    </li>
+
+    <li class="menu-item" routerLink="/student-onboarding" routerLinkActive="active">
+      <div class="menu-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <span>Student Onboarding</span>
+    </li>
+
+    <li class="menu-item" routerLink="/students" routerLinkActive="active">
+      <div class="menu-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <span>Students Master Data</span>
+    </li>
+
+    <!-- Placement Drives (collapsible) -->
+    <li class="menu-item parent" (click)="toggleDrives()" [class.open]="drivesExpanded">
+      <div class="menu-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        </svg>
+      </div>
+      <span>Placement Drives</span>
+      <div class="chevron" [class.rotated]="drivesExpanded">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+    </li>
+
+    <div class="submenu" [class.expanded]="drivesExpanded">
+      <li class="submenu-item" routerLink="/placement-drives/create-drive" routerLinkActive="active">
+        <div class="submenu-dot"></div>
+        Publish New Drive
+      </li>
+      <li class="submenu-item" routerLink="/placement-drives/open-drives" routerLinkActive="active">
+        <div class="submenu-dot"></div>
+        Current Open Applications
+      </li>
+      <li class="submenu-item" routerLink="/placement-drives/closed-drives" routerLinkActive="active">
+        <div class="submenu-dot"></div>
+        Closed Applications
+      </li>
+    </div>
+
+  </ul>
+
+  <!-- Logout at bottom -->
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </button>
+  </div>
+
+</nav>

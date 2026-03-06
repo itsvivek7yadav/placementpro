@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+// ── Shared tokens (same as topbar) ─────────────────────────
+:host {
+  display: block;
+  height: calc(100vh - 60px); // account for fixed topbar
+}
+
+.sidebar {
+  width: 240px;
+  height: 100%;
+  background: #0f172a;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  position: sticky;
+  top: 60px; // stick below the topbar
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+}
+
+// ── Header ─────────────────────────────────────────────────
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 8px;
+}
+
+.institute-badge {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+
+.institute-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.institute-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f1f5f9;
+  letter-spacing: 0.2px;
+  line-height: 1;
+}
+
+.institute-sub {
+  font-size: 11px;
+  color: #475569;
+  line-height: 1;
+}
+
+// ── Nav label ──────────────────────────────────────────────
+.nav-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  padding: 10px 18px 6px;
+}
+
+// ── Menu ───────────────────────────────────────────────────
+.menu {
+  list-style: none;
+  padding: 0 8px;
+  margin: 0;
+  flex: 1;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: #e8ebee;
+  transition: all 0.15s ease;
+  margin-bottom: 1px;
+  position: relative;
+  user-select: none;
+
+  &:hover {
+    background: rgba(255,255,255,0.05);
+    color: #e2e8f0;
+
+    .menu-icon { color: #3b82f6; }
+  }
+
+  &.active {
+    background: rgba(59,130,246,0.12);
+    color: #93c5fd;
+    font-weight: 500;
+
+    .menu-icon { color: #3b82f6; }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 60%;
+      background: #3b82f6;
+      border-radius: 0 3px 3px 0;
+    }
+  }
+
+  &.parent span {
+    font-weight: 500;
+    color: #cbd5e1;
+    flex: 1;
+  }
+
+  &.parent:hover span { color: #f1f5f9; }
+}
+
+.menu-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.chevron {
+  margin-left: auto;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+
+  &.rotated { transform: rotate(180deg); }
+}
+
+// ── Submenu ────────────────────────────────────────────────
+.submenu {
+  list-style: none;
+  padding: 0 8px 0 16px;
+  margin: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+  opacity: 0;
+
+  &.expanded {
+    max-height: 200px;
+    opacity: 1;
+  }
+}
+
+.submenu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #64748b;
+  transition: all 0.15s ease;
+  margin-bottom: 1px;
+
+  &:hover {
+    background: rgba(255,255,255,0.04);
+    color: #94a3b8;
+
+    .submenu-dot { background: #3b82f6; }
+  }
+
+  &.active {
+    color: #93c5fd;
+    background: rgba(59,130,246,0.08);
+
+    .submenu-dot { background: #3b82f6; }
+  }
+}
+
+.submenu-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #334155;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+// ── Footer / Logout ────────────────────────────────────────
+.sidebar-footer {
+  padding: 12px 8px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: auto;
+}
+
+.logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+
+  &:hover {
+    background: rgba(239,68,68,0.1);
+    color: #f87171;
+  }
+}

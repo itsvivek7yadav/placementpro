@@ -1,0 +1,109 @@
+<div class="page" *ngIf="!loading && drive">
+
+  <!-- Back -->
+  <button class="back-btn" (click)="goBack()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Drives
+  </button>
+
+  <div class="detail-layout">
+
+    <!-- Left: Main info -->
+    <div class="detail-main">
+
+      <div class="company-header">
+        <div class="company-avatar">{{ drive.company_name.charAt(0) }}</div>
+        <div>
+          <h1 class="company-name">{{ drive.company_name }}</h1>
+          <div class="job-role">{{ drive.job_role }}</div>
+        </div>
+        <div class="job-type-pill" [ngClass]="drive.job_type === 'FTE' ? 'pill-fte' : 'pill-intern'">
+          {{ drive.job_type === 'FTE' ? 'Full-Time' : drive.job_type === 'INTERNSHIP' ? 'Internship' : 'Intern + PPO' }}
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="section-card">
+        <div class="section-title">About the Role</div>
+        <p class="description">{{ drive.description || 'No description provided.' }}</p>
+      </div>
+
+      <!-- Eligibility -->
+      <div class="section-card">
+        <div class="section-title">Eligibility Criteria</div>
+        <div class="criteria-grid">
+          <div class="criteria-item">
+            <div class="criteria-label">Eligible Programs</div>
+            <div class="criteria-value">{{ drive.eligible_programs }}</div>
+          </div>
+          <div class="criteria-item">
+            <div class="criteria-label">Eligible Batch</div>
+            <div class="criteria-value">{{ drive.eligible_batch }}</div>
+          </div>
+          <div class="criteria-item">
+            <div class="criteria-label">Minimum CGPA</div>
+            <div class="criteria-value">{{ drive.min_cgpa }}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Action card -->
+    <div class="action-card">
+
+      <div class="action-row">
+        <div class="action-label">CTC / Stipend</div>
+        <div class="action-value highlight">{{ drive.ctc || 'Not disclosed' }}</div>
+      </div>
+
+      <div class="action-row">
+        <div class="action-label">Application Deadline</div>
+        <div class="action-value">{{ drive.application_deadline | date:'dd MMM yyyy' }}</div>
+        <div class="deadline-time">{{ drive.application_deadline | date:'hh:mm a' }}</div>
+      </div>
+
+      <div class="action-row">
+        <div class="action-label">Drive Status</div>
+        <div class="status-pill" [ngClass]="drive.status === 'ACTIVE' ? 'status-active' : 'status-closed'">
+          <span class="status-dot"></span>
+          {{ drive.status }}
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Already applied -->
+      <div class="already-applied" *ngIf="drive.my_application_id">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        You've applied for this drive
+      </div>
+
+      <!-- Apply button -->
+      <button
+        class="apply-btn"
+        *ngIf="!drive.my_application_id && drive.status === 'ACTIVE'"
+        (click)="apply()"
+        [disabled]="applying">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        {{ applying ? 'Submitting...' : 'Apply Now' }}
+      </button>
+      <button
+          class="btn-apply"
+          *ngIf="!drive.my_application_id"
+          (click)="applyNow(drive.drive_id)">
+          Apply Now
+        </button>
+
+      <!-- Error -->
+      <div class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="loading-state" *ngIf="loading">
+  <div class="skeleton-header"></div>
+  <div class="skeleton-body"></div>
+</div>

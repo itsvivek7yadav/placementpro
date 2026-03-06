@@ -1,0 +1,86 @@
+<div class="page">
+
+  <div class="page-header">
+    <h2>Open Placement Drives</h2>
+    <span class="drive-count" *ngIf="!loading">{{ drives.length }} Active</span>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>Loading drives…</span>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && drives.length === 0">
+    <div class="empty-icon">📋</div>
+    <p>No open drives at the moment.</p>
+  </div>
+
+  <div class="drives-grid" *ngIf="!loading && drives.length > 0">
+    <div class="drive-card" *ngFor="let drive of drives">
+
+      <div class="card-header">
+        <div class="company-logo">{{ drive.company_name?.charAt(0) }}</div>
+        <div class="company-info">
+          <h3 class="company-name">{{ drive.company_name }}</h3>
+          <p class="job-role">{{ drive.job_role }}</p>
+        </div>
+        <span class="job-type-badge"
+          [ngClass]="{
+            'fte':        drive.job_type === 'FTE',
+            'internship': drive.job_type === 'INTERNSHIP',
+            'ppo':        drive.job_type === 'INTERNSHIP+PPO'
+          }">
+          {{ drive.job_type === 'FTE' ? 'Full-Time' :
+             drive.job_type === 'INTERNSHIP' ? 'Internship' : 'Intern + PPO' }}
+        </span>
+      </div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <span class="meta-label">CTC / Stipend</span>
+          <span class="meta-value">{{ drive.ctc || '—' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Batch</span>
+          <span class="meta-value">{{ drive.eligible_batch || '—' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Min CGPA</span>
+          <span class="meta-value">{{ drive.min_cgpa || '0.0' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Applicants</span>
+          <span class="meta-value">{{ drive.total_applicants || 0 }}</span>
+        </div>
+        <div class="meta-item full-col">
+          <span class="meta-label">Deadline</span>
+          <span class="meta-value deadline-value"
+            [class.urgent]="isDeadlineSoon(drive.application_deadline)"
+            [class.passed]="isDeadlinePassed(drive.application_deadline)">
+            {{ drive.application_deadline | date:'dd MMM yyyy, hh:mm a' }}
+            <span class="deadline-pill" *ngIf="isDeadlineSoon(drive.application_deadline)">⚠ Closing soon</span>
+            <span class="deadline-pill expired-pill" *ngIf="isDeadlinePassed(drive.application_deadline)">Expired</span>
+          </span>
+        </div>
+      </div>
+
+      <hr class="card-divider"/>
+
+      <div class="actions">
+        <button class="btn btn-applicants" (click)="viewApplicants(drive.drive_id)">
+          👥 Applicants
+          <span class="count-pill" *ngIf="drive.total_applicants > 0">{{ drive.total_applicants }}</span>
+        </button>
+        <button class="btn btn-edit" (click)="editDrive(drive.drive_id)">
+          ✏️ Edit
+        </button>
+        <button class="btn btn-close" (click)="closeDrive(drive.drive_id)"
+          [disabled]="closingId === drive.drive_id">
+          {{ closingId === drive.drive_id ? '⏳ Closing…' : '🔒 Close Drive' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

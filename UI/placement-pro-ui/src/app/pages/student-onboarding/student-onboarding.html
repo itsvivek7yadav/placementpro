@@ -1,0 +1,178 @@
+<div class="sob-page">
+
+  <!-- Page Header -->
+  <div class="sob-page-header">
+    <div class="sob-page-title">
+      <h1>Student Onboarding</h1>
+      <p>Bulk import students via Excel upload</p>
+    </div>
+    <div class="sob-badge">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      TPO Access Only
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="sob-grid">
+
+    <!-- Left: Upload card -->
+    <div class="sob-upload-card">
+
+      <div class="sob-card-section">
+        <div class="sob-section-label">Step 1 — Prepare your file</div>
+        <div class="sob-schema">
+          <div class="sob-schema-row header-row">
+            <span>PRN</span>
+            <span>Program Name</span>
+            <span>Program Batch</span>
+            <span>First Name</span>
+            <span>Last Name</span>
+            <span>College Email ID</span>
+          </div>
+          <div class="sob-schema-row sample-row">
+            <span>24030141075</span>
+            <span>MBA IT</span>
+            <span>2024-26</span>
+            <span>Aarav</span>
+            <span>Tiwari</span>
+            <span>aarav.t@sicsr.edu</span>
+          </div>
+        </div>
+        <p class="sob-schema-note">Column headers must match exactly as shown above.</p>
+      </div>
+
+      <div class="sob-divider"></div>
+
+      <div class="sob-card-section">
+        <div class="sob-section-label">Step 2 — Upload file</div>
+
+        <!-- Drop zone -->
+        <div class="sob-dropzone"
+             [class.has-file]="selectedFile"
+             [class.drag-over]="isDragging"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)"
+             (click)="fileInput.click()">
+
+          <input #fileInput type="file" accept=".xlsx" (change)="onFileSelected($event)" hidden />
+
+          <ng-container *ngIf="!selectedFile">
+            <div class="sob-drop-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <div class="sob-drop-text">
+              <strong>Drop your .xlsx file here</strong>
+              <span>or click to browse</span>
+            </div>
+          </ng-container>
+
+          <div class="sob-file-info" *ngIf="selectedFile">
+            <div class="sob-file-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <div class="sob-file-meta">
+              <div class="sob-file-name">{{ selectedFile.name }}</div>
+              <div class="sob-file-size">{{ (selectedFile.size / 1024).toFixed(1) }} KB · Ready to upload</div>
+            </div>
+            <button class="sob-file-remove" (click)="removeFile($event)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button class="sob-upload-btn"
+                (click)="uploadFile()"
+                [disabled]="!selectedFile || loading"
+                [class.loading]="loading">
+          <ng-container *ngIf="!loading">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            </svg>
+            Upload Students
+          </ng-container>
+          <ng-container *ngIf="loading">
+            <span class="sob-spinner"></span>
+            Processing...
+          </ng-container>
+        </button>
+
+        <!-- Toasts -->
+        <div class="sob-toast sob-toast-success" *ngIf="successMessage">
+          <div class="sob-toast-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          {{ successMessage }}
+        </div>
+        <div class="sob-toast sob-toast-error" *ngIf="errorMessage">
+          <div class="sob-toast-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          {{ errorMessage }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Info panel -->
+    <div class="sob-info-panel">
+
+      <div class="sob-info-card sob-info-tip">
+        <div class="sob-info-icon sob-info-icon--blue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div>
+          <div class="sob-info-title">Default Password</div>
+          <div class="sob-info-body">Each student's default password is set to their <strong>PRN number</strong>. They can change it after first login.</div>
+        </div>
+      </div>
+
+      <div class="sob-info-card sob-info-tip">
+        <div class="sob-info-icon sob-info-icon--teal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div>
+          <div class="sob-info-title">Duplicate Handling</div>
+          <div class="sob-info-body">Rows with an existing email or PRN are automatically <strong>skipped</strong>. No duplicates are created.</div>
+        </div>
+      </div>
+
+      <div class="sob-info-card sob-info-tip">
+        <div class="sob-info-icon sob-info-icon--orange">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="sob-info-title">Supported Programs</div>
+          <div class="sob-info-body">Program Name must be one of: <strong>MBA IT</strong>, <strong>MBA DT</strong>, or <strong>MSc CA</strong>. Batch format: <strong>2024-26</strong>.</div>
+        </div>
+      </div>
+
+      <div class="sob-stats-row">
+        <div class="sob-stat">
+          <div class="sob-stat-num">100+</div>
+          <div class="sob-stat-label">Rows per upload</div>
+        </div>
+        <div class="sob-stat">
+          <div class="sob-stat-num">&lt; 5s</div>
+          <div class="sob-stat-label">Avg. process time</div>
+        </div>
+        <div class="sob-stat">
+          <div class="sob-stat-num">2</div>
+          <div class="sob-stat-label">Tables updated</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

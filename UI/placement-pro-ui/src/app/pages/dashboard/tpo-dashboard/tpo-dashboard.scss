@@ -1,0 +1,678 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Inter', sans-serif;
+}
+
+// ── Page ───────────────────────────────────────────────────
+.dash-page {
+  padding: 32px 40px;
+  background: #f0f2f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+// ── Header ─────────────────────────────────────────────────
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.dash-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dash-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a202c;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  span { color: #10b981; }
+}
+
+.dash-subtitle {
+  font-size: 13.5px;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover:not(.spinning) {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &.spinning {
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.placement-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 20px;
+
+  &.badge-placed {
+    background: rgba(16,185,129,0.1);
+    color: #10b981;
+    border: 1px solid rgba(16,185,129,0.2);
+  }
+
+  &.badge-seeking {
+    background: rgba(245,158,11,0.1);
+    color: #d97706;
+    border: 1px solid rgba(245,158,11,0.2);
+  }
+}
+
+// ── KPI Grid ───────────────────────────────────────────────
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.kpi-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-top: 3px solid var(--accent);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: cardIn 0.4s ease both;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+  }
+
+  &:nth-child(1) { animation-delay: 0.05s; }
+  &:nth-child(2) { animation-delay: 0.1s; }
+  &:nth-child(3) { animation-delay: 0.15s; }
+  &:nth-child(4) { animation-delay: 0.2s; }
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.kpi-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a202c;
+  letter-spacing: -0.8px;
+  line-height: 1;
+}
+
+.kpi-trend {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+
+  &.kpi-trend--live {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #10b981;
+  }
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+// ── Skeleton ───────────────────────────────────────────────
+.kpi-skeleton {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  height: 140px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+// ── Bottom Section ────────────────────────────────────────
+.dash-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+// ── Shared Card Base ───────────────────────────────────────
+.dash-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a202c;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.2px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+}
+
+.card-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+// ── Drive List ─────────────────────────────────────────────
+.drive-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drive-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s ease;
+  animation: slideIn 0.3s ease both;
+
+  &:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  &:nth-child(1) { animation-delay: 0.05s; }
+  &:nth-child(2) { animation-delay: 0.1s; }
+  &:nth-child(3) { animation-delay: 0.15s; }
+  &:nth-child(4) { animation-delay: 0.2s; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.drive-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.drive-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drive-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1a202c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-apps {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.drive-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  flex-shrink: 0;
+
+  &.status-open {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+  }
+
+  &.status-closed {
+    background: rgba(148, 163, 184, 0.12);
+    color: #64748b;
+  }
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+// ── Todo Card Specific ────────────────────────────────────
+.todo-card {
+  position: relative;
+}
+
+.todo-meta {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.todo-reset-note {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.todo-input-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.todo-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 13px;
+  color: #1a202c;
+  font-family: inherit;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: #cbd5e1;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.todo-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.04);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ── Todo List ──────────────────────────────────────────────
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s ease;
+  animation: slideIn 0.3s ease both;
+
+  &:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  &.done {
+    opacity: 0.65;
+  }
+
+  &:nth-child(1) { animation-delay: 0.05s; }
+  &:nth-child(2) { animation-delay: 0.1s; }
+  &:nth-child(3) { animation-delay: 0.15s; }
+  &:nth-child(4) { animation-delay: 0.2s; }
+}
+
+.todo-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #cbd5e1;
+  border-radius: 5px;
+  background: white;
+  color: #10b981;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .todo-item.done & {
+    border-color: #10b981;
+    background: #10b981;
+  }
+
+  &:hover {
+    border-color: #10b981;
+  }
+}
+
+.todo-text {
+  flex: 1;
+  font-size: 13.5px;
+  color: #1a202c;
+  word-break: break-word;
+
+  .todo-item.done & {
+    text-decoration: line-through;
+    color: #94a3b8;
+  }
+}
+
+.todo-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    border-radius: 6px;
+  }
+}
+
+// ── Empty States ──────────────────────────────────────────
+.drive-empty,
+.todo-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 36px 20px;
+  color: #cbd5e1;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    opacity: 0.4;
+  }
+
+  p {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+}
+
+// ── Todo Progress ──────────────────────────────────────────
+.todo-progress {
+  height: 3px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.todo-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+// ── Drive CTA ──────────────────────────────────────────────
+.drive-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin-top: auto;
+  cursor: pointer;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    border-color: #10b981;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+  }
+}
+
+// ── Responsive Design ──────────────────────────────────────
+@media (max-width: 1200px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dash-bottom {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dash-page {
+    padding: 24px 20px;
+    gap: 20px;
+  }
+
+  .dash-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card-sub,
+  .todo-meta {
+    margin-left: 0;
+    margin-top: 4px;
+  }
+}

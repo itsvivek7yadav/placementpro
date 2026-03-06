@@ -1,0 +1,79 @@
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Eligible Drives</h1>
+      <p class="page-sub">Placement drives open for your program</p>
+    </div>
+    <div class="drives-count" *ngIf="!loading">
+      {{ drives.length }} drive{{ drives.length !== 1 ? 's' : '' }} available
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="skeleton-grid" *ngIf="loading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4]"></div>
+  </div>
+
+  <!-- Empty -->
+  <div class="empty-state" *ngIf="!loading && drives.length === 0">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+    <h3>No eligible drives right now</h3>
+    <p>Check back later — new drives will appear here when published.</p>
+  </div>
+
+  <!-- Drives Grid -->
+  <div class="drives-grid" *ngIf="!loading && drives.length > 0">
+    <div class="drive-card" *ngFor="let drive of drives">
+
+      <div class="drive-card-header">
+        <div class="company-avatar">{{ drive.company_name.charAt(0) }}</div>
+        <div class="drive-meta">
+          <div class="company-name">{{ drive.company_name }}</div>
+          <div class="job-role">{{ drive.job_role }}</div>
+        </div>
+        <div class="job-type-pill" [ngClass]="drive.job_type === 'FTE' ? 'pill-fte' : 'pill-intern'">
+          {{ drive.job_type === 'FTE' ? 'Full-Time' : drive.job_type === 'INTERNSHIP' ? 'Internship' : 'Intern + PPO' }}
+        </div>
+      </div>
+
+      <div class="drive-details">
+        <div class="detail-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          {{ drive.ctc || 'Not disclosed' }}
+        </div>
+        <div class="detail-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Min CGPA: {{ drive.min_cgpa }}
+        </div>
+        <div class="detail-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Deadline: {{ drive.application_deadline | date:'dd MMM yyyy, hh:mm a' }}
+        </div>
+        <div class="detail-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          {{ drive.total_applicants }} applied
+        </div>
+      </div>
+
+      <div class="drive-card-footer">
+        <button class="btn-detail" (click)="viewDrive(drive.drive_id)">
+          View Details
+        </button>
+        <button
+          class="btn-apply"
+          *ngIf="!drive.my_application_id"
+          (click)="applyNow(drive.drive_id)">
+          Apply Now
+        </button>
+        <div class="applied-pill" *ngIf="drive.my_application_id">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Applied
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

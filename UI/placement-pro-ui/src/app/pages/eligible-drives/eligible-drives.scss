@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:host { display: block; font-family: 'Inter', sans-serif; }
+
+.page {
+  padding: 28px 32px;
+  background: #f0f2f5;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1a202c;
+  letter-spacing: -0.4px;
+  margin: 0 0 4px;
+}
+
+.page-sub { font-size: 13px; color: #94a3b8; margin: 0; }
+
+.drives-count {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 7px 14px;
+}
+
+// ── Drives Grid ────────────────────────────────────────────
+.drives-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.drive-card {
+  background: white;
+  border: 1px solid #e8edf3;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: cardIn 0.35s ease both;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  }
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.drive-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.company-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.drive-meta { flex: 1; min-width: 0; }
+
+.company-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.job-role {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.job-type-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  align-self: flex-start;
+
+  &.pill-fte {
+    background: rgba(59,130,246,0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59,130,246,0.2);
+  }
+
+  &.pill-intern {
+    background: rgba(245,158,11,0.1);
+    color: #d97706;
+    border: 1px solid rgba(245,158,11,0.2);
+  }
+}
+
+.drive-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 1px solid #f0f2f5;
+
+  svg { flex-shrink: 0; color: #94a3b8; }
+}
+
+.drive-card-footer {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.btn-detail {
+  flex: 1;
+  padding: 9px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.18s;
+
+  &:hover { border-color: #3b82f6; color: #3b82f6; }
+}
+
+.btn-apply {
+  flex: 1;
+  padding: 9px;
+  border-radius: 8px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.18s;
+
+  &:hover { background: #2d5ce6; }
+}
+
+.applied-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px;
+  border-radius: 8px;
+  background: rgba(16,185,129,0.08);
+  color: #10b981;
+  border: 1.5px solid rgba(16,185,129,0.2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+// ── Skeleton ───────────────────────────────────────────────
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.skeleton-card {
+  height: 220px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #f0f2f5 25%, #e8ecf0 50%, #f0f2f5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// ── Empty state ────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 0;
+  color: #cbd5e1;
+  text-align: center;
+
+  h3 { font-size: 16px; font-weight: 600; color: #64748b; margin: 0; }
+  p  { font-size: 13px; color: #94a3b8; margin: 0; }
+}

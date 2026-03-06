@@ -1,0 +1,148 @@
+<div class="page-container" *ngIf="!loading">
+
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+    <div class="header-text">
+      <h1 class="page-title">{{ isReopen ? '🔓 Reopen Drive' : '✏️ Edit Drive' }}</h1>
+      <p class="page-subtitle" *ngIf="!isReopen">Update drive details. A new deadline is required.</p>
+      <p class="page-subtitle reopen-sub" *ngIf="isReopen">
+        Enter a new deadline to reopen. The drive will go LIVE immediately.
+      </p>
+    </div>
+  </div>
+
+  <div class="success-msg" *ngIf="successMessage">✅ {{ successMessage }}</div>
+  <div class="error-msg"   *ngIf="errorMessage">❌ {{ errorMessage }}</div>
+
+  <form [formGroup]="driveForm" (ngSubmit)="submit()" class="drive-form">
+
+    <!-- ── Basic Info ── -->
+    <div class="form-section">
+      <div class="section-title">
+        <span class="section-icon">🏢</span>
+        <h3>Basic Information</h3>
+      </div>
+      <div class="section-body">
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Company Name *</label>
+            <input type="text" formControlName="company_name" placeholder="e.g. Deloitte"/>
+          </div>
+
+          <div class="form-group">
+            <label>Job Role *</label>
+            <input type="text" formControlName="job_role" placeholder="e.g. Business Analyst"/>
+          </div>
+
+          <div class="form-group">
+            <label>Job Type *</label>
+            <select formControlName="job_type">
+              <option value="FTE">Full-Time (FTE)</option>
+              <option value="INTERNSHIP">Internship</option>
+              <option value="INTERNSHIP+PPO">Internship + PPO</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>CTC / Stipend</label>
+            <input type="text" formControlName="ctc" placeholder="e.g. 6 LPA – 8 LPA"/>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Job Description</label>
+            <textarea formControlName="description" rows="4"
+              placeholder="Describe role responsibilities, required skills, selection rounds…"></textarea>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Eligibility ── -->
+    <div class="form-section">
+      <div class="section-title">
+        <span class="section-icon">🎓</span>
+        <h3>Eligibility Criteria</h3>
+      </div>
+      <div class="section-body">
+        <div class="form-grid">
+
+          <div class="form-group full-width">
+            <label>Eligible Programs *</label>
+            <div class="custom-multi-select">
+              <div class="select-box" (click)="toggleDropdown()">
+                <span class="placeholder" *ngIf="selectedPrograms.length === 0">Select Programs</span>
+                <div class="selected-chips">
+                  <span class="chip" *ngFor="let id of selectedPrograms">{{ getProgramName(id) }}</span>
+                </div>
+                <span class="arrow">▼</span>
+              </div>
+              <div class="dropdown" *ngIf="dropdownOpen">
+                <div class="dropdown-item" *ngFor="let program of programs">
+                  <input type="checkbox"
+                    [checked]="selectedPrograms.includes(program.program_id)"
+                    (change)="toggleProgram(program.program_id)"/>
+                  {{ program.program_name }}
+                </div>
+              </div>
+            </div>
+            <small>Select one or more eligible programs</small>
+          </div>
+
+          <div class="form-group">
+            <label>Eligible Batch *</label>
+            <select formControlName="eligible_batch">
+              <option value="2024-26">2024–26</option>
+              <option value="2023-25">2023–25</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Minimum CGPA</label>
+            <input type="number" step="0.01" formControlName="min_cgpa" placeholder="e.g. 6.5"/>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Deadline — highlighted, always required ── -->
+    <div class="form-section deadline-section">
+      <div class="section-title">
+        <span class="section-icon">📅</span>
+        <h3>Application Deadline *</h3>
+        <span class="deadline-note" *ngIf="!isReopen">Drive auto-closes when this time is reached</span>
+        <span class="deadline-note reopen-note" *ngIf="isReopen">Must enter a future date to reopen</span>
+      </div>
+      <div class="section-body">
+        <div class="form-group">
+          <input type="datetime-local" formControlName="application_deadline"/>
+          <small *ngIf="isReopen">
+            The drive will become LIVE immediately after saving with the new deadline.
+          </small>
+          <small *ngIf="!isReopen">
+            Updating the deadline resets the auto-close timer.
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button type="button" class="cancel-btn" (click)="goBack()">Cancel</button>
+      <button class="submit-btn" type="submit" [disabled]="driveForm.invalid || saving">
+        <span class="btn-spinner" *ngIf="saving"></span>
+        <span *ngIf="!saving">{{ isReopen ? '🔓 Reopen Drive' : '💾 Save Changes' }}</span>
+        <span *ngIf="saving">{{ isReopen ? 'Reopening…' : 'Saving…' }}</span>
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<!-- Loading skeleton -->
+<div class="loading-page" *ngIf="loading">
+  <div class="spinner"></div>
+  <span>Loading drive details…</span>
+</div>

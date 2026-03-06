@@ -1,0 +1,35 @@
+:host {
+  width: 100%;
+}
+
+.topbar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logout-btn {
+  background: #ef4444;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+}

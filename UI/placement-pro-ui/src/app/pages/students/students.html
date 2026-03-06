@@ -1,0 +1,169 @@
+<div class="students-page">
+
+  <!-- PAGE TITLE -->
+  <div class="page-header">
+    <h1 class="page-title">Student Master Data</h1>
+    <button class="export-btn" (click)="exportCSV()" [disabled]="!searched || filteredStudents.length === 0">
+      ⬇ Export CSV
+    </button>
+  </div>
+
+  <!-- FILTER PANEL -->
+  <div class="filter-panel">
+    <div class="filter-row">
+
+      <input
+        type="text"
+        placeholder="🔍 Search by Name, PRN or Email"
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="triggerSearch()"
+      />
+
+      <select [(ngModel)]="programFilter">
+        <option value="">All Programs</option>
+        <option>MBA IT</option>
+        <option>MBA DT</option>
+        <option>MSC CA</option>
+        <option>BCA</option>
+        <option>BBA</option>
+        <option>BSE</option>
+      </select>
+
+      <select [(ngModel)]="batchFilter">
+        <option value="">All Batches</option>
+        <option>2022-24</option>
+        <option>2023-25</option>
+        <option>2024-26</option>
+      </select>
+
+      <input
+        type="number"
+        placeholder="Min CGPA"
+        step="0.1"
+        [(ngModel)]="cgpaFilter"
+      />
+
+      <select [(ngModel)]="statusFilter">
+        <option value="">All Status</option>
+        <option value="PLACED">Placed</option>
+        <option value="NOT_PLACED">Not Placed</option>
+      </select>
+
+      <button class="search-btn" (click)="triggerSearch()">Search</button>
+      <button class="clear-btn"  (click)="resetFilters()">Clear</button>
+
+    </div>
+  </div>
+
+  <!-- Results count -->
+  <div class="results-count" *ngIf="searched">
+    Showing {{ filteredStudents.length }} of {{ students.length }} students
+  </div>
+
+  <!-- PRE-SEARCH STATE -->
+  <div class="pre-search-state" *ngIf="!searched && !loading">
+    <div class="pre-search-icon">🔍</div>
+    <p>Use the filters above and click <strong>Search</strong> to view student data</p>
+    <span>{{ students.length }} students loaded</span>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrapper" *ngIf="searched && filteredStudents.length > 0">
+    <table class="students-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>PRN</th>
+          <th>College Email</th>
+          <th>Personal Email</th>
+          <th>Phone</th>
+          <th>Gender</th>
+          <th>Program</th>
+          <th>Batch</th>
+          <th>CGPA</th>
+          <th>Sem 1</th>
+          <th>Sem 2</th>
+          <th>Sem 3</th>
+          <th>UG Course</th>
+          <th>UG Spec.</th>
+          <th>UG %</th>
+          <th>PG Program</th>
+          <th>PG Spec.</th>
+          <th>Backlog</th>
+          <th>Work Exp</th>
+          <th>State</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of filteredStudents; let i = index"
+            [ngClass]="s.placement_status === 'PLACED' ? 'row-placed' : ''">
+
+          <td>{{ i + 1 }}</td>
+
+          <td class="col-name">
+            <div class="student-avatar">{{ (s.first_name || s.name || '?').charAt(0) }}</div>
+            <span>{{ s.name }}</span>
+          </td>
+
+          <td class="col-text">{{ s.prn || '—' }}</td>
+          <td class="col-text">{{ s.college_email || '—' }}</td>
+          <td class="col-text">{{ s.email || '—' }}</td>
+          <td class="col-text">{{ s.phone_number || '—' }}</td>
+          <td class="col-text">{{ s.gender || '—' }}</td>
+          <td class="col-text">{{ s.program_name }}</td>
+          <td class="col-text">{{ s.program_batch }}</td>
+
+          <td>
+            <span class="cgpa-badge">{{ s.cgpa || '—' }}</span>
+          </td>
+
+          <td class="col-text">{{ s.sem1_gpa || '—' }}</td>
+          <td class="col-text">{{ s.sem2_gpa || '—' }}</td>
+          <td class="col-text">{{ s.sem3_gpa || '—' }}</td>
+          <td class="col-text">{{ s.ug_course_name || '—' }}</td>
+          <td class="col-text">{{ s.ug_specialization || '—' }}</td>
+          <td class="col-text">{{ s.ug_percentage ? s.ug_percentage + '%' : '—' }}</td>
+          <td class="col-text">{{ s.sicsr_program_name || '—' }}</td>
+          <td class="col-text">{{ s.sicsr_specialization || '—' }}</td>
+
+          <td>
+            <span class="backlog-badge" [ngClass]="s.backlog ? 'backlog-yes' : 'backlog-no'">
+              {{ s.backlog ? 'Yes' : 'No' }}
+            </span>
+          </td>
+
+          <td class="col-text">{{ s.work_experience ? 'Yes' : 'No' }}</td>
+          <td class="col-text">{{ s.state || '—' }}</td>
+
+          <td>
+            <span class="status-chip"
+              [ngClass]="s.placement_status === 'PLACED' ? 'chip-placed' : 'chip-seeking'">
+              {{ s.placement_status }}
+            </span>
+          </td>
+
+          <td>
+            <button class="view-btn">View</button>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EMPTY SEARCH RESULT -->
+  <div class="empty-state" *ngIf="searched && filteredStudents.length === 0">
+    <p>No students match your filters.</p>
+    <button class="clear-btn" (click)="resetFilters()">Clear Filters</button>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    Loading students...
+  </div>
+
+</div>

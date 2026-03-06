@@ -1,0 +1,70 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">My Applications</h1>
+      <p class="page-sub">Track all your placement drive applications</p>
+    </div>
+    <div class="apps-count" *ngIf="!loading">
+      {{ applications.length }} application{{ applications.length !== 1 ? 's' : '' }}
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="skeleton-list" *ngIf="loading">
+    <div class="skeleton-row" *ngFor="let i of [1,2,3,4]"></div>
+  </div>
+
+  <!-- Empty -->
+  <div class="empty-state" *ngIf="!loading && applications.length === 0">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <h3>No applications yet</h3>
+    <p>Browse eligible drives and apply.</p>
+    <a routerLink="/drives" class="browse-btn">Browse Drives</a>
+  </div>
+
+  <!-- Applications list -->
+  <div class="applications-list" *ngIf="!loading && applications.length > 0">
+    <div class="app-row" *ngFor="let app of applications">
+
+      <div class="app-avatar">{{ app.company_name.charAt(0) }}</div>
+
+      <div class="app-info">
+        <div class="app-company">{{ app.company_name }}</div>
+        <div class="app-role">{{ app.job_role }}</div>
+        <div class="app-meta">
+          Applied {{ app.applied_at | date:'dd MMM yyyy' }}
+          · {{ app.job_type === 'FTE' ? 'Full-Time' : app.job_type }}
+          <span *ngIf="app.ctc"> · {{ app.ctc }}</span>
+        </div>
+      </div>
+
+      <!-- Result pill -->
+      <div class="result-section">
+        <div class="result-pill"
+             [ngClass]="{
+               'result-pending':  app.result === 'PENDING',
+               'result-selected': app.result === 'SELECTED',
+               'result-rejected': app.result === 'REJECTED'
+             }">
+          <span class="rdot"></span>
+          {{ app.result === 'PENDING' ? 'Awaiting Result' : app.result === 'SELECTED' ? '🎉 Selected' : 'Rejected' }}
+        </div>
+        <div class="drive-status-note">
+          Drive: {{ app.drive_status === 'ACTIVE' ? 'Active' : 'Closed' }}
+        </div>
+      </div>
+
+      <!-- Withdraw button — only if deadline not passed and result pending -->
+      <button
+        class="withdraw-btn"
+        *ngIf="app.result === 'PENDING' && !isDeadlinePassed(app.application_deadline)"
+        (click)="withdraw(app.application_id)"
+        [disabled]="withdrawingId === app.application_id">
+        {{ withdrawingId === app.application_id ? 'Withdrawing...' : 'Withdraw' }}
+      </button>
+
+    </div>
+  </div>
+
+</div>

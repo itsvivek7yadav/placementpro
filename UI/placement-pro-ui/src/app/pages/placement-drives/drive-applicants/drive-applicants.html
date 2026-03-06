@@ -1,0 +1,182 @@
+<div class="page">
+
+  <!-- ── Toast ── -->
+  <div class="toast" *ngIf="toastMessage" [ngClass]="toastType">
+    <span class="toast-icon">{{ toastType === 'success' ? '✅' : '❌' }}</span>
+    {{ toastMessage }}
+  </div>
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">← Back</button>
+      <div>
+        <h2 class="page-title">Drive Applicants</h2>
+        <p class="page-sub">Drive #{{ driveId }} — {{ totalCount }} total applicants</p>
+      </div>
+    </div>
+    <button class="export-btn" (click)="exportToExcel()" [disabled]="loading || totalCount === 0">
+      <span>⬇</span> Export CSV
+    </button>
+  </div>
+
+  <!-- ── Stats Bar ── -->
+  <div class="stats-bar" *ngIf="!loading">
+    <div class="stat-card" (click)="setFilter('ALL')" [class.active]="filterResult === 'ALL'">
+      <span class="stat-value">{{ totalCount }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-card pending" (click)="setFilter('PENDING')" [class.active]="filterResult === 'PENDING'">
+      <span class="stat-value">{{ pendingCount }}</span>
+      <span class="stat-label">Pending</span>
+    </div>
+    <div class="stat-card selected" (click)="setFilter('SELECTED')" [class.active]="filterResult === 'SELECTED'">
+      <span class="stat-value">{{ selectedCount }}</span>
+      <span class="stat-label">Selected</span>
+    </div>
+    <div class="stat-card rejected" (click)="setFilter('REJECTED')" [class.active]="filterResult === 'REJECTED'">
+      <span class="stat-value">{{ rejectedCount }}</span>
+      <span class="stat-label">Rejected</span>
+    </div>
+  </div>
+
+  <!-- ── Toolbar ── -->
+  <div class="toolbar" *ngIf="!loading">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        placeholder="Search by name, PRN, email or program…"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()" />
+    </div>
+
+    <!-- Bulk Actions — only shown when pending exist -->
+    <div class="bulk-actions" >
+      <span class="bulk-label">Bulk:</span>
+      <button class="bulk-btn bulk-select" (click)="bulkUpdate('SELECTED')" [disabled]="bulkUpdating">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Select All Pending
+      </button>
+      <button class="bulk-btn bulk-reject" (click)="bulkUpdate('REJECTED')" [disabled]="bulkUpdating">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Reject All Pending
+      </button>
+    </div>
+
+    <span class="result-count">{{ filtered.length }} result{{ filtered.length !== 1 ? 's' : '' }}</span>
+  </div>
+
+  <!-- ── Loading ── -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>Loading applicants…</span>
+  </div>
+
+  <!-- ── Empty ── -->
+  <div class="empty-state" *ngIf="!loading && filtered.length === 0">
+    <div class="empty-icon">👤</div>
+    <p *ngIf="totalCount === 0">No one has applied to this drive yet.</p>
+    <p *ngIf="totalCount > 0">No applicants match your current filter.</p>
+  </div>
+
+  <!-- ── Table ── -->
+<!-- ── Table ── -->
+<div class="table-wrapper" *ngIf="!loading && filtered.length > 0">
+  <table class="applicants-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Personal Email</th>
+        <th>Phone</th>
+        <th>Gender</th>
+        <th>UG Degree</th>
+        <th>UG Specialization</th>
+        <th>UG %</th>
+        <th>PG Degree</th>
+        <th>PG Specialization</th>
+        <th>PG %</th>
+        <th>Backlog</th>
+        <th>State</th>
+        <th>CGPA</th>
+        <th>Applied</th>
+        <th>Result</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let app of filtered; let i = index"
+          [ngClass]="{
+            'row-selected': app.result === 'SELECTED',
+            'row-rejected': app.result === 'REJECTED'
+          }">
+
+        <td class="col-index">{{ i + 1 }}</td>
+
+        <td class="col-student">
+          <div class="student-avatar">{{ app.student_name?.charAt(0) }}</div>
+          <div class="student-info">
+            <span class="student-name">{{ app.student_name }}</span>
+            <span class="student-email">{{ app.student_email }}</span>
+          </div>
+        </td>
+
+        <td class="col-text">{{ app.personal_email || '—' }}</td>
+        <td class="col-text">{{ app.phone_number   || '—' }}</td>
+        <td class="col-text">{{ app.gender         || '—' }}</td>
+        <td class="col-text">{{ app.ug_course_name || '—' }}</td>
+        <td class="col-text">{{ app.ug_specialization || '—' }}</td>
+        <td class="col-text">{{ app.ug_percentage ? (app.ug_percentage + '%') : '—' }}</td>
+        <td class="col-text">{{ app.pg_degree         || '—' }}</td>
+        <td class="col-text">{{ app.pg_specialization || '—' }}</td>
+        <td class="col-text">{{ app.pg_percentage ? (app.pg_percentage + '%') : '—' }}</td>
+
+        <td class="col-text">
+          <span class="backlog-badge" [ngClass]="app.backlog ? 'backlog-yes' : 'backlog-no'">
+            {{ app.backlog ? 'Yes' : 'No' }}
+          </span>
+        </td>
+
+        <td class="col-text">{{ app.native_state || '—' }}</td>
+
+        <td class="col-cgpa">
+          <span class="cgpa-badge">{{ app.cgpa | number:'1.2-2' }}</span>
+        </td>
+
+        <td class="col-date">{{ app.applied_at | date:'dd MMM yyyy' }}</td>
+
+        <td class="col-result">
+          <span class="result-badge"
+            [ngClass]="{
+              'badge-pending':  app.result === 'PENDING',
+              'badge-selected': app.result === 'SELECTED',
+              'badge-rejected': app.result === 'REJECTED'
+            }">
+            {{ app.result }}
+          </span>
+        </td>
+
+        <td class="col-actions">
+          <button class="action-btn select-btn"
+            [class.active-result]="app.result === 'SELECTED'"
+            (click)="updateResult(app.application_id, 'SELECTED')"
+            [disabled]="updatingId === app.application_id || bulkUpdating">
+            <span class="btn-spinner" *ngIf="updatingId === app.application_id"></span>
+            <span *ngIf="updatingId !== app.application_id">✓</span>
+          </button>
+          <button class="action-btn reject-btn"
+            [class.active-result]="app.result === 'REJECTED'"
+            (click)="updateResult(app.application_id, 'REJECTED')"
+            [disabled]="updatingId === app.application_id || bulkUpdating">
+            <span class="btn-spinner" *ngIf="updatingId === app.application_id"></span>
+            <span *ngIf="updatingId !== app.application_id">✕</span>
+          </button>
+        </td>
+
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</div>

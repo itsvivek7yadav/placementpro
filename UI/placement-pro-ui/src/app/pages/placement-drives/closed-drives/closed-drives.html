@@ -1,0 +1,74 @@
+<div class="page">
+
+  <div class="page-header">
+    <h2>Closed Placement Drives</h2>
+    <span class="drive-count" *ngIf="!loading">{{ drives.length }} Closed</span>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>Loading drives…</span>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && drives.length === 0">
+    <div class="empty-icon">🗂️</div>
+    <p>No closed drives yet.</p>
+  </div>
+
+  <div class="drives-grid" *ngIf="!loading && drives.length > 0">
+    <div class="drive-card" *ngFor="let drive of drives">
+
+      <div class="card-header">
+        <div class="company-logo">{{ drive.company_name?.charAt(0) }}</div>
+        <div class="company-info">
+          <h3 class="company-name">{{ drive.company_name }}</h3>
+          <p class="job-role">{{ drive.job_role }}</p>
+        </div>
+        <div class="badge-stack">
+          <span class="closed-badge">🔒 Closed</span>
+          <span class="close-type-badge" [ngClass]="drive.close_type === 'MANUAL' ? 'manual' : 'auto'">
+            {{ drive.close_type === 'MANUAL' ? 'Manual' : 'Auto-expired' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <span class="meta-label">Job Type</span>
+          <span class="meta-value">{{ drive.job_type }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">CTC / Stipend</span>
+          <span class="meta-value">{{ drive.ctc || '—' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Batch</span>
+          <span class="meta-value">{{ drive.eligible_batch || '—' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Total Applicants</span>
+          <span class="meta-value">{{ drive.total_applicants || 0 }}</span>
+        </div>
+        <div class="meta-item full-col">
+          <span class="meta-label">Closed At</span>
+          <span class="meta-value closed-time">
+            {{ drive.closed_at | date:'dd MMM yyyy, hh:mm a' }}
+          </span>
+        </div>
+      </div>
+
+      <hr class="card-divider"/>
+
+      <div class="actions">
+        <button class="btn btn-reopen" (click)="reopenDrive(drive.drive_id)">
+          🔓 Reopen Drive
+        </button>
+        <button class="btn btn-view" (click)="viewApplicants(drive.drive_id)">
+          👥 Applicants
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
