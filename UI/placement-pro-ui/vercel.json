@@ -1,5 +1,11 @@
 {
   "buildCommand": "ng build --configuration production",
-  "outputDirectory": "dist/placementpro",
-  "framework": "angular"
+  "outputDirectory": "dist/placement-pro-ui",
+  "framework": "angular",
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ]
 }
