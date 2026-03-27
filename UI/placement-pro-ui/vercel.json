@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist/placement-pro-ui",
+  "outputDirectory": "dist/placement-pro-ui/browser",
   "framework": "angular",
   "rewrites": [
     {
