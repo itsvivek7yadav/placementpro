@@ -1,0 +1,86 @@
+<div class="attempt-page" *ngIf="!loading && !errorMsg">
+
+  <!-- ── Top Bar ── -->
+  <div class="attempt-topbar">
+    <div class="test-title-bar">{{ test.title }}</div>
+    <div class="timer" [class.timer-low]="isTimeLow">
+      ⏱ {{ formattedTime }}
+    </div>
+    <div class="progress-bar-text">
+      {{ answeredCount }} / {{ totalCount }} answered
+    </div>
+  </div>
+
+  <div class="attempt-body">
+
+    <!-- ── Question Navigator ── -->
+    <div class="question-nav">
+      <div class="nav-title">Questions</div>
+      <div class="nav-grid">
+        <button *ngFor="let q of questions; let i = index"
+          class="nav-btn"
+          [class.nav-current]="i === currentIndex"
+          [class.nav-answered]="isAnswered(q.question_id)"
+          (click)="goTo(i)">
+          {{ i + 1 }}
+        </button>
+      </div>
+      <div class="nav-legend">
+        <span class="legend-item"><span class="dot dot-answered"></span> Answered</span>
+        <span class="legend-item"><span class="dot dot-current"></span> Current</span>
+        <span class="legend-item"><span class="dot dot-unanswered"></span> Unanswered</span>
+      </div>
+    </div>
+
+    <!-- ── Question Panel ── -->
+    <div class="question-panel">
+
+      <div class="q-header">
+        <span class="q-number">Question {{ currentIndex + 1 }} of {{ totalCount }}</span>
+        <span class="q-marks">{{ currentQuestion.marks }} mark(s)</span>
+      </div>
+
+      <div class="q-text">{{ currentQuestion.question }}</div>
+
+      <div class="options-list">
+        <div *ngFor="let opt of ['A','B','C','D']"
+          class="option-item"
+          [class.option-selected]="getAnswer(currentQuestion.question_id) === opt"
+          (click)="selectAnswer(currentQuestion.question_id, opt)">
+          <span class="option-label">{{ opt }}</span>
+          <span class="option-text">
+            {{ opt === 'A' ? currentQuestion.option_a :
+               opt === 'B' ? currentQuestion.option_b :
+               opt === 'C' ? currentQuestion.option_c :
+                             currentQuestion.option_d }}
+          </span>
+        </div>
+      </div>
+
+      <div class="q-navigation">
+        <button class="btn-nav" (click)="prev()" [disabled]="currentIndex === 0">
+          ← Previous
+        </button>
+        <button class="btn-submit" (click)="submitTest()" [disabled]="submitting">
+          {{ submitting ? 'Submitting...' : '✅ Submit Test' }}
+        </button>
+        <button class="btn-nav" (click)="next()"
+          [disabled]="currentIndex === questions.length - 1">
+          Next →
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="loading-page" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Loading test...</p>
+</div>
+
+<!-- Error -->
+<div class="error-page" *ngIf="errorMsg">
+  <p>{{ errorMsg }}</p>
+</div>

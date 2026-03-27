@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LayoutStateService } from '../layout-state.service';
 
 @Component({
   standalone: true,
@@ -7,18 +10,26 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <header class="topbar">
+      <button *ngIf="isMobile" class="menu-btn" (click)="toggleSidebar()" aria-label="Toggle navigation menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
 
       <div class="topbar-left">
         <div class="logo">
-          Placement<span>Pro</span>
+          <span>Pro</span>Launch
         </div>
-        <div class="topbar-divider"></div>
+        <div class="topbar-divider" *ngIf="!isMobile"></div>
         <div class="user-role">{{ role }}</div>
       </div>
 
       <!-- 🔹 CENTER TITLE -->
-      <div class="topbar-center">
-        Symbiosis Institute of Computer Studies and Research
+      <div class="topbar-center" *ngIf="!isMobile">
+        Institute Placement Management System
       </div>
 
       <div class="topbar-right">
@@ -58,6 +69,21 @@ import { CommonModule } from '@angular/common';
       justify-content: space-between;
       padding: 0 20px 0 24px;
       box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .menu-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      margin-right: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: #e2e8f0;
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
     /* ── Left ── */
@@ -170,14 +196,55 @@ import { CommonModule } from '@angular/common';
       border-color: rgba(239,68,68,0.45);
       color: #fca5a5;
     }
+
+    @media (max-width: 900px) {
+      .topbar {
+        height: 56px;
+        padding: 0 14px;
+        gap: 10px;
+      }
+
+      .topbar-left {
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .logo {
+        font-size: 15px;
+      }
+
+      .user-role {
+        display: none;
+      }
+
+      .topbar-right {
+        margin-left: auto;
+        gap: 8px;
+      }
+
+      .user-chip {
+        padding: 4px 8px 4px 4px;
+      }
+
+      .user-details {
+        display: none;
+      }
+
+      .logout-btn {
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+    }
   `]
 })
-export class Topbar {
+export class Topbar implements OnInit, OnDestroy {
   userName = '';
   userInitial = '';
   role = '';
+  isMobile = false;
+  private destroy$ = new Subject<void>();
 
-  constructor() {
+  constructor(private layoutState: LayoutStateService) {
     const user = localStorage.getItem('user');
     if (user) {
       const parsed = JSON.parse(user);
@@ -185,6 +252,23 @@ export class Topbar {
       this.role = parsed.role || '';
       this.userInitial = this.userName.charAt(0).toUpperCase();
     }
+  }
+
+  ngOnInit(): void {
+    this.layoutState.isMobile$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isMobile) => {
+        this.isMobile = isMobile;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  toggleSidebar(): void {
+    this.layoutState.toggleSidebar();
   }
 
   logout() {

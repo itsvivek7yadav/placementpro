@@ -1,0 +1,54 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <h1 class="page-title">Practice Tests</h1>
+    <p class="page-sub">Aptitude and practice tests assigned to your program</p>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">Loading tests...</div>
+
+  <div class="empty-state" *ngIf="!loading && tests.length === 0">
+    <p>No tests available right now. Check back later.</p>
+  </div>
+
+  <div class="test-grid" *ngIf="!loading && tests.length > 0">
+    <div class="test-card" *ngFor="let t of tests">
+
+      <div class="card-top">
+        <h3 class="test-title">{{ t.title }}</h3>
+        <span class="status-badge"
+          [ngClass]="{
+            'badge-live':     t.status === 'LIVE',
+            'badge-closed':   t.status === 'CLOSED',
+            'badge-submitted': t.attempt_status === 'SUBMITTED'
+          }">
+          {{ t.attempt_status === 'SUBMITTED' ? 'Submitted' : t.status }}
+        </span>
+      </div>
+
+      <p class="test-desc" *ngIf="t.description">{{ t.description }}</p>
+
+      <div class="test-meta">
+        <span>⏱ {{ t.duration_mins }} mins</span>
+        <span>❓ {{ t.question_count }} questions</span>
+        <span>📅 {{ t.start_time | date:'dd MMM, hh:mm a' }}</span>
+      </div>
+
+      <!-- Score if submitted -->
+      <div class="score-box" *ngIf="t.attempt_status === 'SUBMITTED'">
+        <span class="score-val">{{ t.my_score }} / {{ t.my_total_marks }}</span>
+        <span class="score-label">Your Score</span>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn-start"
+          [disabled]="t.attempt_status === 'SUBMITTED' || !isLive(t)"
+          (click)="startTest(t.test_id)">
+          {{ getButtonLabel(t) }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

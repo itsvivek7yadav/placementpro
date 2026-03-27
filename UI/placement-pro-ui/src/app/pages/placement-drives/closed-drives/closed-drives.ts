@@ -15,7 +15,7 @@ export class ClosedDrives implements OnInit {
   drives: any[] = [];
   loading = true;
 
-  private baseUrl = 'http://localhost:5050/api/drives';
+private baseUrl = 'http://localhost:5050/api/placement-drives';
 
   constructor(private http: HttpClient, private router: Router) {}
 

@@ -1,0 +1,155 @@
+<!-- src/app/pages/off-campus/off-campus-jobs.component.html -->
+
+<div class="jobs-container">
+
+  <!-- <section class="jobs-hero">
+    <div class="jobs-hero__content">
+      <div class="jobs-hero__eyebrow">
+        <span class="jobs-hero__pulse"></span>
+        Curated off-campus opportunities
+      </div>
+      <h2 class="jobs-hero__title">Find polished, relevant roles without digging through noisy listings.</h2>
+      <p class="jobs-hero__copy">
+        Focus on analyst, consulting, fresher, and business-friendly openings with faster filtering and cleaner previews.
+      </p>
+    </div>
+
+    <div class="jobs-hero__stats">
+      <div class="stat-card">
+        <span class="stat-card__label">Open roles</span>
+        <strong class="stat-card__value">{{ total || 0 }}</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__label">Sources</span>
+        <strong class="stat-card__value">{{ sourceOptions.length - 1 }}</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card__label">Status</span>
+        <strong class="stat-card__value">{{ hasActiveFilters ? 'Filtered' : 'Live' }}</strong>
+      </div>
+    </div>
+  </section> -->
+
+  <section class="filter-shell">
+    <div class="filter-shell__header">
+      <div>
+        <p class="filter-shell__eyebrow">Search smarter</p>
+        <h3 class="filter-shell__title">Refine the feed</h3>
+      </div>
+      <button
+        mat-stroked-button
+        class="btn-clear"
+        *ngIf="hasActiveFilters"
+        (click)="clearFilters()"
+        type="button"
+        matTooltip="Clear all filters"
+      >
+        <mat-icon>filter_list_off</mat-icon>
+        Reset Filters
+      </button>
+    </div>
+
+    <form [formGroup]="filterForm" class="filter-form">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Role Type</mat-label>
+        <mat-select formControlName="role_type">
+          <mat-option *ngFor="let opt of roleTypeOptions" [value]="opt.value">
+            {{ opt.label }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>person_search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field filter-field--grow">
+        <mat-label>Location</mat-label>
+        <input matInput formControlName="location" placeholder="e.g. Mumbai, Bangalore">
+        <mat-icon matPrefix>location_on</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field filter-field--grow">
+        <mat-label>Skills</mat-label>
+        <input matInput formControlName="skills" placeholder="e.g. SQL, Python, Excel">
+        <mat-icon matPrefix>build_circle</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Source</mat-label>
+        <mat-select formControlName="source">
+          <mat-option *ngFor="let opt of sourceOptions" [value]="opt.value">
+            {{ opt.label }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>source</mat-icon>
+      </mat-form-field>
+    </form>
+
+    <div class="results-meta" *ngIf="!isLoading && !hasError">
+      <span class="results-count" *ngIf="total > 0">
+        <mat-icon>work_outline</mat-icon>
+        {{ total }} job{{ total !== 1 ? 's' : '' }} found
+      </span>
+      <div class="results-tags" *ngIf="hasActiveFilters">
+        <mat-chip *ngIf="filterForm.value.role_type">{{ filterForm.value.role_type }}</mat-chip>
+        <mat-chip *ngIf="filterForm.value.location">{{ filterForm.value.location }}</mat-chip>
+        <mat-chip *ngIf="filterForm.value.skills">{{ filterForm.value.skills }}</mat-chip>
+        <mat-chip *ngIf="filterForm.value.source">{{ filterForm.value.source }}</mat-chip>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  <div class="state-loading" *ngIf="isLoading">
+    <div class="loading-grid">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="state-error" *ngIf="hasError && !isLoading">
+    <mat-icon class="state-icon state-icon--error">cloud_off</mat-icon>
+    <h3>Something went wrong</h3>
+    <p>{{ errorMessage }}</p>
+    <button mat-raised-button color="primary" (click)="loadJobs()">
+      <mat-icon>refresh</mat-icon>
+      Try Again
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="state-empty" *ngIf="!isLoading && !hasError && jobs.length === 0">
+    <mat-icon class="state-icon">search_off</mat-icon>
+    <h3>No jobs found</h3>
+    <p *ngIf="hasActiveFilters">Try adjusting your filters or clearing them to see all jobs.</p>
+    <p *ngIf="!hasActiveFilters">Check back soon — new opportunities are added every 6 hours.</p>
+    <button mat-stroked-button color="primary" *ngIf="hasActiveFilters" (click)="clearFilters()">
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- Jobs Grid -->
+  <div class="jobs-grid" *ngIf="!isLoading && !hasError && jobs.length > 0">
+    <app-opportunity-card
+      *ngFor="let job of jobs; trackBy: trackById"
+      [item]="job"
+      [type]="'job'"
+      [bookmarkLoading]="isBookmarkLoading(job.id)"
+      (bookmarkToggled)="onBookmarkToggle($event)"
+      (viewDetail)="onViewDetail($event)"
+      class="job-card-wrapper"
+    ></app-opportunity-card>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-wrapper" *ngIf="!isLoading && total > pageSize">
+    <mat-paginator
+      [length]="total"
+      [pageSize]="pageSize"
+      [pageIndex]="currentPage - 1"
+      [pageSizeOptions]="[6, 9, 18, 27]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      aria-label="Jobs pagination"
+    ></mat-paginator>
+  </div>
+
+</div>

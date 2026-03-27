@@ -10,6 +10,7 @@
 
   <!-- FILTER PANEL -->
   <div class="filter-panel">
+    <div class="filter-section-title">Primary Filters</div>
     <div class="filter-row">
 
       <input
@@ -36,22 +37,46 @@
         <option>2024-26</option>
       </select>
 
-      <input
-        type="number"
-        placeholder="Min CGPA"
-        step="0.1"
-        [(ngModel)]="cgpaFilter"
-      />
-
       <select [(ngModel)]="statusFilter">
         <option value="">All Status</option>
         <option value="PLACED">Placed</option>
         <option value="NOT_PLACED">Not Placed</option>
       </select>
 
+    </div>
+
+    <button class="advanced-toggle" type="button" (click)="toggleAcademicFilters()">
+      <span>Academic Filters</span>
+      <span>{{ showAcademicFilters ? 'Hide' : 'Show' }}</span>
+    </button>
+
+    <div class="academic-panel" *ngIf="showAcademicFilters">
+      <label class="filter-switch">
+        <input type="checkbox" [(ngModel)]="useAcademicFilters" />
+        <span>Enable academic performance filtering</span>
+      </label>
+
+      <div class="filter-hint">
+        Overall Academic Threshold checks all available academic records. GPA/CGPA values are compared as percentage equivalents using `x10`.
+      </div>
+
+      <div class="filter-grid academic-row">
+        <input type="number" placeholder="Overall Academic Threshold" step="0.1" [(ngModel)]="overallAcademicThreshold" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min UG CGPA" step="0.1" [(ngModel)]="ugCgpaFilter" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Std XII CGPA" step="0.1" [(ngModel)]="stdXiiCgpaFilter" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Std X CGPA" step="0.1" [(ngModel)]="stdXCgpaFilter" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Sem 1 GPA" step="0.1" [(ngModel)]="sem1GpaFilter" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Sem 2 GPA" step="0.1" [(ngModel)]="sem2GpaFilter" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Sem 3 GPA" step="0.1" [(ngModel)]="sem3GpaFilter" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min UG %" step="0.1" [(ngModel)]="ugPercentageFilter" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Std XII %" step="0.1" [(ngModel)]="stdXiiPercentageFilter" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Std X %" step="0.1" [(ngModel)]="stdXPercentageFilter" [disabled]="!useAcademicFilters" />
+      </div>
+    </div>
+
+    <div class="filter-actions">
       <button class="search-btn" (click)="triggerSearch()">Search</button>
       <button class="clear-btn"  (click)="resetFilters()">Clear</button>
-
     </div>
   </div>
 
@@ -73,27 +98,47 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Name</th>
-          <th>PRN</th>
-          <th>College Email</th>
-          <th>Personal Email</th>
-          <th>Phone</th>
-          <th>Gender</th>
           <th>Program</th>
           <th>Batch</th>
-          <th>CGPA</th>
+          <th>Status</th>
+          <th>College Email</th>
+          <th>PRN</th>
+          <th>First Name</th>
+          <th>Middle Name</th>
+          <th>Last Name</th>
+          <th>Personal Email</th>
+          <th>Date of Birth</th>
+          <th>Gender</th>
+          <th>Phone</th>
+          <th>WhatsApp No.</th>
+          <th>WhatsApp Link</th>
+          <th>LinkedIn</th>
+          <th>City</th>
+          <th>State</th>
+          <th>Country</th>
+          <th>Std X %</th>
+          <th>Std X CGPA</th>
+          <th>Std XII %</th>
+          <th>Std XII CGPA</th>
+          <th>UG Course</th>
+          <th>UG Spec.</th>
+          <th>UG University</th>
+          <th>UG %</th>
+          <th>UG CGPA</th>
+          <th>UG Year</th>
+          <th>Educational Background</th>
+          <th>SICSR Program</th>
+          <th>SICSR Spec.</th>
           <th>Sem 1</th>
           <th>Sem 2</th>
           <th>Sem 3</th>
-          <th>UG Course</th>
-          <th>UG Spec.</th>
-          <th>UG %</th>
-          <th>PG Program</th>
-          <th>PG Spec.</th>
+          <th>Final CGPA</th>
           <th>Backlog</th>
+          <th>Interested Roles</th>
           <th>Work Exp</th>
-          <th>State</th>
-          <th>Status</th>
+          <th>Total Work Exp</th>
+          <th>Last Company</th>
+          <th>Last Industry</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -102,51 +147,58 @@
             [ngClass]="s.placement_status === 'PLACED' ? 'row-placed' : ''">
 
           <td>{{ i + 1 }}</td>
-
-          <td class="col-name">
-            <div class="student-avatar">{{ (s.first_name || s.name || '?').charAt(0) }}</div>
-            <span>{{ s.name }}</span>
-          </td>
-
-          <td class="col-text">{{ s.prn || '—' }}</td>
-          <td class="col-text">{{ s.college_email || '—' }}</td>
-          <td class="col-text">{{ s.email || '—' }}</td>
-          <td class="col-text">{{ s.phone_number || '—' }}</td>
-          <td class="col-text">{{ s.gender || '—' }}</td>
-          <td class="col-text">{{ s.program_name }}</td>
-          <td class="col-text">{{ s.program_batch }}</td>
-
+          <td class="col-text">{{ s.program_name || '—' }}</td>
+          <td class="col-text">{{ s.program_batch || '—' }}</td>
           <td>
-            <span class="cgpa-badge">{{ s.cgpa || '—' }}</span>
+            <span class="status-chip"
+              [ngClass]="s.placement_status === 'PLACED' ? 'chip-placed' : 'chip-seeking'">
+              {{ s.placement_status || '—' }}
+            </span>
           </td>
-
+          <td class="col-text">{{ s.college_email || '—' }}</td>
+          <td class="col-text">{{ s.prn || '—' }}</td>
+          <td class="col-text">{{ s.first_name || '—' }}</td>
+          <td class="col-text">{{ s.middle_name || '—' }}</td>
+          <td class="col-text">{{ s.last_name || '—' }}</td>
+          <td class="col-text">{{ s.personal_email || '—' }}</td>
+          <td class="col-text">{{ s.date_of_birth ? (s.date_of_birth | date:'mediumDate') : '—' }}</td>
+          <td class="col-text">{{ s.gender || '—' }}</td>
+          <td class="col-text">{{ s.phone_number || '—' }}</td>
+          <td class="col-text">{{ s.whatsapp_number || '—' }}</td>
+          <td class="col-text">{{ s.whatsapp_link || '—' }}</td>
+          <td class="col-text">{{ s.linkedin_profile_url || '—' }}</td>
+          <td class="col-text">{{ s.city || '—' }}</td>
+          <td class="col-text">{{ s.state || '—' }}</td>
+          <td class="col-text">{{ s.country || '—' }}</td>
+          <td class="col-text">{{ s.std_x_percentage ? s.std_x_percentage + '%' : '—' }}</td>
+          <td class="col-text">{{ s.std_x_cgpa || '—' }}</td>
+          <td class="col-text">{{ s.std_xii_percentage ? s.std_xii_percentage + '%' : '—' }}</td>
+          <td class="col-text">{{ s.std_xii_cgpa || '—' }}</td>
+          <td class="col-text">{{ s.ug_course_name || '—' }}</td>
+          <td class="col-text">{{ s.ug_specialization || '—' }}</td>
+          <td class="col-text">{{ s.ug_university || '—' }}</td>
+          <td class="col-text">{{ s.ug_percentage ? s.ug_percentage + '%' : '—' }}</td>
+          <td class="col-text">{{ s.ug_cgpa || '—' }}</td>
+          <td class="col-text">{{ s.ug_year || '—' }}</td>
+          <td class="col-text">{{ s.educational_background || '—' }}</td>
+          <td class="col-text">{{ s.sicsr_program_name || '—' }}</td>
+          <td class="col-text">{{ s.sicsr_specialization || '—' }}</td>
           <td class="col-text">{{ s.sem1_gpa || '—' }}</td>
           <td class="col-text">{{ s.sem2_gpa || '—' }}</td>
           <td class="col-text">{{ s.sem3_gpa || '—' }}</td>
-          <td class="col-text">{{ s.ug_course_name || '—' }}</td>
-          <td class="col-text">{{ s.ug_specialization || '—' }}</td>
-          <td class="col-text">{{ s.ug_percentage ? s.ug_percentage + '%' : '—' }}</td>
-          <td class="col-text">{{ s.sicsr_program_name || '—' }}</td>
-          <td class="col-text">{{ s.sicsr_specialization || '—' }}</td>
-
+          <td><span class="cgpa-badge">{{ s.cgpa || '—' }}</span></td>
           <td>
             <span class="backlog-badge" [ngClass]="s.backlog ? 'backlog-yes' : 'backlog-no'">
               {{ s.backlog ? 'Yes' : 'No' }}
             </span>
           </td>
-
+          <td class="col-text">{{ s.interested_job_roles || '—' }}</td>
           <td class="col-text">{{ s.work_experience ? 'Yes' : 'No' }}</td>
-          <td class="col-text">{{ s.state || '—' }}</td>
-
+          <td class="col-text">{{ s.total_work_experience || '—' }}</td>
+          <td class="col-text">{{ s.last_company_name || '—' }}</td>
+          <td class="col-text">{{ s.last_company_industry || '—' }}</td>
           <td>
-            <span class="status-chip"
-              [ngClass]="s.placement_status === 'PLACED' ? 'chip-placed' : 'chip-seeking'">
-              {{ s.placement_status }}
-            </span>
-          </td>
-
-          <td>
-            <button class="view-btn">View</button>
+            <button class="view-btn" (click)="viewStudentProgress(s.student_id)">View</button>
           </td>
 
         </tr>

@@ -1,0 +1,142 @@
+// ═══════════════════════════════════════════════
+//  test-score.scss
+// ═══════════════════════════════════════════════
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+$primary:      #2563eb;
+$primary-soft: #eff6ff;
+$success:      #16a34a;
+$success-soft: #f0fdf4;
+$danger:       #dc2626;
+$warning:      #d97706;
+$border:       #e5e7eb;
+$text-dark:    #0f172a;
+$text-muted:   #6b7280;
+$radius:       16px;
+
+// ── Full page centered ────────────────────────────
+.score-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 40px 24px;
+  font-family: 'DM Sans', sans-serif;
+  background: #f0f2f5;
+}
+
+// ── Card ─────────────────────────────────────────
+.score-card {
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 48px 40px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+// ── Icon ─────────────────────────────────────────
+.score-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  animation: bounceIn 0.5s 0.2s both;
+}
+
+@keyframes bounceIn {
+  0%   { transform: scale(0); }
+  70%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+// ── Title ────────────────────────────────────────
+.score-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: $text-dark;
+  margin: 0 0 6px;
+}
+
+.score-test-name {
+  font-size: 14px;
+  color: $text-muted;
+  margin: 0 0 28px;
+}
+
+// ── Score Circle ─────────────────────────────────
+.score-circle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  background: #f8fafc;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 20px 32px;
+  margin-bottom: 16px;
+}
+
+.score-num {
+  font-size: 48px;
+  font-weight: 800;
+  color: $text-dark;
+  font-variant-numeric: tabular-nums;
+}
+
+.score-sep {
+  font-size: 28px;
+  color: #cbd5e1;
+  font-weight: 300;
+}
+
+.score-total {
+  font-size: 24px;
+  font-weight: 600;
+  color: $text-muted;
+}
+
+// ── Percentage ───────────────────────────────────
+.score-percent {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 12px;
+
+  &.percent-high   { color: $success; }
+  &.percent-medium { color: $warning; }
+  &.percent-low    { color: $danger; }
+}
+
+// ── Message ──────────────────────────────────────
+.score-msg {
+  font-size: 14px;
+  color: $text-muted;
+  margin: 0 0 32px;
+  line-height: 1.6;
+}
+
+// ── Back Button ──────────────────────────────────
+.btn-back {
+  display: inline-block;
+  padding: 12px 28px;
+  background: $primary;
+  color: #fff;
+  border: none;
+  border-radius: $radius;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 150ms ease, box-shadow 150ms ease;
+
+  &:hover {
+    background: #1d4ed8;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+  }
+}

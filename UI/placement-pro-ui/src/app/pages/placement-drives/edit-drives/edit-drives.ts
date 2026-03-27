@@ -26,7 +26,7 @@ export class EditDrive implements OnInit {
   successMessage = '';
   errorMessage   = '';
 
-  private baseUrl = 'http://localhost:5050/api/drives';
+  private baseUrl = 'http://localhost:5050/api/placement-drives';
 
   constructor(
     private fb:     FormBuilder,

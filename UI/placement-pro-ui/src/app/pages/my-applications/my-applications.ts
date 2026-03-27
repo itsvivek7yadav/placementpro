@@ -32,9 +32,8 @@ export class MyApplications implements OnInit {
   loadApplications() {
     this.loading = true;
 
-    // ✅ Fix 1: was '/api/applications/my' — missing 'student/' prefix
     this.http.get<any>(
-      `${this.API}/student/applications/my`,
+      `${this.API}/applications/my`,
       { headers: this.getAuthHeaders() }
     ).subscribe({
       next:  (res) => { this.applications = res.applications; this.loading = false; },
@@ -51,9 +50,8 @@ export class MyApplications implements OnInit {
 
     this.withdrawingId = applicationId;
 
-    // ✅ Fix 2: was relative '/api/...' — must be full URL with auth header
     this.http.delete(
-      `${this.API}/student/applications/withdraw/${applicationId}`,
+      `${this.API}/applications/withdraw/${applicationId}`,
       { headers: this.getAuthHeaders() }
     ).subscribe({
       next: () => {

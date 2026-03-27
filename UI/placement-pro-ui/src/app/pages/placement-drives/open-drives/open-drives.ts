@@ -16,7 +16,7 @@ export class OpenDrives implements OnInit {
   loading    = true;
   closingId: number | null = null;
 
-  private baseUrl = 'http://localhost:5050/api/drives';
+  private baseUrl = 'http://localhost:5050/api/placement-drives'
 
   constructor(private http: HttpClient, private router: Router) {}
 

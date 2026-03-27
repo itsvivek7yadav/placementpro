@@ -1,0 +1,119 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Test Results</h1>
+      <p class="page-sub" *ngIf="testInfo">{{ testInfo.title }}</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="goBack()">← Back</button>
+      <button class="btn-export"
+        [disabled]="results.length === 0"
+        (click)="exportExcel()">
+        ⬇ Export Excel
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">Loading results...</div>
+
+  <ng-container *ngIf="!loading">
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-label">Total Attempts</span>
+        <span class="stat-val">{{ results.length }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Submitted</span>
+        <span class="stat-val">{{ submittedCount }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Avg Score</span>
+        <span class="stat-val">{{ avgScore }}%</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Top Score</span>
+        <span class="stat-val">{{ highScore }}</span>
+        <span class="stat-sub">marks</span>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div class="empty-state" *ngIf="results.length === 0">
+      No students have attempted this test yet.
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" *ngIf="results.length > 0">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Student</th>
+            <th>PRN</th>
+            <th>Program</th>
+            <th>Score</th>
+            <th>%</th>
+            <th>Status</th>
+            <th>Submitted At</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of results; let i = index">
+
+            <td>
+              <div class="rank-num" [ngClass]="getRankClass(i)">
+                {{ i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1 }}
+              </div>
+            </td>
+
+            <td>
+              <div class="student-cell">
+                <div class="student-avatar">
+                  {{ (r.student_name || '?').charAt(0) }}
+                </div>
+                <div>
+                  <div class="student-name">{{ r.student_name }}</div>
+                  <div class="student-email">{{ r.email }}</div>
+                </div>
+              </div>
+            </td>
+
+            <td>{{ r.prn }}</td>
+            <td>{{ r.program_name }} · {{ r.program_batch }}</td>
+
+            <td>
+              <div class="score-cell">
+                <span class="score-text">{{ r.score }} / {{ r.total_marks }}</span>
+                <div class="score-bar-wrap">
+                  <div class="score-bar"
+                    [ngClass]="getBarClass(r)"
+                    [style.width.%]="getPercent(r)">
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <td><strong>{{ getPercent(r) }}%</strong></td>
+
+            <td>
+              <span class="status-chip"
+                [ngClass]="r.status === 'SUBMITTED' ? 'chip-submitted' : 'chip-progress'">
+                {{ r.status }}
+              </span>
+            </td>
+
+            <td>
+              {{ r.submitted_at ? (r.submitted_at | date:'dd MMM, hh:mm a') : '—' }}
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </ng-container>
+
+</div>

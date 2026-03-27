@@ -1,0 +1,75 @@
+// src/app/pages/off-campus/saved-opportunities/saved-opportunities.scss
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600&family=Inter:wght@400;500;600&display=swap');
+
+.saved-wrap { padding: 22px 0 44px; font-family: 'Inter', sans-serif; }
+
+.saved-hdr {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding-bottom: 18px; border-bottom: 1px solid #f1f5f9; margin-bottom: 18px;
+  flex-wrap: wrap; gap: 12px;
+}
+.saved-title {
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; color: #0f172a;
+  display: flex; align-items: center; gap: 7px; margin: 0 0 3px;
+  mat-icon { color: #f59e0b; font-size: 20px; width: 20px; height: 20px; }
+}
+.saved-sub { font-size: 12px; color: #94a3b8; margin: 0; }
+.btn-refresh {
+  border-radius: 9px; font-family: 'Inter', sans-serif; font-size: 12px; height: 38px;
+  mat-icon { font-size: 15px; margin-right: 4px; }
+}
+
+.filter-pills { display: flex; gap: 7px; margin-bottom: 18px; flex-wrap: wrap; }
+.pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 13px; border: 1px solid #e2e8f0; border-radius: 20px;
+  background: transparent; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #64748b;
+  transition: all .15s;
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
+  &:hover:not(.active) { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+  &.active {
+    background: #1d4ed8; color: #fff; border-color: #1d4ed8;
+    .pill-count { background: rgba(255,255,255,.2); color: #fff; }
+  }
+}
+.pill-count {
+  background: #f1f5f9; color: #334155; font-size: 10px; font-weight: 700;
+  padding: 0 6px; border-radius: 10px;
+}
+
+.state-loading {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 64px 0; gap: 14px; color: #64748b; font-size: 13px;
+}
+.state-empty {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 56px 24px; text-align: center;
+  .state-icon { font-size: 52px; width: 52px; height: 52px; color: #cbd5e1; margin-bottom: 14px; }
+  h4 { font-family: 'Syne', sans-serif; font-size: 15px; color: #1e293b; margin: 0 0 6px; }
+  p  { font-size: 13px; color: #64748b; max-width: 340px; line-height: 1.6; margin: 0 0 18px; }
+}
+.empty-icon-box {
+  width: 68px; height: 68px; border-radius: 18px;
+  background: #fffbeb; border: 1.5px solid #fcd34d;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+  mat-icon { font-size: 36px; width: 36px; height: 36px; color: #f59e0b; }
+}
+.empty-hint {
+  display: flex; gap: 7px; padding: 10px 14px;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 9px; text-align: left; max-width: 340px;
+  mat-icon { font-size: 14px; width: 14px; height: 14px; color: #f59e0b; flex-shrink: 0; margin-top: 2px; }
+  span { font-size: 12px; color: #475569; line-height: 1.55; }
+}
+
+.saved-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+}
+.saved-card {
+  animation: fadeUp .3s ease both;
+  @for $i from 1 through 20 { &:nth-child(#{$i}) { animation-delay: #{($i - 1) * 0.04}s; } }
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+@media (max-width: 768px) { .saved-grid { grid-template-columns: 1fr; } }

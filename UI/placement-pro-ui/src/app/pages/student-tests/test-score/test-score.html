@@ -1,0 +1,35 @@
+<div class="score-page">
+  <div class="score-card">
+
+    <div class="score-icon">
+      {{ percentage >= 70 ? '🏆' : percentage >= 40 ? '👍' : '📚' }}
+    </div>
+
+    <h2 class="score-title">Test Submitted!</h2>
+    <p class="score-test-name">{{ title }}</p>
+
+    <div class="score-circle">
+      <span class="score-num">{{ score }}</span>
+      <span class="score-sep">/</span>
+      <span class="score-total">{{ total_marks }}</span>
+    </div>
+
+    <div class="score-percent"
+      [ngClass]="{
+        'percent-high':   percentage >= 70,
+        'percent-medium': percentage >= 40 && percentage < 70,
+        'percent-low':    percentage < 40
+      }">
+      {{ percentage }}%
+    </div>
+
+    <p class="score-msg">
+      {{ percentage >= 70 ? 'Excellent work! Keep it up.' :
+         percentage >= 40 ? 'Good effort! Keep practicing.' :
+                            'Keep practicing — you will improve!' }}
+    </p>
+
+    <button class="btn-back" (click)="goBack()">← Back to Tests</button>
+
+  </div>
+</div>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../auth/auth';
 
 @Component({
   selector: 'app-student-profile',
@@ -23,9 +24,12 @@ export class StudentProfile implements OnInit {
 
   newCvFile: File | null = null;
 
-  private API = 'http://localhost:5050/api/student/profile';
+  private API = 'http://localhost:5050/api/student-profile';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     this.loadProfile();
@@ -45,7 +49,9 @@ export class StudentProfile implements OnInit {
 
   loadProfile() {
     this.loading = true;
-    this.http.get<any>(this.API).subscribe({
+    this.http.get<any>(this.API, {
+      headers: this.authService.getAuthHeaders()
+    }).subscribe({
       next: (res) => {
         this.profile = res.profile;
         this.loading = false;
@@ -127,7 +133,9 @@ export class StudentProfile implements OnInit {
       formData.append('cv_link', this.profile.cv_link);
     }
 
-    this.http.put<any>(this.API, formData).subscribe({
+    this.http.put<any>(this.API, formData, {
+      headers: this.authService.getAuthHeaders()
+    }).subscribe({
       next: (res) => {
         this.successMessage = 'Profile updated successfully!';
         this.saving   = false;

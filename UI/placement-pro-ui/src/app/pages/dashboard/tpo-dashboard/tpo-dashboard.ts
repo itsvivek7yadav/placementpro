@@ -29,7 +29,7 @@ interface TodoItem {
   selector: 'app-tpo-dashboard',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './tpo-dashboard.html',   // ← correct path
+  templateUrl: './tpo-dashboard.html',
   styleUrls: ['./tpo-dashboard.scss']
 })
 export class TpoDashboard {
@@ -75,7 +75,8 @@ export class TpoDashboard {
 
   loadStats() {
     this.loading = true;
-    this.http.get<DashboardStats>('http://localhost:5050/api/tpo-dashboard/stats').subscribe({
+    // ✅ FIX: was /api/tpo-dashboard/stats → correct mount is /api/tpo/dashboard
+    this.http.get<DashboardStats>('http://localhost:5050/api/tpo/dashboard/stats').subscribe({
       next:  (res) => { this.stats = res; this.loading = false; },
       error: (err) => { console.error(err); this.loading = false; }
     });

@@ -1,0 +1,311 @@
+// src/app/pages/off-campus/opportunity-detail.component.scss
+
+.detail-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+  background: #f4f6fb;
+  min-height: 100vh;
+}
+
+// ── Nav ──────────────────────────────────────────────────
+.detail-nav { margin-bottom: 16px; }
+
+.btn-back {
+  color: #3949ab;
+  font-weight: 500;
+
+  mat-icon { margin-right: 4px; }
+}
+
+// ── Loading / Error ───────────────────────────────────────
+.state-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  gap: 16px;
+
+  p { color: #78909c; }
+}
+
+.state-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 24px;
+  gap: 12px;
+  text-align: center;
+
+  h3 { font-size: 1.2rem; color: #37474f; }
+}
+
+.state-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #cfd8dc;
+}
+
+// ── Hero Card ─────────────────────────────────────────────
+.hero-card {
+  border-radius: 14px;
+  margin-bottom: 24px;
+  border: 1px solid #e8eaf0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.hero-card__header {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 24px;
+  flex-wrap: wrap;
+}
+
+.hero-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #3949ab, #7986cb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &--event {
+    background: linear-gradient(135deg, #00897b, #4db6ac);
+  }
+
+  mat-icon {
+    color: #fff;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.hero-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a237e;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: #5c6bc0;
+  font-weight: 500;
+  margin: 0 0 14px;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background: #f0f2ff;
+  color: #3949ab;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+
+  &--green { background: #e8f5e9; color: #2e7d32; }
+  &--blue  { background: #e3f2fd; color: #1565c0; }
+}
+
+.hero-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    flex-direction: row;
+    width: 100%;
+  }
+}
+
+.btn-apply-hero {
+  min-width: 140px;
+  font-weight: 600;
+  border-radius: 8px;
+  mat-icon { margin-right: 4px; }
+}
+
+.btn-bookmark-hero {
+  border-radius: 8px;
+  font-weight: 600;
+
+  &.active {
+    color: #ffa000;
+    border-color: #ffa000;
+  }
+
+  mat-icon { margin-right: 4px; font-size: 18px; }
+}
+
+// ── Detail Grid ───────────────────────────────────────────
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+.detail-main,
+.detail-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// ── Cards ─────────────────────────────────────────────────
+.detail-card {
+  border-radius: 12px;
+  border: 1px solid #e8eaf0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+  mat-card-title  { font-size: 1rem; font-weight: 600; }
+  mat-card-content { padding-top: 8px; }
+}
+
+// Section icons
+.section-icon {
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+
+  &--purple { background: #ede7f6; color: #6a1b9a; }
+  &--blue   { background: #e3f2fd; color: #1565c0; }
+  &--teal   { background: #e0f2f1; color: #00695c; }
+  &--amber  { background: #fff8e1; color: #f57f17; }
+  &--grey   { background: #f5f5f5; color: #546e7a; }
+}
+
+// Summary text
+.summary-text {
+  font-size: 0.95rem;
+  color: #455a64;
+  line-height: 1.7;
+  margin: 0;
+  background: #f8f9ff;
+  padding: 14px;
+  border-radius: 8px;
+  border-left: 3px solid #7986cb;
+}
+
+// Full description
+.description-text {
+  font-size: 0.875rem;
+  color: #546e7a;
+  line-height: 1.8;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+// Skills
+.skills-set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-chip {
+  font-size: 0.78rem !important;
+  height: 26px !important;
+  background-color: #e8eaf6 !important;
+  color: #3949ab !important;
+}
+
+// Tip card
+.tip-card {
+  background: linear-gradient(to bottom right, #fffde7, #fff9c4) !important;
+  border-color: #ffe082 !important;
+}
+
+.tip-text {
+  font-size: 0.875rem;
+  color: #5d4037;
+  line-height: 1.6;
+  margin: 0;
+}
+
+// Source card
+.source-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f5f5f5;
+
+  &:last-child { border-bottom: none; }
+}
+
+.source-label {
+  font-size: 0.8rem;
+  color: #90a4ae;
+  font-weight: 500;
+}
+
+.source-value {
+  font-size: 0.85rem;
+  color: #37474f;
+  font-weight: 600;
+}
+
+.source-badge {
+  padding: 2px 10px;
+  background: #e8eaf6;
+  color: #3949ab;
+  border-radius: 12px;
+  text-transform: capitalize;
+}
+
+// ── Bottom CTA ────────────────────────────────────────────
+.detail-cta {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-apply-bottom {
+  min-width: 220px;
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  mat-icon { margin-right: 8px; }
+}
+
+// ── Responsive ────────────────────────────────────────────
+@media (max-width: 900px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .detail-page       { padding: 12px 16px 40px; }
+  .hero-title        { font-size: 1.2rem; }
+  .hero-card__header { padding: 16px; }
+}

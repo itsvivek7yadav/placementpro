@@ -1,0 +1,188 @@
+// ═══════════════════════════════════════════════
+//  my-tests.scss  (Student)
+// ═══════════════════════════════════════════════
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+$primary:      #2563eb;
+$primary-soft: #eff6ff;
+$success:      #16a34a;
+$success-soft: #f0fdf4;
+$danger:       #dc2626;
+$border:       #e5e7eb;
+$text-dark:    #0f172a;
+$text-muted:   #6b7280;
+$radius:       12px;
+
+// ── Page ─────────────────────────────────────────
+.page-container {
+  padding: 28px 24px 60px;
+  font-family: 'DM Sans', sans-serif;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0 0 4px;
+}
+
+.page-sub {
+  font-size: 13px;
+  color: $text-muted;
+  margin: 0;
+}
+
+// ── States ───────────────────────────────────────
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  color: $text-muted;
+  font-size: 15px;
+}
+
+// ── Test Grid ────────────────────────────────────
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+// ── Test Card ────────────────────────────────────
+.test-card {
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: box-shadow 180ms ease, transform 180ms ease;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.09);
+    transform: translateY(-2px);
+  }
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.test-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.test-desc {
+  font-size: 13px;
+  color: $text-muted;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ── Status Badge ─────────────────────────────────
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge-live      { background: $success-soft; color: $success; }
+.badge-closed    { background: #f1f5f9; color: #94a3b8; }
+.badge-submitted { background: $primary-soft; color: $primary; }
+
+// ── Test Meta ────────────────────────────────────
+.test-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  span {
+    font-size: 12px;
+    color: $text-muted;
+    background: #f8fafc;
+    border: 1px solid $border;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-weight: 500;
+  }
+}
+
+// ── Score Box ────────────────────────────────────
+.score-box {
+  background: $primary-soft;
+  border: 1px solid #bfdbfe;
+  border-radius: $radius;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.score-val {
+  font-size: 22px;
+  font-weight: 800;
+  color: $primary;
+}
+
+.score-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e40af;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+// ── Card Footer ──────────────────────────────────
+.card-footer {
+  margin-top: auto;
+}
+
+.btn-start {
+  width: 100%;
+  padding: 11px;
+  background: $primary;
+  color: #fff;
+  border: none;
+  border-radius: $radius;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease, box-shadow 150ms ease;
+
+  &:hover:not(:disabled) {
+    background: #1d4ed8;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+  }
+
+  &:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+}

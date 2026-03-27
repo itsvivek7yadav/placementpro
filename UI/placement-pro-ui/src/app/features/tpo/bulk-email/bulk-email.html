@@ -1,0 +1,224 @@
+<div class="campaign-container">
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- VIEW: CAMPAIGN LIST                                  -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <ng-container *ngIf="view === 'list'">
+
+    <div class="page-header">
+      <h2 class="title">📧 Bulk Email Campaigns</h2>
+      <button class="btn primary" (click)="openUploadForm()">
+        + New Campaign
+      </button>
+    </div>
+
+    <div class="loading-row" *ngIf="loadingCampaigns">Loading campaigns...</div>
+
+    <div class="empty-state" *ngIf="!loadingCampaigns && campaigns.length === 0">
+      <p>No campaigns yet. Click <strong>+ New Campaign</strong> to get started.</p>
+    </div>
+
+    <div class="campaign-list" *ngIf="!loadingCampaigns && campaigns.length > 0">
+
+      <div
+        class="campaign-card"
+        *ngFor="let c of campaigns"
+        (click)="openCampaign(c)"
+      >
+
+        <div class="campaign-card-left">
+          <div class="campaign-card-name">{{ c.campaign_name }}</div>
+          <div class="campaign-card-date">{{ c.created_at | date:'dd MMM yyyy, hh:mm a' }}</div>
+        </div>
+
+        <div class="campaign-card-stats">
+          <span class="mini-stat total">{{ c.total_recipients }} Total</span>
+          <span class="mini-stat sent">{{ c.sent_count }} Sent</span>
+          <span class="mini-stat pending">{{ c.pending_count }} Pending</span>
+          <span class="mini-stat failed">{{ c.failed_count }} Failed</span>
+        </div>
+
+        <div class="campaign-card-right">
+          <span class="status-badge" [ngClass]="c.status">
+            {{ c.status === 'in_progress' ? '⏳ In Progress' : '✅ Completed' }}
+          </span>
+          <span class="arrow">›</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </ng-container>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- VIEW: UPLOAD FORM                                    -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <ng-container *ngIf="view === 'upload'">
+
+    <div class="page-header">
+      <button class="btn back" (click)="goToList()">← Back</button>
+      <h2 class="title">New Campaign</h2>
+    </div>
+
+    <div class="card">
+
+      <div class="form-grid">
+
+        <div class="file-upload-wrapper">
+          <label class="file-label">Upload CSV File</label>
+          <input
+            type="file"
+            accept=".csv"
+            (change)="selectFile($event)"
+            class="input-file"
+          />
+          <span class="file-hint">CSV must have columns: email, name, company</span>
+        </div>
+
+        <input
+          placeholder="Campaign Name"
+          [(ngModel)]="campaignName"
+          class="input"
+        />
+
+        <input
+          placeholder="Email Subject"
+          [(ngModel)]="subject"
+          class="input"
+        />
+
+        <textarea
+          rows="6"
+          placeholder="Write your email body..."
+          [(ngModel)]="body"
+          class="textarea"
+        ></textarea>
+
+      </div>
+
+      <div class="error-banner" *ngIf="uploadError">
+        ⚠️ {{ uploadError }}
+      </div>
+
+      <div class="actions">
+        <button
+          class="btn primary"
+          (click)="uploadCampaign()"
+          [disabled]="uploading"
+        >
+          {{ uploading ? 'Uploading...' : '📤 Upload & Start Campaign' }}
+        </button>
+        <button class="btn secondary" (click)="goToList()">Cancel</button>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- VIEW: CAMPAIGN DETAIL                                -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <ng-container *ngIf="view === 'detail' && selectedCampaign">
+
+    <div class="page-header">
+      <button class="btn back" (click)="goToList()">← Back</button>
+      <div class="detail-title-block">
+        <h2 class="title">{{ selectedCampaign.campaign_name }}</h2>
+        <span class="status-badge" [ngClass]="stats.status">
+          {{ isInProgress ? '⏳ In Progress' : '✅ Completed' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats">
+
+      <div class="stat-card total">
+        <h3>Total</h3>
+        <p>{{ stats.total }}</p>
+      </div>
+
+      <div class="stat-card pending">
+        <h3>Pending</h3>
+        <p>{{ stats.pending }}</p>
+      </div>
+
+      <div class="stat-card sent">
+        <h3>Sent</h3>
+        <p>{{ stats.sent }}</p>
+      </div>
+
+      <div class="stat-card failed">
+        <h3>Failed</h3>
+        <p>{{ stats.failed }}</p>
+      </div>
+
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-label">Progress: {{ progressPercent }}%</div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progressPercent"></div>
+      </div>
+    </div>
+
+    <!-- View All Button -->
+    <div class="view-all-wrap">
+      <button class="btn secondary" (click)="toggleEmailList()">
+        {{ showEmails ? '▲ Hide Email List' : '▼ View All Emails' }}
+      </button>
+    </div>
+
+    <!-- Email Table -->
+    <div class="table-container" *ngIf="showEmails">
+
+      <div class="loading-row" *ngIf="loadingEmails">Loading emails...</div>
+
+      <table *ngIf="!loadingEmails">
+
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Company</th>
+            <th>Status</th>
+            <th>Sent At</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let e of emails; let i = index">
+            <td class="row-num">{{ i + 1 }}</td>
+            <td>{{ e.email }}</td>
+            <td>{{ e.recruiter_name || '—' }}</td>
+            <td>{{ e.company_name || '—' }}</td>
+            <td>
+              <span class="status-pill" [ngClass]="e.status">
+                {{ e.status }}
+              </span>
+            </td>
+            <td>{{ e.sent_at ? (e.sent_at | date:'dd MMM yyyy, hh:mm a') : '—' }}</td>
+            <td class="error-cell">{{ e.response_message || '—' }}</td>
+          </tr>
+
+          <tr *ngIf="emails.length === 0">
+            <td colspan="7" class="empty-row">No emails found.</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </ng-container>
+
+</div>

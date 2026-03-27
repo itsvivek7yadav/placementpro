@@ -1,0 +1,117 @@
+<div class="resume" id="resume-preview">
+  <div class="resume-header">
+    <div>
+      <div class="eyebrow">Professional Curriculum Vitae</div>
+      <h1>{{ fullName }}</h1>
+      <p *ngIf="headline" class="headline">{{ headline }}</p>
+    </div>
+  </div>
+
+  <div class="contact-strip">
+    <span *ngIf="student?.email">{{ student?.email }}</span>
+    <span *ngIf="student?.phone">{{ student?.phone }}</span>
+    <span *ngIf="location">{{ location }}</span>
+  </div>
+
+  <div class="resume-body">
+    <section *ngIf="resume?.personalSummary" class="resume-section">
+      <div class="resume-section-title">Professional Summary</div>
+      <p class="resume-summary">{{ resume?.personalSummary }}</p>
+    </section>
+
+    <section *ngIf="student?.collegeName" class="resume-section">
+      <div class="resume-section-title">Education</div>
+      <article class="resume-item">
+        <div class="resume-item-header">
+          <div>
+            <h3>{{ student?.degree }}</h3>
+            <div class="resume-item-sub">{{ student?.branch }}<span *ngIf="student?.branch && student?.collegeName">, </span>{{ student?.collegeName }}</div>
+          </div>
+          <span class="date-range" *ngIf="student?.graduationYear">Class of {{ student?.graduationYear }}</span>
+        </div>
+        <div *ngIf="student?.cgpa" class="resume-item-desc">CGPA: {{ student?.cgpa }}/10</div>
+      </article>
+    </section>
+
+    <section *ngIf="resume?.experience?.length" class="resume-section">
+      <div class="resume-section-title">Experience</div>
+
+      <article *ngFor="let exp of resume?.experience" class="resume-item">
+        <div class="resume-item-header">
+          <div>
+            <h3>{{ exp.role || 'Role Title' }}</h3>
+            <div class="resume-item-sub">{{ exp.company }}</div>
+          </div>
+          <span class="date-range">{{ formatRange(exp.startDate, exp.endDate, exp.currentlyWorking) }}</span>
+        </div>
+
+        <ul *ngIf="getBulletLines(exp.description).length" class="resume-bullets">
+          <li *ngFor="let line of getBulletLines(exp.description)">{{ line }}</li>
+        </ul>
+      </article>
+    </section>
+
+    <section *ngIf="resume?.projects?.length" class="resume-section">
+      <div class="resume-section-title">Projects</div>
+
+      <article *ngFor="let project of resume?.projects" class="resume-item">
+        <div class="resume-item-header">
+          <div>
+            <h3>{{ project.title || 'Project Title' }}</h3>
+            <div *ngIf="project.link" class="project-link">{{ project.link }}</div>
+          </div>
+        </div>
+
+        <ul *ngIf="getBulletLines(project.description).length" class="resume-bullets">
+          <li *ngFor="let line of getBulletLines(project.description)">{{ line }}</li>
+        </ul>
+
+        <div *ngIf="getTechTags(project.technologies).length" class="tech-tags">
+          <span *ngFor="let t of getTechTags(project.technologies)">{{ t }}</span>
+        </div>
+      </article>
+    </section>
+
+    <section *ngIf="resume?.skills?.technical?.length || resume?.skills?.soft?.length" class="resume-section">
+      <div class="resume-section-title">Skills</div>
+      <div *ngIf="resume?.skills?.technical?.length" class="skills-group">
+        <div class="skills-label">Technical</div>
+        <div class="skill-chips">
+          <span *ngFor="let skill of resume?.skills?.technical">{{ skill }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="resume?.skills?.soft?.length" class="skills-group">
+        <div class="skills-label">Soft</div>
+        <div class="skill-chips">
+          <span *ngFor="let skill of resume?.skills?.soft">{{ skill }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section *ngIf="resume?.certifications?.length" class="resume-section">
+      <div class="resume-section-title">Certifications</div>
+      <div *ngFor="let cert of resume?.certifications" class="cert-item">
+        <div class="cert-name">{{ cert.name }}</div>
+        <div *ngIf="cert.issuer" class="cert-issuer">{{ cert.issuer }}</div>
+        <div *ngIf="cert.issueDate" class="cert-date">{{ formatMonthYear(cert.issueDate) }}</div>
+      </div>
+    </section>
+
+    <section *ngIf="resume?.languages?.length" class="resume-section">
+      <div class="resume-section-title">Languages</div>
+      <div *ngFor="let language of resume?.languages" class="language-item">
+        <span>{{ language.language }}</span>
+        <strong>{{ language.proficiency }}</strong>
+      </div>
+    </section>
+
+    <section *ngIf="resume?.achievements?.length" class="resume-section">
+      <div class="resume-section-title">Achievements</div>
+      <article *ngFor="let achievement of resume?.achievements" class="resume-item compact-item">
+        <h3>{{ achievement.title }}</h3>
+        <p *ngIf="achievement.description" class="resume-item-desc">{{ achievement.description }}</p>
+      </article>
+    </section>
+  </div>
+</div>

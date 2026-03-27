@@ -1,0 +1,368 @@
+// ═══════════════════════════════════════════════
+//  test-attempt.scss
+// ═══════════════════════════════════════════════
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+$primary:      #2563eb;
+$primary-dark: #1d4ed8;
+$primary-soft: #eff6ff;
+$success:      #16a34a;
+$success-soft: #f0fdf4;
+$danger:       #dc2626;
+$danger-soft:  #fef2f2;
+$border:       #e5e7eb;
+$text-dark:    #0f172a;
+$text-muted:   #6b7280;
+$radius:       10px;
+
+// ── Host fills full viewport ──────────────────────
+:host {
+  display: block;
+  height: 100%;
+}
+
+// ── Attempt Page Layout ───────────────────────────
+.attempt-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  background: #f0f2f5;
+  overflow: hidden;
+}
+
+// ── Top Bar ──────────────────────────────────────
+.attempt-topbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #0f172a;
+  color: #fff;
+  padding: 0 24px;
+  height: 56px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.test-title-bar {
+  font-size: 15px;
+  font-weight: 700;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timer {
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: rgba(255,255,255,0.1);
+  padding: 6px 16px;
+  border-radius: 8px;
+  letter-spacing: 2px;
+  transition: background 300ms ease, color 300ms ease;
+
+  &.timer-low {
+    background: $danger;
+    color: #fff;
+    animation: pulse 1s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.75; }
+}
+
+.progress-bar-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+}
+
+// ── Body ─────────────────────────────────────────
+.attempt-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+// ── Question Navigator (Left Panel) ──────────────
+.question-nav {
+  width: 220px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid $border;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+
+.nav-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: $text-muted;
+  margin-bottom: 12px;
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.nav-btn {
+  aspect-ratio: 1;
+  border: 1.5px solid $border;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover { border-color: $primary; color: $primary; }
+
+  &.nav-current {
+    background: $primary;
+    border-color: $primary;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+  }
+
+  &.nav-answered:not(.nav-current) {
+    background: $success-soft;
+    border-color: #86efac;
+    color: $success;
+  }
+}
+
+.nav-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid $border;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: $text-muted;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+
+  &.dot-answered   { background: $success-soft; border: 1.5px solid #86efac; }
+  &.dot-current    { background: $primary; }
+  &.dot-unanswered { background: #fff; border: 1.5px solid $border; }
+}
+
+// ── Question Panel (Right) ────────────────────────
+.question-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 28px 32px;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+
+.q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.q-number {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-muted;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.q-marks {
+  font-size: 13px;
+  font-weight: 700;
+  color: $primary;
+  background: $primary-soft;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.q-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: $text-dark;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  padding: 20px 24px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+// ── Options ──────────────────────────────────────
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #fff;
+  border: 2px solid $border;
+  border-radius: $radius;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+
+  &:hover {
+    border-color: #93c5fd;
+    background: #fafbff;
+  }
+
+  &.option-selected {
+    border-color: $primary;
+    background: $primary-soft;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+
+    .option-label {
+      background: $primary;
+      color: #fff;
+    }
+
+    .option-text { color: $primary; font-weight: 600; }
+  }
+}
+
+.option-label {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: $text-muted;
+  flex-shrink: 0;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.option-text {
+  font-size: 14px;
+  color: $text-dark;
+  line-height: 1.4;
+  transition: color 150ms ease;
+}
+
+// ── Navigation Buttons ───────────────────────────
+.q-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid $border;
+}
+
+.btn-nav {
+  padding: 10px 20px;
+  background: #fff;
+  color: $text-dark;
+  border: 1.5px solid $border;
+  border-radius: $radius;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: $primary;
+    color: $primary;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.btn-submit {
+  padding: 11px 28px;
+  background: $success;
+  color: #fff;
+  border: none;
+  border-radius: $radius;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease, box-shadow 150ms ease;
+
+  &:hover:not(:disabled) {
+    background: #15803d;
+    box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+  }
+
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+// ── Loading / Error Pages ─────────────────────────
+.loading-page,
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  font-family: 'DM Sans', sans-serif;
+  color: $text-muted;
+  font-size: 15px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e7eb;
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,45 +1,99 @@
+/**
+ * TPO Sidebar Component Styles
+ * 
+ * Comprehensive styling for the TPO admin sidebar navigation.
+ * Features:
+ * - Dark theme with blue accent color (differentiated from Student sidebar)
+ * - Collapsible submenu for Placement Drives
+ * - Responsive design with proper accessibility
+ * - Smooth transitions and hover states
+ * 
+ * Design Tokens:
+ * - Primary Accent: Blue (#3b82f6)
+ * - Text Light: #f1f5f9
+ * - Background Dark: #0f172a
+ */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
-// ── Shared tokens (same as topbar) ─────────────────────────
+// ===== DESIGN TOKENS =====
+$color-accent: #3b82f6;
+$color-accent-dark: #2563eb;
+$color-accent-light: #93c5fd;
+$color-bg-dark: #0f172a;
+$color-text-primary: #f1f5f9;
+$color-text-secondary: #94a3b8;
+$color-text-muted: #475569;
+$color-text-accent: #e2e8f0;
+$color-border: rgba(255, 255, 255, 0.07);
+$color-border-light: rgba(255, 255, 255, 0.06);
+$color-hover-bg: rgba(255, 255, 255, 0.05);
+$color-active-bg: rgba(59, 130, 246, 0.12);
+$color-submenu-active: rgba(59, 130, 246, 0.08);
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$transition-fast: all 0.15s ease;
+$transition-normal: all 0.2s ease;
+
+// ===== HOST & ROOT =====
 :host {
   display: block;
-  height: calc(100vh - 60px); // account for fixed topbar
+  height: calc(100vh - 60px); // Account for fixed topbar
 }
 
+// ===== SIDEBAR CONTAINER =====
 .sidebar {
   width: 240px;
   height: 100%;
-  background: #0f172a;
-  border-right: 1px solid rgba(255,255,255,0.07);
+  background: $color-bg-dark;
+  border-right: 1px solid $color-border;
   display: flex;
   flex-direction: column;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family;
   position: sticky;
-  top: 60px; // stick below the topbar
+  top: 60px; // Stick below the topbar
   overflow-y: auto;
   overflow-x: hidden;
   flex-shrink: 0;
 
   // Custom scrollbar
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
 }
 
-// ── Header ─────────────────────────────────────────────────
+// ===== HEADER SECTION =====
 .sidebar-header {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 20px 16px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid $color-border-light;
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .institute-badge {
   width: 34px;
   height: 34px;
-  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  min-width: 34px;
+  background: linear-gradient(135deg, $color-accent, $color-accent-dark);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -48,30 +102,39 @@
   font-weight: 700;
   color: white;
   flex-shrink: 0;
+  user-select: none;
   letter-spacing: -0.5px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 
 .institute-info {
   display: flex;
   flex-direction: column;
   gap: 1px;
+  min-width: 0; // Ensure text truncation works
 }
 
 .institute-name {
   font-size: 14px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: $color-text-primary;
   letter-spacing: 0.2px;
-  line-height: 1;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .institute-sub {
   font-size: 11px;
-  color: #475569;
-  line-height: 1;
+  color: $color-text-muted;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-// ── Nav label ──────────────────────────────────────────────
+// ===== NAV LABEL =====
 .nav-label {
   font-size: 10.5px;
   font-weight: 600;
@@ -79,14 +142,18 @@
   text-transform: uppercase;
   letter-spacing: 0.9px;
   padding: 10px 18px 6px;
+  user-select: none;
 }
 
-// ── Menu ───────────────────────────────────────────────────
+// ===== MENU =====
 .menu {
   list-style: none;
   padding: 0 8px;
   margin: 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .menu-item {
@@ -99,24 +166,43 @@
   font-size: 13.5px;
   font-weight: 400;
   color: #e8ebee;
-  transition: all 0.15s ease;
+  transition: $transition-fast;
   margin-bottom: 1px;
   position: relative;
   user-select: none;
+  text-decoration: none;
+  list-style: none;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: inherit;
 
   &:hover {
-    background: rgba(255,255,255,0.05);
-    color: #e2e8f0;
+    background: $color-hover-bg;
+    color: $color-text-accent;
 
-    .menu-icon { color: #3b82f6; }
+    .menu-icon {
+      color: $color-accent;
+    }
+  }
+
+  &:active {
+    background: rgba(59, 130, 246, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+    outline-offset: -2px;
   }
 
   &.active {
-    background: rgba(59,130,246,0.12);
-    color: #93c5fd;
+    background: $color-active-bg;
+    color: $color-accent-light;
     font-weight: 500;
 
-    .menu-icon { color: #3b82f6; }
+    .menu-icon {
+      color: $color-accent;
+    }
 
     &::before {
       content: '';
@@ -126,54 +212,74 @@
       transform: translateY(-50%);
       width: 3px;
       height: 60%;
-      background: #3b82f6;
+      background: $color-accent;
       border-radius: 0 3px 3px 0;
     }
   }
 
-  &.parent span {
-    font-weight: 500;
-    color: #cbd5e1;
-    flex: 1;
-  }
+  &.parent {
+    span {
+      font-weight: 500;
+      color: #cbd5e1;
+      flex: 1;
+    }
 
-  &.parent:hover span { color: #f1f5f9; }
+    &:hover span {
+      color: $color-text-primary;
+    }
+  }
 }
 
 .menu-icon {
   width: 18px;
   height: 18px;
+  min-width: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #475569;
+  color: $color-text-muted;
   flex-shrink: 0;
-  transition: color 0.15s;
+  transition: color 0.15s ease;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .chevron {
   margin-left: auto;
-  color: #475569;
+  color: $color-text-muted;
   display: flex;
   align-items: center;
+  justify-content: center;
   transition: transform 0.2s ease;
+  flex-shrink: 0;
 
-  &.rotated { transform: rotate(180deg); }
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  &.rotated {
+    transform: rotate(180deg);
+  }
 }
 
-// ── Submenu ────────────────────────────────────────────────
+// ===== SUBMENU =====
 .submenu {
   list-style: none;
   padding: 0 8px 0 16px;
   margin: 0;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.25s ease, opacity 0.2s ease;
+  transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
   opacity: 0;
 
   &.expanded {
-    max-height: 200px;
+    max-height: 300px;
     opacity: 1;
+    margin-bottom: 4px;
   }
 }
 
@@ -185,22 +291,43 @@
   border-radius: 7px;
   cursor: pointer;
   font-size: 13px;
+  font-weight: 400;
   color: #64748b;
-  transition: all 0.15s ease;
+  transition: $transition-fast;
   margin-bottom: 1px;
+  position: relative;
+  text-decoration: none;
+  list-style: none;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: inherit;
 
   &:hover {
-    background: rgba(255,255,255,0.04);
-    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.04);
+    color: $color-text-secondary;
 
-    .submenu-dot { background: #3b82f6; }
+    .submenu-dot {
+      background: $color-accent;
+    }
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+    outline-offset: -2px;
   }
 
   &.active {
-    color: #93c5fd;
-    background: rgba(59,130,246,0.08);
+    color: $color-accent-light;
+    background: $color-submenu-active;
 
-    .submenu-dot { background: #3b82f6; }
+    .submenu-dot {
+      background: $color-accent;
+    }
   }
 }
 
@@ -210,14 +337,15 @@
   border-radius: 50%;
   background: #334155;
   flex-shrink: 0;
-  transition: background 0.15s;
+  transition: background 0.15s ease;
 }
 
-// ── Footer / Logout ────────────────────────────────────────
+// ===== FOOTER SECTION =====
 .sidebar-footer {
   padding: 12px 8px 16px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid $color-border-light;
   margin-top: auto;
+  flex-shrink: 0;
 }
 
 .logout-btn {
@@ -230,15 +358,78 @@
   border: none;
   background: transparent;
   color: #64748b;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family;
   font-size: 13.5px;
   font-weight: 400;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: $transition-fast;
   text-align: left;
+  user-select: none;
+
+  svg {
+    flex-shrink: 0;
+  }
 
   &:hover {
-    background: rgba(239,68,68,0.1);
+    background: rgba(239, 68, 68, 0.1);
     color: #f87171;
   }
+
+  &:active {
+    background: rgba(239, 68, 68, 0.15);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: -2px;
+  }
+}
+
+// ===== RESPONSIVE DESIGN =====
+@media (max-width: 1024px) {
+  :host {
+    height: calc(100vh - 50px); // Adjust for smaller topbar
+  }
+
+  .sidebar {
+    width: 220px;
+    top: 50px;
+  }
+
+  .institute-name {
+    max-width: 130px;
+  }
+
+  .menu-item span {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  :host {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    border-right: none;
+  }
+}
+
+// ===== ACCESSIBILITY =====
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ===== FOCUS MANAGEMENT FOR KEYBOARD NAVIGATION =====
+@media (prefers-color-scheme: dark) {
+  // Already implemented as dark theme
 }

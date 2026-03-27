@@ -7,8 +7,9 @@ import { HttpClient } from '@angular/common/http';
 
 export interface TpoDashboardStats {
   totalStudents: number;
-  placedStudents: number;
+  totalPlaced: number;
   totalDrives: number;
+  activeDrives: number;
   totalApplications: number;
 }
 
@@ -32,7 +33,7 @@ export class DashboardService {
   // 🔹 TPO Dashboard
   getTpoStats() {
     return this.http.get<TpoDashboardStats>(
-      `${this.baseUrl}/tpo-dashboard/stats`
+      `${this.baseUrl}/tpo/dashboard/stats`
     );
   }
 

@@ -1,0 +1,11 @@
+.DS_Store
+node_modules/
+dist/
+coverage/
+.angular/
+.cache/
+uploads/
+*.log
+.env
+placementpro-backend/uploads/
+placementpro-backend/test-emails.csv

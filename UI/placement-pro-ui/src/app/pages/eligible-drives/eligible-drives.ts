@@ -25,7 +25,7 @@ export class EligibleDrives implements OnInit {
 
   loadDrives() {
     this.loading = true;
-    this.http.get<any>(`${this.API}/drives/eligible`).subscribe({
+    this.http.get<any>(`${this.API}/student-drives/eligible`).subscribe({
       next: (res) => {
         this.drives = res.drives;
         this.loading = false;
@@ -52,7 +52,7 @@ applyNow(driveId: number) {
   };
 
   this.http.post(
-    'http://localhost:5050/api/student/applications/apply',
+    'http://localhost:5050/api/applications/apply',
     payload,
     {
       headers: {

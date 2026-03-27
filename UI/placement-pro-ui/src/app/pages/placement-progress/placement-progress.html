@@ -1,0 +1,312 @@
+<div class="progress-page" *ngIf="!loading && progress as data; else loadingBlock">
+  <div class="page-head">
+    <div class="page-copy">
+      <div class="eyebrow">{{ isTpoView ? 'Student Progress View' : 'Performance Snapshot' }}</div>
+      <h1>{{ headerTitle }}</h1>
+      <p>{{ headerSubtitle }}</p>
+    </div>
+
+    <div class="head-actions">
+      <button *ngIf="isTpoView" class="ghost-btn" (click)="goBackToStudents()">Back to Master Data</button>
+      <span class="status-pill" [ngClass]="data.student.placement_status === 'PLACED' ? 'placed' : 'seeking'">
+        {{ data.student.placement_status === 'PLACED' ? 'Placed' : 'Placement Seeking' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="banner-grid">
+    <div class="profile-card card">
+      <div class="profile-main">
+        <div class="avatar">{{ data.student.name.charAt(0) }}</div>
+        <div class="profile-copy">
+          <h2>{{ data.student.name }}</h2>
+          <p>{{ data.student.program_name }} • {{ data.student.program_batch }}</p>
+        </div>
+      </div>
+
+      <div class="meta-grid">
+        <div>
+          <span class="meta-label">PRN</span>
+          <strong>{{ data.student.prn || '—' }}</strong>
+        </div>
+        <div>
+          <span class="meta-label">CGPA</span>
+          <strong>{{ data.student.cgpa || '—' }}</strong>
+        </div>
+        <div>
+          <span class="meta-label">College Email</span>
+          <strong>{{ data.student.college_email || '—' }}</strong>
+        </div>
+        <div>
+          <span class="meta-label">Contact</span>
+          <strong>{{ data.student.phone_number || data.student.personal_email || '—' }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="card tpo-card" *ngIf="isTpoView">
+      <div class="section-title">Placement Control</div>
+      <p class="muted">Update the student placement outcome directly from the progress view.</p>
+      <div class="control-row">
+        <select [(ngModel)]="selectedPlacementStatus">
+          <option value="NOT_PLACED">Not Placed</option>
+          <option value="PLACED">Placed</option>
+        </select>
+        <button class="primary-btn" (click)="savePlacementStatus()" [disabled]="savingPlacement">
+          {{ savingPlacement ? 'Saving...' : 'Save Status' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="message success" *ngIf="successMessage">{{ successMessage }}</div>
+  <div class="message error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div class="stats-grid">
+    <div class="stat-card card">
+      <span>Drive Registrations</span>
+      <strong>{{ data.overview.totalApplications }}</strong>
+      <small>{{ data.overview.totalCompaniesRegistered }} distinct companies</small>
+    </div>
+    <div class="stat-card card">
+      <span>Drive Outcomes</span>
+      <strong>{{ data.overview.selectedCount }}</strong>
+      <small>{{ data.overview.pendingCount }} pending, {{ data.overview.rejectedCount }} rejected</small>
+    </div>
+    <div class="stat-card card">
+      <span>Mock Tests Completed</span>
+      <strong>{{ data.overview.submittedTests }}/{{ data.overview.totalPublishedTests }}</strong>
+      <small>{{ data.overview.attemptRate }}% completion rate</small>
+    </div>
+    <div class="stat-card card">
+      <span>Average Test Score</span>
+      <strong>{{ data.overview.averageTestPercentage }}%</strong>
+      <small>Best score {{ data.overview.bestTestPercentage }}%</small>
+    </div>
+  </div>
+
+  <div class="insights-grid">
+    <div class="insight-card card" *ngFor="let insight of data.insights" [ngClass]="insight.tone">
+      <span>{{ insight.label }}</span>
+      <strong>{{ insight.value }}</strong>
+    </div>
+  </div>
+
+  <div class="visual-grid">
+    <section class="card visual-card">
+      <div class="section-head">
+        <div class="section-copy">
+          <h3>Drive Outcome Snapshot</h3>
+          <p>A quick visual of current application outcomes.</p>
+        </div>
+      </div>
+
+      <div class="outcome-visual">
+        <div class="donut-shell">
+          <div class="donut-chart" [style.background]="driveOutcomeBackground">
+            <div class="donut-hole">
+              <strong>{{ data.overview.totalApplications }}</strong>
+              <span>Total Drives</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-list">
+          <div class="legend-row" *ngFor="let item of driveOutcomeChart">
+            <span class="legend-swatch" [style.background]="item.color"></span>
+            <span class="legend-label">{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card visual-card">
+      <div class="section-head">
+        <div class="section-copy">
+          <h3>Performance Graph</h3>
+          <p>Mock test readiness and score trend in one place.</p>
+        </div>
+      </div>
+
+      <div class="metric-bars">
+        <div class="metric-row">
+          <div class="metric-copy">
+            <span>Drive engagement</span>
+            <strong>{{ data.overview.totalApplications }} registrations</strong>
+          </div>
+          <div class="metric-track">
+            <div class="metric-fill navy" [style.width.%]="applicationEngagementWidth"></div>
+          </div>
+        </div>
+
+        <div class="metric-row">
+          <div class="metric-copy">
+            <span>Test completion</span>
+            <strong>{{ data.overview.attemptRate }}%</strong>
+          </div>
+          <div class="metric-track">
+            <div class="metric-fill teal" [style.width.%]="submittedTestWidth"></div>
+          </div>
+        </div>
+
+        <div class="metric-row">
+          <div class="metric-copy">
+            <span>Average score</span>
+            <strong>{{ data.overview.averageTestPercentage }}%</strong>
+          </div>
+          <div class="metric-track">
+            <div class="metric-fill gold" [style.width.%]="averageScoreWidth"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="top-test-bars" *ngIf="topTestBars.length > 0">
+        <div class="bar-head">
+          <span>Top test scores</span>
+          <small>Best recent submitted attempts</small>
+        </div>
+
+        <div class="bar-row" *ngFor="let test of topTestBars">
+          <div class="bar-label">{{ test.title }}</div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="test.percentage"></div>
+          </div>
+          <div class="bar-value">{{ test.percentage }}%</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="content-grid">
+    <section class="card">
+      <div class="section-head collapsible-head">
+        <div class="section-copy">
+          <h3>Company Drive Activity</h3>
+          <p>{{ data.overview.totalApplications }} registration{{ data.overview.totalApplications === 1 ? '' : 's' }} tracked</p>
+        </div>
+        <button class="collapse-btn" (click)="toggleApplications()">
+          {{ showApplications ? 'Hide Details' : 'View Details' }}
+        </button>
+      </div>
+
+      <div class="mini-summary">
+        <div class="mini-pill">
+          <span>Companies</span>
+          <strong>{{ data.overview.totalCompaniesRegistered }}</strong>
+        </div>
+        <div class="mini-pill">
+          <span>Selected</span>
+          <strong>{{ data.overview.selectedCount }}</strong>
+        </div>
+        <div class="mini-pill">
+          <span>Pending</span>
+          <strong>{{ data.overview.pendingCount }}</strong>
+        </div>
+      </div>
+
+      <div class="empty-block" *ngIf="showApplications && applicationList.length === 0">
+        No drive applications yet.
+      </div>
+
+      <div class="table-shell" *ngIf="showApplications && applicationList.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Role</th>
+              <th>Result</th>
+              <th>Drive</th>
+              <th>Applied On</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let app of applicationList">
+              <td>
+                <div class="table-title">{{ app.company_name }}</div>
+                <div class="table-sub">{{ app.job_type || 'Role not specified' }}</div>
+              </td>
+              <td>{{ app.job_role || '—' }}</td>
+              <td>
+                <span class="result-pill"
+                  [ngClass]="{
+                    'selected': app.result === 'SELECTED',
+                    'rejected': app.result === 'REJECTED',
+                    'pending': app.result === 'PENDING'
+                  }">
+                  {{ app.result }}
+                </span>
+              </td>
+              <td>{{ app.drive_status }}</td>
+              <td>{{ app.applied_at | date:'mediumDate' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head collapsible-head">
+        <div class="section-copy">
+          <h3>Mock Test Performance</h3>
+          <p>{{ data.overview.submittedTests }} completed out of {{ data.overview.totalPublishedTests }} eligible tests</p>
+        </div>
+        <button class="collapse-btn" (click)="toggleTests()">
+          {{ showTests ? 'Hide Details' : 'View Details' }}
+        </button>
+      </div>
+
+      <div class="mini-summary">
+        <div class="mini-pill">
+          <span>Published</span>
+          <strong>{{ data.overview.totalPublishedTests }}</strong>
+        </div>
+        <div class="mini-pill">
+          <span>Submitted</span>
+          <strong>{{ data.overview.submittedTests }}</strong>
+        </div>
+        <div class="mini-pill">
+          <span>Average</span>
+          <strong>{{ data.overview.averageTestPercentage }}%</strong>
+        </div>
+      </div>
+
+      <div class="empty-block" *ngIf="showTests && testList.length === 0">
+        No mock tests published yet for this student.
+      </div>
+
+      <div class="test-list" *ngIf="showTests && testList.length > 0">
+        <div class="test-card" *ngFor="let test of testList">
+          <div class="test-head">
+            <div>
+              <h4>{{ test.title }}</h4>
+              <p>{{ test.question_count }} questions • {{ test.duration_mins }} mins</p>
+            </div>
+            <span class="test-status" [ngClass]="test.attempt_status ? 'done' : 'todo'">
+              {{ test.attempt_status ? test.attempt_status : 'Not Attempted' }}
+            </span>
+          </div>
+
+          <div class="test-metrics">
+            <div>
+              <span>Score</span>
+              <strong>{{ test.my_score }}/{{ test.my_total_marks || 0 }}</strong>
+            </div>
+            <div>
+              <span>Percentage</span>
+              <strong>{{ test.percentage }}%</strong>
+            </div>
+            <div>
+              <span>Window</span>
+              <strong>{{ test.start_time | date:'mediumDate' }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<ng-template #loadingBlock>
+  <div class="loading-state" *ngIf="loading">Loading placement progress...</div>
+</ng-template>

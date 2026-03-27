@@ -1,0 +1,73 @@
+<div class="saved-container">
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="hasError && !isLoading" class="error">
+    <p>Failed to load saved items</p>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!isLoading && !hasError && items.length === 0" class="empty">
+    <p>No saved opportunities yet</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading && items.length > 0">
+
+    <!-- Filters -->
+    <div class="filters">
+      <button mat-button (click)="setFilter('all')">
+        All ({{ items.length }})
+      </button>
+
+      <button mat-button (click)="setFilter('job')">
+        Jobs ({{ jobCount }})
+      </button>
+
+      <button mat-button (click)="setFilter('event')">
+        Events ({{ eventCount }})
+      </button>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards">
+
+      <div *ngFor="let item of filtered; trackBy: trackById" class="card">
+
+        <h3>{{ item.title }}</h3>
+
+        <p>{{ item.company || item.organizer }}</p>
+
+        <p>{{ item.location }}</p>
+
+        <p>{{ item.summary }}</p>
+
+        <!-- Actions -->
+        <div class="actions">
+
+          <!-- Apply -->
+          <button mat-raised-button color="primary"
+                  (click)="onViewDetail(item)">
+            Apply
+          </button>
+
+          <!-- Remove -->
+          <button mat-stroked-button color="warn"
+                  (click)="onBookmarkToggle({ id: item.id, type: item.opportunity_type })"
+                  [disabled]="isLoading2(item.id)">
+            Remove
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

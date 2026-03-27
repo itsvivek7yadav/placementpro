@@ -1,0 +1,186 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Create Mock Test</h1>
+      <p class="page-sub">Fill details, upload questions and publish</p>
+    </div>
+    <button class="btn-secondary" (click)="cancel()">← Back</button>
+  </div>
+
+  <div class="alert-success" *ngIf="successMsg">✅ {{ successMsg }}</div>
+  <div class="alert-error"   *ngIf="errorMsg">❌ {{ errorMsg }}</div>
+
+  <form [formGroup]="testForm">
+
+    <!-- ── SECTION 1: Test Details ── -->
+    <div class="form-section">
+      <div class="section-title">📋 Test Details</div>
+      <div class="form-grid">
+
+        <div class="form-group full">
+          <label>Test Title *</label>
+          <input type="text" formControlName="title" placeholder="e.g. Aptitude Test — March 2026"/>
+        </div>
+
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea rows="3" formControlName="description"
+            placeholder="What topics does this test cover?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Duration (minutes) *</label>
+          <input type="number" formControlName="duration_mins" min="1" placeholder="60"/>
+        </div>
+
+        <div class="form-group">
+          <label>Eligible Batch *</label>
+          <select formControlName="eligible_batch">
+            <option value="2024-26">2024–26</option>
+            <option value="2023-25">2023–25</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Start Date & Time *</label>
+          <input type="datetime-local" formControlName="start_time"/>
+        </div>
+
+        <div class="form-group">
+          <label>End Date & Time *</label>
+          <input type="datetime-local" formControlName="end_time"/>
+        </div>
+
+        <div class="form-group full">
+          <label>Eligible Programs *</label>
+          <div class="custom-select">
+            <div class="select-box" (click)="toggleDropdown()">
+              <span *ngIf="selectedPrograms.length === 0" class="placeholder">
+                Select Programs
+              </span>
+              <div class="chips">
+                <span class="chip" *ngFor="let id of selectedPrograms">
+                  {{ getProgramName(id) }}
+                </span>
+              </div>
+              <span class="arrow">▼</span>
+            </div>
+            <div class="dropdown" *ngIf="dropdownOpen">
+              <div class="dropdown-item" *ngFor="let p of programs">
+                <input type="checkbox"
+                  [checked]="selectedPrograms.includes(p.program_id)"
+                  (change)="toggleProgram(p.program_id)"/>
+                {{ p.program_name }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: Upload Questions ── -->
+    <div class="form-section">
+      <div class="section-title">📂 Upload Questions</div>
+
+      <div class="template-row">
+        <span class="template-hint">
+          Download the template, fill your questions and upload below
+        </span>
+        <button type="button" class="btn-template" (click)="downloadTemplate()">
+          ⬇ Download Template
+        </button>
+      </div>
+
+      <!-- Drop Zone -->
+      <div class="drop-zone"
+           [class.has-file]="uploadedFile"
+           [class.has-errors]="uploadErrors.length > 0"
+           (click)="fileInput.click()"
+           (dragover)="$event.preventDefault()"
+           (drop)="onFileDrop($event)">
+        <input #fileInput type="file" accept=".xlsx,.xls"
+               style="display:none" (change)="onFileSelect($event)"/>
+
+        <div *ngIf="!uploadedFile" class="drop-content">
+          <span class="drop-icon">📊</span>
+          <p>Click or drag your Excel file here</p>
+          <small>.xlsx or .xls — max 5MB</small>
+        </div>
+
+        <div *ngIf="uploadedFile && uploadErrors.length === 0" class="drop-content success">
+          <span class="drop-icon">✅</span>
+          <p>{{ uploadedFile.name }}</p>
+          <small>{{ previewQuestions.length }} questions loaded — click to replace</small>
+        </div>
+
+        <div *ngIf="uploadedFile && uploadErrors.length > 0" class="drop-content error">
+          <span class="drop-icon">❌</span>
+          <p>{{ uploadedFile.name }}</p>
+          <small>{{ uploadErrors.length }} error(s) found — click to replace</small>
+        </div>
+      </div>
+
+      <!-- Upload Errors -->
+      <div class="error-list" *ngIf="uploadErrors.length > 0">
+        <div class="error-item" *ngFor="let err of uploadErrors">⚠ {{ err }}</div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: Preview ── -->
+    <div class="form-section" *ngIf="previewQuestions.length > 0">
+      <div class="section-title">
+        👁 Question Preview
+        <span class="q-count">{{ previewQuestions.length }} questions</span>
+      </div>
+
+      <div class="preview-table-wrapper">
+        <table class="preview-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Question</th>
+              <th>A</th>
+              <th>B</th>
+              <th>C</th>
+              <th>D</th>
+              <th>Answer</th>
+              <th>Marks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let q of previewQuestions; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td class="q-text">{{ q.question }}</td>
+              <td [class.correct-opt]="q.correct_ans === 'A'">{{ q.option_a }}</td>
+              <td [class.correct-opt]="q.correct_ans === 'B'">{{ q.option_b }}</td>
+              <td [class.correct-opt]="q.correct_ans === 'C'">{{ q.option_c }}</td>
+              <td [class.correct-opt]="q.correct_ans === 'D'">{{ q.option_d }}</td>
+              <td><span class="ans-badge">{{ q.correct_ans }}</span></td>
+              <td>{{ q.marks }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Footer Buttons ── -->
+    <div class="form-footer">
+      <button type="button" class="btn-secondary" (click)="cancel()">
+        Cancel
+      </button>
+      <button type="button" class="btn-draft"
+        [disabled]="loading || testForm.invalid || previewQuestions.length === 0"
+        (click)="submit(false)">
+        {{ loading ? 'Saving...' : '💾 Save as Draft' }}
+      </button>
+      <button type="button" class="btn-publish"
+        [disabled]="loading || testForm.invalid || previewQuestions.length === 0"
+        (click)="submit(true)">
+        {{ loading ? 'Publishing...' : '🚀 Publish Now' }}
+      </button>
+    </div>
+
+  </form>
+</div>

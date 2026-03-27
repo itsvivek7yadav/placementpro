@@ -1,0 +1,89 @@
+<div class="page-container">
+
+  <div class="toast" *ngIf="toastMsg" [class.toast-error]="toastType === 'error'">
+    {{ toastMsg }}
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Mock Tests</h1>
+      <p class="page-sub">Create and manage aptitude/practice tests for students</p>
+    </div>
+    <button class="btn-primary" (click)="createTest()">+ Create Test</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">Loading tests...</div>
+
+  <!-- Empty -->
+  <div class="empty-state" *ngIf="!loading && tests.length === 0">
+    <p>No tests created yet.</p>
+    <button class="btn-primary" (click)="createTest()">Create your first test</button>
+  </div>
+
+  <!-- Test Cards -->
+  <div class="test-grid" *ngIf="!loading && tests.length > 0">
+    <div class="test-card" *ngFor="let t of tests">
+
+      <div class="card-header">
+        <div class="card-title-row">
+          <h3 class="test-title">{{ t.title }}</h3>
+          <span class="status-badge" [ngClass]="getStatusClass(t.status)">
+            {{ t.status }}
+          </span>
+        </div>
+        <p class="test-desc" *ngIf="t.description">{{ t.description }}</p>
+      </div>
+
+      <div class="card-meta">
+        <div class="meta-item">
+          <span class="meta-label">Duration</span>
+          <span class="meta-val">{{ t.duration_mins }} mins</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Questions</span>
+          <span class="meta-val">{{ t.question_count }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Attempts</span>
+          <span class="meta-val">{{ t.attempt_count }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Batch</span>
+          <span class="meta-val">{{ t.eligible_batch }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Programs</span>
+          <span class="meta-val">{{ t.eligible_programs || '—' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Window</span>
+          <span class="meta-val">
+            {{ t.start_time | date:'dd MMM, hh:mm a' }} →
+            {{ t.end_time   | date:'dd MMM, hh:mm a' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-results"
+          *ngIf="t.status !== 'DRAFT'"
+          (click)="viewResults(t.test_id)">
+          📊 Results
+        </button>
+        <button class="btn-close"
+          *ngIf="t.status === 'LIVE'"
+          (click)="closeTest(t.test_id)">
+          🔒 Close
+        </button>
+        <button class="btn-delete"
+          *ngIf="t.status === 'DRAFT'"
+          (click)="deleteTest(t.test_id)">
+          🗑 Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

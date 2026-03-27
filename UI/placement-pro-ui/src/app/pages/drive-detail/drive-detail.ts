@@ -32,7 +32,7 @@ export class DriveDetail implements OnInit {
   }
 
   loadDrive(id: number): void {
-    this.http.get<any>(`${this.API}/student/drives/${id}`).subscribe({
+    this.http.get<any>(`${this.API}/student-drives/${id}`).subscribe({
       next: (res) => {
         this.drive = res.drive;
         this.loading = false;
@@ -59,7 +59,7 @@ export class DriveDetail implements OnInit {
 this.applying = true;
 this.errorMessage = '';
 
-this.http.post<any>(`${this.API}/student/applications/apply`, { drive_id: driveId })
+this.http.post<any>(`${this.API}/applications/apply`, { drive_id: driveId })
       .subscribe({
         next: (res) => {
           this.drive.my_application_id = res.application_id;

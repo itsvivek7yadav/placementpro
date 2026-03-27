@@ -67,7 +67,7 @@ export class StudentOnboarding {
     this.successMessage = '';
     this.errorMessage = '';
 
-    this.http.post<any>('http://localhost:5050/api/upload/students', formData).subscribe({
+    this.http.post<any>('http://localhost:5050/api/bulk-upload/students', formData).subscribe({
       next: (res) => {
         this.loading = false;
         this.selectedFile = null;

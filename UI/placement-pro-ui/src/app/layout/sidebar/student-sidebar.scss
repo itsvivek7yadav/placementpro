@@ -1,45 +1,97 @@
+/**
+ * Student Sidebar Component Styles
+ * 
+ * Comprehensive styling for the student-specific sidebar navigation.
+ * Features:
+ * - Dark theme with emerald green accent color
+ * - Responsive design
+ * - Smooth transitions and hover states
+ * - Accessibility-first approach
+ * 
+ * Design Tokens:
+ * - Primary Accent: Emerald Green (#10b981)
+ * - Text Light: #f1f5f9
+ * - Background Dark: #0f172a
+ */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
-// ── Shared tokens (same as topbar) ─────────────────────────
+// ===== DESIGN TOKENS =====
+$color-accent: #10b981;
+$color-accent-dark: #059669;
+$color-accent-light: #6ee7b7;
+$color-bg-dark: #0f172a;
+$color-text-primary: #f1f5f9;
+$color-text-secondary: #94a3b8;
+$color-text-muted: #475569;
+$color-text-accent: #e2e8f0;
+$color-border: rgba(255, 255, 255, 0.07);
+$color-hover-bg: rgba(255, 255, 255, 0.05);
+$color-active-bg: rgba(16, 185, 129, 0.12);
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$transition-fast: all 0.15s ease;
+$transition-normal: all 0.2s ease;
+
+// ===== HOST & ROOT =====
 :host {
   display: block;
-  height: calc(100vh - 60px); // account for fixed topbar
+  height: calc(100vh - 60px); // Account for fixed topbar
 }
 
+// ===== SIDEBAR CONTAINER =====
 .sidebar {
   width: 240px;
   height: 100%;
-  background: #0f172a;
-  border-right: 1px solid rgba(255,255,255,0.07);
+  background: $color-bg-dark;
+  border-right: 1px solid $color-border;
   display: flex;
   flex-direction: column;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family;
   position: sticky;
-  top: 60px; // stick below the topbar
+  top: 60px; // Stick below the topbar
   overflow-y: auto;
   overflow-x: hidden;
   flex-shrink: 0;
 
   // Custom scrollbar
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
 }
 
-// ── Header ─────────────────────────────────────────────────
+// ===== HEADER SECTION =====
 .sidebar-header {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 20px 16px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid $color-border;
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
-.institute-badge {
+.user-avatar {
   width: 34px;
   height: 34px;
-  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  min-width: 34px;
+  background: linear-gradient(135deg, $color-accent, $color-accent-dark);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -48,30 +100,38 @@
   font-weight: 700;
   color: white;
   flex-shrink: 0;
-  letter-spacing: -0.5px;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
 }
 
-.institute-info {
+.user-info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
+  min-width: 0; // Ensure text truncation works
 }
 
-.institute-name {
-  font-size: 14px;
+.user-name {
+  font-size: 13.5px;
   font-weight: 600;
-  color: #f1f5f9;
-  letter-spacing: 0.2px;
-  line-height: 1;
+  color: $color-text-primary;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
 }
 
-.institute-sub {
+.user-role {
   font-size: 11px;
-  color: #475569;
-  line-height: 1;
+  color: $color-text-muted;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-// ── Nav label ──────────────────────────────────────────────
+// ===== NAV LABEL =====
 .nav-label {
   font-size: 10.5px;
   font-weight: 600;
@@ -79,14 +139,18 @@
   text-transform: uppercase;
   letter-spacing: 0.9px;
   padding: 10px 18px 6px;
+  user-select: none;
 }
 
-// ── Menu ───────────────────────────────────────────────────
+// ===== MENU =====
 .menu {
   list-style: none;
   padding: 0 8px;
   margin: 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .menu-item {
@@ -98,25 +162,44 @@
   cursor: pointer;
   font-size: 13.5px;
   font-weight: 400;
-  color: #e8ebee;
-  transition: all 0.15s ease;
+  color: $color-text-secondary;
+  transition: $transition-fast;
   margin-bottom: 1px;
   position: relative;
   user-select: none;
+  text-decoration: none;
+  list-style: none;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: inherit;
 
   &:hover {
-    background: rgba(255,255,255,0.05);
-    color: #e2e8f0;
+    background: $color-hover-bg;
+    color: $color-text-accent;
 
-    .menu-icon { color: #3b82f6; }
+    .menu-icon {
+      color: $color-accent;
+    }
+  }
+
+  &:active {
+    background: rgba(16, 185, 129, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+    outline-offset: -2px;
   }
 
   &.active {
-    background: rgba(59,130,246,0.12);
-    color: #93c5fd;
+    background: $color-active-bg;
+    color: $color-accent-light;
     font-weight: 500;
 
-    .menu-icon { color: #3b82f6; }
+    .menu-icon {
+      color: $color-accent;
+    }
 
     &::before {
       content: '';
@@ -126,98 +209,85 @@
       transform: translateY(-50%);
       width: 3px;
       height: 60%;
-      background: #3b82f6;
+      background: $color-accent;
       border-radius: 0 3px 3px 0;
     }
   }
 
-  &.parent span {
-    font-weight: 500;
-    color: #cbd5e1;
+  span {
     flex: 1;
+    min-width: 0; // Enable text truncation
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-
-  &.parent:hover span { color: #f1f5f9; }
 }
 
 .menu-icon {
   width: 18px;
   height: 18px;
+  min-width: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #475569;
+  color: $color-text-muted;
   flex-shrink: 0;
-  transition: color 0.15s;
+  transition: color 0.15s ease;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 }
 
-.chevron {
-  margin-left: auto;
-  color: #475569;
+.badge {
+  background: $color-accent;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  line-height: 1.4;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+// ===== PLACEMENT STATUS SECTION =====
+.placement-status {
   display: flex;
   align-items: center;
-  transition: transform 0.2s ease;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 8px 8px 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: $transition-fast;
 
-  &.rotated { transform: rotate(180deg); }
-}
+  svg {
+    flex-shrink: 0;
+  }
 
-// ── Submenu ────────────────────────────────────────────────
-.submenu {
-  list-style: none;
-  padding: 0 8px 0 16px;
-  margin: 0;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.25s ease, opacity 0.2s ease;
-  opacity: 0;
+  &.ps-placed {
+    background: rgba(16, 185, 129, 0.1);
+    color: $color-accent;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
 
-  &.expanded {
-    max-height: 200px;
-    opacity: 1;
+  &.ps-seeking {
+    background: rgba(245, 158, 11, 0.08);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.15);
   }
 }
 
-.submenu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 7px;
-  cursor: pointer;
-  font-size: 13px;
-  color: #64748b;
-  transition: all 0.15s ease;
-  margin-bottom: 1px;
-
-  &:hover {
-    background: rgba(255,255,255,0.04);
-    color: #94a3b8;
-
-    .submenu-dot { background: #3b82f6; }
-  }
-
-  &.active {
-    color: #93c5fd;
-    background: rgba(59,130,246,0.08);
-
-    .submenu-dot { background: #3b82f6; }
-  }
-}
-
-.submenu-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #334155;
-  flex-shrink: 0;
-  transition: background 0.15s;
-}
-
-// ── Footer / Logout ────────────────────────────────────────
+// ===== FOOTER SECTION =====
 .sidebar-footer {
   padding: 12px 8px 16px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid $color-border;
   margin-top: auto;
+  flex-shrink: 0;
 }
 
 .logout-btn {
@@ -230,15 +300,78 @@
   border: none;
   background: transparent;
   color: #64748b;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-family;
   font-size: 13.5px;
   font-weight: 400;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: $transition-fast;
   text-align: left;
+  user-select: none;
+
+  svg {
+    flex-shrink: 0;
+  }
 
   &:hover {
-    background: rgba(239,68,68,0.1);
+    background: rgba(239, 68, 68, 0.1);
     color: #f87171;
   }
+
+  &:active {
+    background: rgba(239, 68, 68, 0.15);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: -2px;
+  }
+}
+
+// ===== RESPONSIVE DESIGN =====
+@media (max-width: 1024px) {
+  :host {
+    height: calc(100vh - 50px); // Adjust for smaller topbar
+  }
+
+  .sidebar {
+    width: 220px;
+    top: 50px;
+  }
+
+  .user-name {
+    max-width: 140px;
+  }
+
+  .menu-item span {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  :host {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    border-right: none;
+  }
+}
+
+// ===== ACCESSIBILITY =====
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ===== DARK MODE SUPPORT (for potential light mode implementation) =====
+@media (prefers-color-scheme: dark) {
+  // Already implemented as dark theme
 }

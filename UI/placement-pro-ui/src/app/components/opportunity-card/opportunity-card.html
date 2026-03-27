@@ -1,0 +1,67 @@
+<!-- src/app/components/opportunity-card/opportunity-card.html -->
+<article class="opp-card" [class.opp-card--saved]="isBookmarked" (click)="onCardClick()">
+  <div class="card-top">
+    <span class="src-badge src-badge--{{ type }}">
+      <mat-icon>{{ isJob ? 'work_outline' : 'event' }}</mat-icon>
+      {{ isJob ? job.source : event.source }}
+    </span>
+    <span class="role-badge role-badge--{{ badgeColor }}">{{ badgeLabel }}</span>
+  </div>
+
+  <div class="card-company-row">
+    <div class="co-avatar" [attr.data-letter]="displaySubtitle.charAt(0)">
+      {{ displaySubtitle.charAt(0).toUpperCase() }}
+    </div>
+    <div class="co-info">
+      <h3 class="card-title">{{ displayTitle }}</h3>
+      <p class="card-co">{{ displaySubtitle }}</p>
+    </div>
+  </div>
+
+  <div class="card-meta-row">
+    <span class="meta-it" *ngIf="displayLocation">
+      <mat-icon>location_on</mat-icon>{{ displayLocation }}
+    </span>
+    <span class="meta-it" *ngIf="displayDate">
+      <mat-icon>schedule</mat-icon>{{ displayDate }}
+    </span>
+    <span class="meta-it meta-it--free" *ngIf="!isJob && event.is_free">
+      <mat-icon>sell</mat-icon>Free
+    </span>
+    <span class="meta-it meta-it--online" *ngIf="!isJob && event.is_online">
+      <mat-icon>videocam</mat-icon>Online
+    </span>
+    <span class="meta-it" *ngIf="isJob && job.job_type">
+      <mat-icon>business_center</mat-icon>{{ job.job_type }}
+    </span>
+  </div>
+
+  <p class="card-summary" *ngIf="displaySummary">{{ displaySummary }}</p>
+
+  <div class="skills-row" *ngIf="displaySkills.length">
+    <span class="skill" *ngFor="let s of displaySkills.slice(0,4)">{{ s }}</span>
+    <span class="skill skill--more" *ngIf="displaySkills.length > 4">+{{ displaySkills.length - 4 }}</span>
+  </div>
+
+  <div class="card-tip" *ngIf="isJob && job.application_tip">
+    <mat-icon>lightbulb</mat-icon>
+    <span>{{ job.application_tip }}</span>
+  </div>
+
+  <div class="card-footer">
+    <button class="btn-apply" (click)="onApplyClick($event)">
+      <mat-icon>arrow_forward</mat-icon>
+      {{ isJob ? 'Apply Now' : 'Register' }}
+    </button>
+    <button
+      class="btn-bm"
+      [class.btn-bm--saved]="isBookmarked"
+      [disabled]="bookmarkLoading"
+      (click)="onBookmarkClick($event)"
+      [title]="isBookmarked ? 'Remove bookmark' : 'Save for later'"
+    >
+      <mat-spinner *ngIf="bookmarkLoading" diameter="16"></mat-spinner>
+      <mat-icon *ngIf="!bookmarkLoading">{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+    </button>
+  </div>
+</article>

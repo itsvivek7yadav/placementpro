@@ -29,26 +29,29 @@
   justify-content: center;
   align-items: center;
   position: relative;
+  padding: 24px;
 }
 
 /* Card */
 .login-card {
-  width: 420px;
-  padding: 50px 45px;
+  width: min(500px, 100%);
+  padding: 56px 48px 44px;
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25);
   text-align: center;
   animation: fadeIn 0.6s ease;
 }
 
 /* Logo */
-.sicsr-logo {
-  width: 160px;
+.login-logo {
+  width: min(360px, 100%);
+  max-width: 100%;
   height: auto;
   object-fit: contain;
   display: block;
-  margin: 0 auto 30px auto;
+  margin: 0 auto 34px auto;
 }
 
 /* Branding */
@@ -59,6 +62,10 @@
   color: #111827;
   line-height: 1.4;
 }
+
+.app-name span {
+      color: #3b82f6;
+    }
 
 .app-name {
   font-size: 28px;
@@ -76,23 +83,25 @@
 /* Form */
 .form-group {
   text-align: left;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 
   label {
     font-size: 13px;
+    font-weight: 600;
     color: #475569;
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   input {
     width: 100%;
-    padding: 14px;
-    border-radius: 10px;
+    padding: 16px;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
     background: #f8fafc;
-    font-size: 14px;
+    font-size: 15px;
     transition: all 0.25s ease;
+    box-sizing: border-box;
 
     &:focus {
       outline: none;
@@ -106,13 +115,13 @@
 /* Button */
 button {
   width: 100%;
-  padding: 14px;
-  border-radius: 12px;
+  padding: 16px;
+  border-radius: 14px;
   border: none;
   background: #2563eb;
   color: white;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.25s ease;
 
@@ -154,7 +163,13 @@ button {
 /* Responsive */
 @media (max-width: 480px) {
   .login-card {
-    width: 90%;
-    padding: 40px 30px;
+    width: 100%;
+    padding: 36px 24px 28px;
+    border-radius: 20px;
+  }
+
+  .login-logo {
+    width: min(300px, 100%);
+    margin-bottom: 26px;
   }
 }

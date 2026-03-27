@@ -1,3 +1,6 @@
+console.log("EMAIL USER:", process.env.EMAIL_USER);
+console.log("EMAIL PASS LOADED:", process.env.EMAIL_PASSWORD ? "YES" : "NO");
+
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -6,56 +9,111 @@ dotenv.config();
 
 const app = express();
 
-// ─── Middlewares ───────────────────────────────────────────────────────────
+// ─── CORS Middleware (MUST BE FIRST) ────────────────────────────────────────
 app.use(cors({
-  origin: 'http://localhost:4200',
-  credentials: true
+  origin: ['http://localhost:4200', 'http://localhost:3000', 'http://127.0.0.1:4200'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
 }));
+
+// ─── JSON Parser Middleware ────────────────────────────────────────────────
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // ─── DB Connection ─────────────────────────────────────────────────────────
 require('./config/db');
 
 // ─── Cron Jobs ─────────────────────────────────────────────────────────────
 require('./cron/closeExpiredDrives');
+require('./cron/remailWorker');
+
+// ─── Off-Campus Cron Jobs ─────────────────────────────────────────────────
+const { startScraperJob } = require('./cron/offCampusScraperJob');
+const { startCleanupJob } = require('./cron/cleanupExpiredOpportunities');
+startScraperJob();
+startCleanupJob();
 
 // ─── Route Imports ─────────────────────────────────────────────────────────
-const authRoutes               = require('./routes/authRoutes');
-const userRoutes               = require('./routes/userRoutes');
-const placementDriveRoutes     = require('./routes/placementDriveRoutes');
-const studentDriveRoutes       = require('./routes/studentDriveRoutes');
-const applicationRoutes        = require('./routes/applicationRoutes');        // student apply/my/withdraw
-const applicationReviewRoutes  = require('./routes/applicationReviewRoutes');  // TPO review
-const tpoDashboardRoutes       = require('./routes/tpoDashboardRoutes');
-const bulkUploadRoutes         = require('./routes/bulkUploadRoutes');
-const studentRoutes            = require('./routes/studentRoutes');
-const programRoutes            = require('./routes/programRoutes');
-const studentProfileRoutes     = require('./routes/studentProfileRoutes');
-                                 
-// const driveNoticeRoutes        = require('./routes/driveNoticeRoutes');
+const authRoutes              = require('./routes/authRoutes');
+const userRoutes              = require('./routes/userRoutes');
+const placementDriveRoutes    = require('./routes/placementDriveRoutes');
+const studentDriveRoutes      = require('./routes/studentDriveRoutes');
+const applicationRoutes       = require('./routes/applicationRoutes');
+const applicationReviewRoutes = require('./routes/applicationReviewRoutes');
+const tpoDashboardRoutes      = require('./routes/tpoDashboardRoutes');
+const bulkUploadRoutes        = require('./routes/bulkUploadRoutes');
+const studentRoutes           = require('./routes/studentRoutes');
+const programRoutes           = require('./routes/programRoutes');
+const studentProfileRoutes    = require('./routes/studentProfileRoutes');
+const studentProgressRoutes   = require('./routes/studentProgressRoutes');
+const mockTestRoutes          = require('./routes/mockTestRoutes');
+const studentTestRoutes       = require('./routes/studentTestRoutes');
+const resumeRoutes            = require('./routes/resumeRoutes');
+const emailRoutes             = require('./routes/emailRoutes');
+const offCampusRoutes         = require('./routes/offCampusRoutes');  // ← NEW
 
 // ─── Route Mounts ──────────────────────────────────────────────────────────
-app.use('/api/auth',                 authRoutes);
-app.use('/api/users',                userRoutes);
-app.use('/api/drives',               placementDriveRoutes);
-app.use('/api/student/drives',       studentDriveRoutes);
-app.use('/api/student/applications', applicationRoutes);        // student apply/my/withdraw
-app.use('/api/tpo/applications',     applicationReviewRoutes);  // TPO view/update applicants
-app.use('/api/tpo-dashboard',        tpoDashboardRoutes);
-app.use('/api/upload',               bulkUploadRoutes);
-app.use('/api/programs',             programRoutes);
-app.use('/api/students',             studentRoutes);
-app.use('/api/student/profile',      studentProfileRoutes);
-app.use('/uploads',                  express.static('uploads'));
+app.use('/api/auth',               authRoutes);
+app.use('/api/users',              userRoutes);
+app.use('/api/placement-drives',   placementDriveRoutes);
+app.use('/api/student-drives',     studentDriveRoutes);
+app.use('/api/applications',       applicationRoutes);
+app.use('/api/application-review', applicationReviewRoutes);
+app.use('/api/tpo/dashboard',      tpoDashboardRoutes);
+app.use('/api/bulk-upload',        bulkUploadRoutes);
+app.use('/api/students',           studentRoutes);
+app.use('/api/programs',           programRoutes);
+app.use('/api/student-profile',    studentProfileRoutes);
+app.use('/api/student-progress',   studentProgressRoutes);
+app.use('/api/mock-tests',         mockTestRoutes);
+app.use('/api/student-tests',      studentTestRoutes);
+app.use('/api/resume',             resumeRoutes);
+app.use('/api/tpo/email-campaigns', emailRoutes);
+app.use('/api/offcampus',          offCampusRoutes);  // ← NEW
+// temp test
+// TEMP: manual scraper trigger — remove after testing
+app.get('/api/run-scraper', async (req, res) => {
+  const { runAllScrapers } = require('./cron/offCampusScraperJob');
+  const result = await runAllScrapers();
+  res.json(result);
+});
 
-// app.use('/api/tpo/drives',           driveNoticeRoutes);
+
+// 
 // ─── Health Check ──────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.send('PlacementPro Backend Running 🚀');
 });
 
+// ─── 404 Handler ───────────────────────────────────────────────────────────
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Route not found',
+    path: req.path,
+    method: req.method
+  });
+});
+
+// ─── Global Error Handler (MUST BE LAST) ───────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error('❌ Error:', err.message);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    status: err.status || 500
+  });
+});
+
 // ─── Start Server ──────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5050;
+
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`✅ CORS enabled`);
+  console.log(`✅ Resume API available at /api/resume`);
+  console.log(`✅ Email Campaign API available at /api/tpo/email-campaigns`);
+  console.log(`✅ Off-Campus Feed API available at /api/offcampus`);  // ← NEW
 });
+
+module.exports = app;

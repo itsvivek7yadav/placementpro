@@ -1,0 +1,352 @@
+<div class="resume-builder-container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-icon">📄</div>
+    <div>
+      <h1>Standard CV Builder</h1>
+      <p>Create one clean, professional resume in a standard top-to-bottom format</p>
+    </div>
+    <div class="header-status">
+      <div class="status-pill">{{ completionScore }}% complete</div>
+      <strong>{{ completionLabel }}</strong>
+    </div>
+  </div>
+
+  <!-- Alert -->
+  <div *ngIf="message" [ngClass]="'alert alert-' + messageType">
+    {{ messageType === 'success' ? '✅' : '⚠️' }} {{ message }}
+  </div>
+
+  <div class="main-grid">
+
+    <!-- ── SIDEBAR ──────────────────────────────────────────────────────── -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-icon">✓</div>
+        <h3>Resume Status</h3>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="standard-resume-note">
+          One standard resume format is used across preview and PDF export.
+        </div>
+
+        <div class="resume-card active">
+          <div class="resume-card-header">
+            <h4>Professional CV</h4>
+            <span class="template-badge">standard</span>
+          </div>
+          <p class="standard-resume-copy">
+            A single polished format focused on readability, strong hierarchy, and recruiter-friendly flow.
+          </p>
+          <div class="resume-card-actions">
+            <button *ngIf="currentResumeId" (click)="downloadSavedResume(currentResumeId)" class="btn-download" [disabled]="loading">⬇️ PDF</button>
+            <button *ngIf="currentResumeId" (click)="deleteResume(currentResumeId)" class="btn-delete" [disabled]="loading">🗑️</button>
+            <button *ngIf="!currentResumeId" (click)="startNewResume()" class="btn-edit" [disabled]="loading">Start</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAIN PANEL ────────────────────────────────────────────────────── -->
+    <div class="form-panel">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn" [class.active]="activeTab === 'edit'" (click)="activeTab = 'edit'">
+          ✏️ Edit Resume
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'preview'" (click)="activeTab = 'preview'">
+          👁️ Preview
+        </button>
+      </div>
+
+      <!-- ── EDIT TAB ──────────────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'edit'" class="tab-content">
+        <div class="builder-insights">
+          <div class="insight-card">
+            <strong>What recruiters notice first</strong>
+            <span>Clear summary, impact-driven bullets, and confident skills grouping.</span>
+          </div>
+          <div class="insight-card">
+            <strong>Best practice</strong>
+            <span>Keep each experience or project to 2 to 4 concise bullets focused on results.</span>
+          </div>
+        </div>
+
+        <!-- Professional Summary -->
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-title-icon">💼</div>
+            <h3>Professional Summary <span style="color:var(--red)">*</span></h3>
+          </div>
+          <div class="form-group">
+            <label>Summary</label>
+            <textarea
+              [(ngModel)]="resumeData.personalSummary"
+              placeholder="Write a brief professional summary (2–3 lines)…"
+              rows="4"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-title-icon">🏢</div>
+            <h3>Experience</h3>
+          </div>
+
+          <div *ngFor="let exp of resumeData.experience; let i = index" class="form-item">
+            <button (click)="removeExperience(i)" class="btn-remove-item">✕</button>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Company</label>
+                <input type="text" [(ngModel)]="exp.company" placeholder="Company name">
+              </div>
+              <div class="form-group">
+                <label>Role / Title</label>
+                <input type="text" [(ngModel)]="exp.role" placeholder="e.g. Software Engineer">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Start Date</label>
+                <input type="month" [(ngModel)]="exp.startDate">
+              </div>
+              <div class="form-group">
+                <label>End Date</label>
+                <input type="month" [(ngModel)]="exp.endDate" [disabled]="exp.currentlyWorking">
+              </div>
+            </div>
+
+            <div class="form-group checkbox">
+              <label>
+                <input type="checkbox" [(ngModel)]="exp.currentlyWorking">
+                Currently working here
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label>Description</label>
+              <textarea [(ngModel)]="exp.description" placeholder="Key achievements and responsibilities (one per line)" rows="3"></textarea>
+            </div>
+          </div>
+
+          <button (click)="addExperience()" class="btn-add">+ Add Experience</button>
+        </div>
+
+        <!-- Skills -->
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-title-icon">⚡</div>
+            <h3>Skills</h3>
+          </div>
+
+          <div class="skill-subsection">
+            <label>Technical Skills</label>
+            <div class="skill-input">
+              <input
+                #technicalInput
+                type="text"
+                placeholder="Type a skill and press Enter…"
+                (keyup.enter)="addSkill('technical', technicalInput.value); technicalInput.value = ''"
+              >
+            </div>
+            <div class="skill-tags">
+              <span *ngFor="let skill of resumeData.skills.technical; let i = index" class="skill-tag">
+                {{ skill }}
+                <button (click)="removeSkill('technical', i)" class="btn-remove-skill">✕</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="skill-subsection">
+            <label>Soft Skills</label>
+            <div class="skill-input">
+              <input
+                #softInput
+                type="text"
+                placeholder="Type a skill and press Enter…"
+                (keyup.enter)="addSkill('soft', softInput.value); softInput.value = ''"
+              >
+            </div>
+            <div class="skill-tags">
+              <span *ngFor="let skill of resumeData.skills.soft; let i = index" class="skill-tag">
+                {{ skill }}
+                <button (click)="removeSkill('soft', i)" class="btn-remove-skill">✕</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects -->
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-title-icon">🚀</div>
+            <h3>Projects</h3>
+          </div>
+
+          <div *ngFor="let project of resumeData.projects; let i = index" class="form-item">
+            <button (click)="removeProject(i)" class="btn-remove-item">✕</button>
+
+            <div class="form-group">
+              <label>Project Title</label>
+              <input type="text" [(ngModel)]="project.title" placeholder="Project name">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea [(ngModel)]="project.description" placeholder="What did you build and what impact did it have?" rows="2"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Technologies</label>
+                <input type="text" [(ngModel)]="project.technologies" placeholder="React, Node.js, etc.">
+              </div>
+              <div class="form-group">
+                <label>Link</label>
+                <input type="url" [(ngModel)]="project.link" placeholder="https://github.com/…">
+              </div>
+            </div>
+          </div>
+
+          <button (click)="addProject()" class="btn-add">+ Add Project</button>
+        </div>
+
+        <!-- Certifications -->
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-title-icon">🎓</div>
+            <h3>Certifications</h3>
+          </div>
+
+          <div *ngFor="let cert of resumeData.certifications; let i = index" class="form-item">
+            <button (click)="removeCertification(i)" class="btn-remove-item">✕</button>
+            <div class="form-row-3">
+              <div class="form-group">
+                <label>Certificate Name</label>
+                <input type="text" [(ngModel)]="cert.name" placeholder="e.g. AWS Solutions Architect">
+              </div>
+              <div class="form-group">
+                <label>Issuing Organisation</label>
+                <input type="text" [(ngModel)]="cert.issuer" placeholder="e.g. Amazon Web Services">
+              </div>
+              <div class="form-group">
+                <label>Issue Date</label>
+                <input type="month" [(ngModel)]="cert.issueDate">
+              </div>
+            </div>
+          </div>
+
+          <button (click)="addCertification()" class="btn-add">+ Add Certification</button>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-title-icon">🌍</div>
+            <h3>Languages</h3>
+          </div>
+
+          <div *ngFor="let language of resumeData.languages; let i = index" class="form-item">
+            <button (click)="removeLanguage(i)" class="btn-remove-item">✕</button>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Language</label>
+                <input type="text" [(ngModel)]="language.language" placeholder="English">
+              </div>
+              <div class="form-group">
+                <label>Proficiency</label>
+                <select [(ngModel)]="language.proficiency">
+                  <option>Native</option>
+                  <option>Fluent</option>
+                  <option>Professional</option>
+                  <option>Conversational</option>
+                  <option>Basic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button (click)="addLanguage()" class="btn-add">+ Add Language</button>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title">
+            <div class="section-title-icon">🏆</div>
+            <h3>Achievements</h3>
+          </div>
+
+          <div *ngFor="let achievement of resumeData.achievements; let i = index" class="form-item">
+            <button (click)="removeAchievement(i)" class="btn-remove-item">✕</button>
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" [(ngModel)]="achievement.title" placeholder="Hackathon finalist">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea [(ngModel)]="achievement.description" placeholder="Add the impact, ranking, recognition, or measurable outcome" rows="2"></textarea>
+            </div>
+          </div>
+
+          <button (click)="addAchievement()" class="btn-add">+ Add Achievement</button>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-buttons">
+          <button (click)="saveResume()" class="btn btn-primary" [disabled]="saving">
+            💾 Save Resume
+          </button>
+          <button (click)="activeTab = 'preview'" class="btn btn-secondary">
+            👁️ Preview
+          </button>
+        </div>
+
+      </div><!-- /edit tab -->
+
+      <!-- ── PREVIEW TAB ────────────────────────────────────────────────── -->
+      <div *ngIf="activeTab === 'preview'" class="tab-content">
+
+        <div class="preview-shell">
+          <div class="preview-sidebar">
+            <div class="preview-notice">
+              ℹ️ This is your final standard resume layout. Save first, then download the PDF.
+            </div>
+            <div class="preview-checklist">
+              <strong>Before you export</strong>
+              <span>Keep bullets concise, use strong action verbs, and remove any repeated or low-impact lines.</span>
+            </div>
+          </div>
+
+          <app-resume-preview
+            [student]="studentData"
+            [resume]="resumeData">
+          </app-resume-preview>
+        </div>
+
+        <div class="action-buttons" style="margin-top:24px">
+          <button (click)="saveResume()" class="btn btn-primary" [disabled]="saving">
+            💾 Save Resume
+          </button>
+          <button (click)="downloadPDF()" class="btn btn-secondary">
+            ⬇️ Download PDF
+          </button>
+          <button (click)="activeTab = 'edit'" class="btn btn-secondary">
+            ← Back to Edit
+          </button>
+        </div>
+
+      </div><!-- /preview tab -->
+
+    </div><!-- /form-panel -->
+  </div><!-- /main-grid -->
+
+  <!-- Loading overlay -->
+  <div *ngIf="loading || saving" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>{{ saving ? 'Saving…' : 'Loading…' }}</p>
+  </div>
+
+</div>
