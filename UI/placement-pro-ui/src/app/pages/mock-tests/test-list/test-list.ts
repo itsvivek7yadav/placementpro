@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-test-list',
@@ -17,7 +18,7 @@ export class TestList implements OnInit {
   toastMsg = '';
   toastType: 'success' | 'error' = 'success';
 
-private API = 'http://localhost:5050/api/mock-tests';
+private API = buildApiUrl('/mock-tests');
 
   constructor(private http: HttpClient, private router: Router) {}
 

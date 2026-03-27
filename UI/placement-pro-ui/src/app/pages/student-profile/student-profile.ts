@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../auth/auth';
+import { buildApiUrl, buildBackendUrl } from '../../api.config';
 
 @Component({
   selector: 'app-student-profile',
@@ -24,7 +25,7 @@ export class StudentProfile implements OnInit {
 
   newCvFile: File | null = null;
 
-  private API = 'http://localhost:5050/api/student-profile';
+  private API = buildApiUrl('/student-profile');
 
   constructor(
     private http: HttpClient,
@@ -45,6 +46,10 @@ export class StudentProfile implements OnInit {
     const f = this.profile.first_name?.charAt(0) || '';
     const l = this.profile.last_name?.charAt(0)  || '';
     return (f + l).toUpperCase() || 'S';
+  }
+
+  getCvUrl(path?: string): string {
+    return buildBackendUrl(path || '');
   }
 
   loadProfile() {

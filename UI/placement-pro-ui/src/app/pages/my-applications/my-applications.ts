@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { API_BASE_URL } from '../../api.config';
 
 @Component({
   selector: 'app-my-applications',
@@ -16,7 +17,7 @@ export class MyApplications implements OnInit {
   loading = true;
   withdrawingId: number | null = null;
 
-  private API = 'http://localhost:5050/api';
+  private API = API_BASE_URL;
 
   constructor(private http: HttpClient) {}
 

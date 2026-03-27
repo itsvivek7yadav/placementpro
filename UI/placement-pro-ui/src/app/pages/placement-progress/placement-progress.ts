@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth/auth';
+import { buildApiUrl } from '../../api.config';
 
 interface ProgressStudent {
   student_id: number;
@@ -86,7 +87,7 @@ interface PlacementProgressResponse {
   styleUrls: ['./placement-progress.scss']
 })
 export class PlacementProgress implements OnInit {
-  private API = 'http://localhost:5050/api/student-progress';
+  private API = buildApiUrl('/student-progress');
 
   loading = true;
   savingPlacement = false;

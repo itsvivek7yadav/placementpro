@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-my-tests',
@@ -15,7 +16,7 @@ export class MyTests implements OnInit {
   tests:   any[] = [];
   loading  = true;
 
-  private API = 'http://localhost:5050/api/student-tests';
+  private API = buildApiUrl('/student-tests');
 
   constructor(private http: HttpClient, private router: Router) {}
 

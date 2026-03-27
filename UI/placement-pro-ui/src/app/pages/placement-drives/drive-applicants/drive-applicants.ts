@@ -3,6 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-drive-applicants',
@@ -27,7 +28,7 @@ export class DriveApplicants implements OnInit {
   toastMessage = '';
   toastType: 'success' | 'error' = 'success';
 
-  private API = 'http://localhost:5050/api/tpo/applications';
+  private API = buildApiUrl('/tpo/applications');
 
   constructor(
     private http: HttpClient,

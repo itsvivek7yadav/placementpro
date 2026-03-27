@@ -8,6 +8,7 @@ import {
   Validators
 } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-create-drive',
@@ -17,6 +18,8 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./create-drive.scss']
 })
 export class CreateDrive implements OnInit {
+  private readonly programsUrl = buildApiUrl('/programs');
+  private readonly drivesUrl = buildApiUrl('/placement-drives');
 
   driveForm!: FormGroup;
 
@@ -61,7 +64,7 @@ export class CreateDrive implements OnInit {
   }
 
   loadPrograms(): void {
-    this.http.get<any>('http://localhost:5050/api/programs')
+    this.http.get<any>(this.programsUrl)
       .subscribe({
         next: (res) => {
           this.programs = res.programs || [];
@@ -117,7 +120,7 @@ export class CreateDrive implements OnInit {
 
     this.loading = true;
 
-    this.http.post('http://localhost:5050/api/placement-drives', this.driveForm.value).subscribe({
+    this.http.post(this.drivesUrl, this.driveForm.value).subscribe({
       next: () => {
         this.successMessage = 'Drive published successfully';
 

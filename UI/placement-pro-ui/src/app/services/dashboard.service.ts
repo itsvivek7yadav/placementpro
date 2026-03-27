@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { API_BASE_URL } from '../api.config';
 
 /* =========================
    INTERFACES
@@ -26,7 +27,7 @@ export interface StudentDashboardStats {
   providedIn: 'root'
 })
 export class DashboardService {
-  private baseUrl = 'http://localhost:5050/api';
+  private baseUrl = API_BASE_URL;
 
   constructor(private http: HttpClient) {}
 

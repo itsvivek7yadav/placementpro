@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { buildApiUrl } from '../../../api.config';
 
 interface DriveStats {
   drive_id: number;
@@ -33,6 +34,7 @@ interface TodoItem {
   styleUrls: ['./tpo-dashboard.scss']
 })
 export class TpoDashboard {
+  private readonly statsUrl = buildApiUrl('/tpo/dashboard/stats');
 
   stats: DashboardStats | null = null;
   loading = false;
@@ -76,7 +78,7 @@ export class TpoDashboard {
   loadStats() {
     this.loading = true;
     // ✅ FIX: was /api/tpo-dashboard/stats → correct mount is /api/tpo/dashboard
-    this.http.get<DashboardStats>('http://localhost:5050/api/tpo/dashboard/stats').subscribe({
+    this.http.get<DashboardStats>(this.statsUrl).subscribe({
       next:  (res) => { this.stats = res; this.loading = false; },
       error: (err) => { console.error(err); this.loading = false; }
     });
