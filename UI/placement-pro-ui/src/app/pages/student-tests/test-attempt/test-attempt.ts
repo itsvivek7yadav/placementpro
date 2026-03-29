@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-test-attempt',
@@ -24,7 +25,7 @@ export class TestAttempt implements OnInit, OnDestroy {
   timeLeft   = 0;
   timerInterval: any;
 
-  private API = 'http://localhost:5050/api/student-tests';
+  private readonly API = buildApiUrl('student-tests');
 
   constructor(
     private route:  ActivatedRoute,

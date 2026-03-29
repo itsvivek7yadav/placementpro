@@ -6,6 +6,7 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { isApiRequestUrl } from '../api.config';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -13,7 +14,7 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
     const token = localStorage.getItem('token');
-    const isApiRequest = req.url.startsWith('http://localhost:5050/api/');
+    const isApiRequest = isApiRequestUrl(req.url) || req.url.startsWith('/api/');
 
     if (token) {
       if (isApiRequest) {

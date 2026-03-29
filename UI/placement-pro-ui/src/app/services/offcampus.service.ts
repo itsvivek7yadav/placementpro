@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AuthService } from '../auth/auth';
+import { buildApiUrl } from '../api.config';
 
 // ─────────────────────────────────────────────
 // INTERFACES
@@ -82,7 +83,7 @@ export interface EventFilters {
 @Injectable({ providedIn: 'root' })
 export class OffCampusService {
 
-  private readonly base = 'http://localhost:5050/api/offcampus';
+  private readonly base = buildApiUrl('offcampus');
 
   constructor(
     private http: HttpClient,

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { buildApiUrl } from '../../api.config';
 
 @Component({
   selector: 'app-students',
@@ -43,7 +44,7 @@ export class Students implements OnInit {
   }
 
   loadStudents() {
-    this.http.get<{ students: any[] }>('http://localhost:5050/api/students')
+    this.http.get<{ students: any[] }>(buildApiUrl('students'))
       .subscribe({
         next: (res) => {
           this.students = res.students;

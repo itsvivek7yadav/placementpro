@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { buildApiUrl } from '../api.config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private API = 'http://localhost:5050/api/auth';
+  private readonly apiUrl = buildApiUrl('auth');
 
   constructor(private http: HttpClient) {}
 
   login(credentials: { email: string; password: string }) {
-    return this.http.post<any>(`${this.API}/login`, credentials);
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials);
   }
 
   saveToken(token: string) {

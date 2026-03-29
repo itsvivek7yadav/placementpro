@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-bulk-email',
@@ -12,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class BulkEmail implements OnInit, OnDestroy {
 
-  API = "http://localhost:5050/api/tpo/email-campaigns";
+  API = buildApiUrl('tpo/email-campaigns');
 
   // ── View state ─────────────────────────────────────────
   // 'list'   → shows all campaigns

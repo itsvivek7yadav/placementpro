@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { buildApiUrl } from '../../api.config';
 
 @Component({
   selector: 'app-student-onboarding',
@@ -67,7 +68,7 @@ export class StudentOnboarding {
     this.successMessage = '';
     this.errorMessage = '';
 
-    this.http.post<any>('http://localhost:5050/api/bulk-upload/students', formData).subscribe({
+    this.http.post<any>(buildApiUrl('bulk-upload/students'), formData).subscribe({
       next: (res) => {
         this.loading = false;
         this.selectedFile = null;

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-edit-drive',
@@ -26,7 +27,7 @@ export class EditDrive implements OnInit {
   successMessage = '';
   errorMessage   = '';
 
-  private baseUrl = 'http://localhost:5050/api/placement-drives';
+  private readonly baseUrl = buildApiUrl('placement-drives');
 
   constructor(
     private fb:     FormBuilder,
@@ -61,7 +62,7 @@ export class EditDrive implements OnInit {
   }
 
   loadPrograms() {
-    this.http.get<any>('http://localhost:5050/api/programs').subscribe({
+    this.http.get<any>(buildApiUrl('programs')).subscribe({
       next: res => {
         this.programs = res.programs || [];
         this.loadDrive(); // load drive only after programs are ready
