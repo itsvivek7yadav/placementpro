@@ -98,6 +98,7 @@
       <thead>
         <tr>
           <th>#</th>
+          <th>Action</th>
           <th>Program</th>
           <th>Batch</th>
           <th>Status</th>
@@ -139,7 +140,6 @@
           <th>Total Work Exp</th>
           <th>Last Company</th>
           <th>Last Industry</th>
-          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -147,6 +147,9 @@
             [ngClass]="s.placement_status === 'PLACED' ? 'row-placed' : ''">
 
           <td>{{ i + 1 }}</td>
+          <td>
+            <button class="view-btn" (click)="viewStudentProgress(s.student_id)">View</button>
+          </td>
           <td class="col-text">{{ s.program_name || '—' }}</td>
           <td class="col-text">{{ s.program_batch || '—' }}</td>
           <td>
@@ -197,10 +200,6 @@
           <td class="col-text">{{ s.total_work_experience || '—' }}</td>
           <td class="col-text">{{ s.last_company_name || '—' }}</td>
           <td class="col-text">{{ s.last_company_industry || '—' }}</td>
-          <td>
-            <button class="view-btn" (click)="viewStudentProgress(s.student_id)">View</button>
-          </td>
-
         </tr>
       </tbody>
     </table>

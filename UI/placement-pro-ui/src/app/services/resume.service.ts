@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { buildApiUrl } from '../api.config';
 
 export interface ResumeData {
   personalSummary: string;
@@ -59,7 +58,7 @@ export interface StudentData {
   providedIn: 'root'
 })
 export class ResumeService {
-  private apiUrl = buildApiUrl('/resume');
+  private apiUrl = 'http://localhost:5050/api/resume';
 
   constructor(private http: HttpClient) {}
 

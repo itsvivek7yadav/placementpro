@@ -4,7 +4,6 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
-import { API_BASE_URL } from '../../../api.config';
 
 @Component({
   selector: 'app-create-test',
@@ -29,7 +28,7 @@ export class CreateTest implements OnInit {
   errorMsg = '';
   successMsg = '';
 
-  private API = API_BASE_URL;
+  private API = 'http://localhost:5050/api';
 
   constructor(
     private fb:     FormBuilder,

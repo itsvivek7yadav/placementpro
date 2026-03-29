@@ -7,11 +7,16 @@ async function getStudentByUserId(userId) {
         s.user_id,
         s.prn,
         s.first_name,
+        s.middle_name,
         s.last_name,
         s.program_name,
         s.program_batch,
         s.cgpa,
         s.placement_status,
+        s.placed_company,
+        s.placement_mode,
+        s.placement_package,
+        s.placed_at,
         s.college_email,
         s.personal_email,
         s.phone_number,
@@ -34,11 +39,16 @@ async function getStudentById(studentId) {
         s.user_id,
         s.prn,
         s.first_name,
+        s.middle_name,
         s.last_name,
         s.program_name,
         s.program_batch,
         s.cgpa,
         s.placement_status,
+        s.placed_company,
+        s.placement_mode,
+        s.placement_package,
+        s.placed_at,
         s.college_email,
         s.personal_email,
         s.phone_number,
@@ -56,6 +66,62 @@ async function getStudentById(studentId) {
 
 function roundTo(value, digits = 1) {
   return Number(Number(value || 0).toFixed(digits));
+}
+
+async function attachRoundDetails(applications) {
+  if (!applications.length) {
+    return applications;
+  }
+
+  const applicationIds = applications.map((application) => application.application_id);
+  const placeholders = applicationIds.map(() => '?').join(', ');
+
+  const [roundRows] = await db.query(
+    `SELECT
+        ars.application_id,
+        ars.round_id,
+        ars.status,
+        ars.remarks,
+        dr.round_name,
+        dr.round_order
+     FROM applicant_round_status ars
+     JOIN drive_rounds dr ON dr.round_id = ars.round_id
+     WHERE ars.application_id IN (${placeholders})
+     ORDER BY dr.round_order ASC`,
+    applicationIds
+  );
+
+  const grouped = new Map();
+  roundRows.forEach((row) => {
+    if (!grouped.has(row.application_id)) {
+      grouped.set(row.application_id, []);
+    }
+
+    grouped.get(row.application_id).push({
+      round_id: row.round_id,
+      round_name: row.round_name,
+      round_order: row.round_order,
+      status: row.status,
+      remarks: row.remarks
+    });
+  });
+
+  return applications.map((application) => {
+    const rounds = grouped.get(application.application_id) || [];
+    const currentRound =
+      rounds.find((round) => round.round_id === application.current_round_id) ||
+      rounds.find((round) => round.status === 'PENDING') ||
+      [...rounds].reverse().find((round) => round.status === 'CLEARED') ||
+      null;
+
+    return {
+      ...application,
+      rounds,
+      current_round_name: currentRound?.round_name || null,
+      current_round_order: currentRound?.round_order || null,
+      current_round_status: currentRound?.status || null
+    };
+  });
 }
 
 function buildProgressResponse(student, applications, tests) {
@@ -93,14 +159,19 @@ function buildProgressResponse(student, applications, tests) {
   return {
     student: {
       student_id: student.student_id,
-      name: student.name || [student.first_name, student.last_name].filter(Boolean).join(' ') || 'Student',
+      name: student.name || [student.first_name, student.middle_name, student.last_name].filter(Boolean).join(' ') || 'Student',
       first_name: student.first_name,
+      middle_name: student.middle_name,
       last_name: student.last_name,
       prn: student.prn,
       program_name: student.program_name,
       program_batch: student.program_batch,
       cgpa: student.cgpa,
       placement_status: student.placement_status,
+      placed_company: student.placed_company,
+      placement_mode: student.placement_mode,
+      placement_package: student.placement_package,
+      placed_at: student.placed_at,
       college_email: student.college_email,
       personal_email: student.personal_email,
       phone_number: student.phone_number || student.email || null
@@ -152,7 +223,11 @@ function buildProgressResponse(student, applications, tests) {
       application_status: app.status,
       result: app.result,
       applied_at: app.applied_at,
-      application_deadline: app.application_deadline
+      application_deadline: app.application_deadline,
+      current_round_name: app.current_round_name,
+      current_round_order: app.current_round_order,
+      current_round_status: app.current_round_status,
+      rounds: app.rounds || []
     })),
     tests: tests.map(test => {
       const score = Number(test.my_score || 0);
@@ -182,6 +257,7 @@ async function getApplicationsByStudentId(studentId) {
         a.application_id,
         a.status,
         a.result,
+        a.current_round_id,
         a.applied_at,
         pd.drive_id,
         pd.company_name,
@@ -197,10 +273,17 @@ async function getApplicationsByStudentId(studentId) {
     [studentId]
   );
 
-  return applications;
+  return attachRoundDetails(applications);
 }
 
 async function getTestsByStudent(student) {
+  await db.query(
+    `UPDATE mock_tests
+     SET status = 'CLOSED'
+     WHERE status = 'LIVE'
+       AND end_time <= NOW()`
+  );
+
   const [tests] = await db.query(
     `SELECT
         mt.test_id,
@@ -273,10 +356,37 @@ exports.getStudentProgressById = async (req, res) => {
 
 exports.updatePlacementStatus = async (req, res) => {
   try {
-    const { placement_status } = req.body;
+    const {
+      placement_status,
+      placed_company,
+      placement_mode,
+      placement_package,
+      placed_at
+    } = req.body;
+    const allowedPlacementModes = ['ON_CAMPUS', 'OFF_CAMPUS', 'FAMILY_BUSINESS', 'HIGHER_STUDIES', 'NOT_PLACED'];
 
     if (!['PLACED', 'NOT_PLACED'].includes(placement_status)) {
       return res.status(400).json({ message: 'placement_status must be PLACED or NOT_PLACED' });
+    }
+
+    if (placement_mode && !allowedPlacementModes.includes(placement_mode)) {
+      return res.status(400).json({ message: 'placement_mode is invalid' });
+    }
+
+    if (placement_status === 'PLACED' && !placement_mode) {
+      return res.status(400).json({ message: 'placement_mode is required when marking a student placed' });
+    }
+
+    if (placement_status === 'PLACED' && placement_mode === 'NOT_PLACED') {
+      return res.status(400).json({ message: 'placement_mode cannot be NOT_PLACED when placement_status is PLACED' });
+    }
+
+    const normalizedPackage = placement_package === '' || placement_package == null
+      ? null
+      : Number(placement_package);
+
+    if (normalizedPackage != null && Number.isNaN(normalizedPackage)) {
+      return res.status(400).json({ message: 'placement_package must be a valid number' });
     }
 
     const student = await getStudentById(req.params.student_id);
@@ -285,17 +395,45 @@ exports.updatePlacementStatus = async (req, res) => {
       return res.status(404).json({ message: 'Student not found' });
     }
 
+    const nextPlacementMode = placement_status === 'PLACED'
+      ? placement_mode
+      : 'NOT_PLACED';
+    const nextPlacedCompany = placement_status === 'PLACED'
+      ? (placed_company || null)
+      : null;
+    const nextPlacementPackage = placement_status === 'PLACED'
+      ? normalizedPackage
+      : null;
+    const nextPlacedAt = placement_status === 'PLACED'
+      ? (placed_at || null)
+      : null;
+
     await db.query(
       `UPDATE students
-       SET placement_status = ?
+       SET placement_status = ?,
+           placed_company = ?,
+           placement_mode = ?,
+           placement_package = ?,
+           placed_at = ?
        WHERE student_id = ?`,
-      [placement_status, req.params.student_id]
+      [
+        placement_status,
+        nextPlacedCompany,
+        nextPlacementMode,
+        nextPlacementPackage,
+        nextPlacedAt,
+        req.params.student_id
+      ]
     );
 
     res.json({
       message: `Student marked as ${placement_status}`,
       student_id: Number(req.params.student_id),
-      placement_status
+      placement_status,
+      placed_company: nextPlacedCompany,
+      placement_mode: nextPlacementMode,
+      placement_package: nextPlacementPackage,
+      placed_at: nextPlacedAt
     });
   } catch (err) {
     console.error('Update Placement Status Error:', err);

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { buildApiUrl } from '../../api.config';
 
 @Component({
   selector: 'app-student-onboarding',
@@ -11,7 +10,6 @@ import { buildApiUrl } from '../../api.config';
   styleUrls: ['./student-onboarding.scss']
 })
 export class StudentOnboarding {
-  private readonly uploadUrl = buildApiUrl('/bulk-upload/students');
 
   selectedFile: File | null = null;
   loading = false;
@@ -69,7 +67,7 @@ export class StudentOnboarding {
     this.successMessage = '';
     this.errorMessage = '';
 
-    this.http.post<any>(this.uploadUrl, formData).subscribe({
+    this.http.post<any>('http://localhost:5050/api/bulk-upload/students', formData).subscribe({
       next: (res) => {
         this.loading = false;
         this.selectedFile = null;

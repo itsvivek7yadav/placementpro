@@ -26,11 +26,6 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "src/assets",
-                "output": "assets"
-              },
-              {
-                "glob": "**/*",
                 "input": "public"
               }
             ],
@@ -66,7 +61,8 @@
               "buildTarget": "placement-pro-ui:build:production"
             },
             "development": {
-              "buildTarget": "placement-pro-ui:build:development"
+              "buildTarget": "placement-pro-ui:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
@@ -86,12 +82,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "src/assets",
-                "output": "assets"
-              },
-              {
-                "glob": "**/*",
                 "input": "public"
+                
               }
             ],
             "styles": [

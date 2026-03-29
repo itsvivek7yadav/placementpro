@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { API_BASE_URL } from '../../api.config';
+import { buildApiUrl } from '../../api.config';
 
 @Component({
   selector: 'app-my-applications',
@@ -17,7 +17,7 @@ export class MyApplications implements OnInit {
   loading = true;
   withdrawingId: number | null = null;
 
-  private API = API_BASE_URL;
+  private readonly apiBase = buildApiUrl();
 
   constructor(private http: HttpClient) {}
 
@@ -34,7 +34,7 @@ export class MyApplications implements OnInit {
     this.loading = true;
 
     this.http.get<any>(
-      `${this.API}/applications/my`,
+      `${this.apiBase}/applications/my`,
       { headers: this.getAuthHeaders() }
     ).subscribe({
       next:  (res) => { this.applications = res.applications; this.loading = false; },
@@ -46,13 +46,45 @@ export class MyApplications implements OnInit {
     return new Date(deadline) < new Date();
   }
 
+  hasRounds(app: any): boolean {
+    return Array.isArray(app?.rounds) && app.rounds.length > 0;
+  }
+
+  formatRoundStatus(status?: string | null): string {
+    switch (status) {
+      case 'CLEARED':
+        return 'Cleared';
+      case 'REJECTED':
+        return 'Rejected';
+      case 'PENDING':
+        return 'In Progress';
+      default:
+        return 'Not Reached';
+    }
+  }
+
+  getCurrentRoundSummary(app: any): string {
+    if (!this.hasRounds(app)) {
+      return 'Round updates will appear here once the hiring process starts.';
+    }
+
+    if (!app.current_round_name) {
+      return app.result === 'SELECTED'
+        ? 'All hiring rounds cleared.'
+        : 'Round update pending from placement cell.';
+    }
+
+    const orderLabel = app.current_round_order ? `Round ${app.current_round_order}` : 'Current Round';
+    return `${orderLabel}: ${app.current_round_name} • ${this.formatRoundStatus(app.current_round_status)}`;
+  }
+
   withdraw(applicationId: number) {
     if (!confirm('Withdraw this application?')) return;
 
     this.withdrawingId = applicationId;
 
     this.http.delete(
-      `${this.API}/applications/withdraw/${applicationId}`,
+      `${this.apiBase}/applications/withdraw/${applicationId}`,
       { headers: this.getAuthHeaders() }
     ).subscribe({
       next: () => {

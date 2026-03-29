@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
@@ -8,7 +8,6 @@ import {
   Validators
 } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-create-drive',
@@ -18,8 +17,6 @@ import { buildApiUrl } from '../../../api.config';
   styleUrls: ['./create-drive.scss']
 })
 export class CreateDrive implements OnInit {
-  private readonly programsUrl = buildApiUrl('/programs');
-  private readonly drivesUrl = buildApiUrl('/placement-drives');
 
   driveForm!: FormGroup;
 
@@ -33,7 +30,8 @@ export class CreateDrive implements OnInit {
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef<HTMLElement>
   ) { }
 
   ngOnInit(): void {
@@ -64,7 +62,7 @@ export class CreateDrive implements OnInit {
   }
 
   loadPrograms(): void {
-    this.http.get<any>(this.programsUrl)
+    this.http.get<any>('http://localhost:5050/api/programs')
       .subscribe({
         next: (res) => {
           this.programs = res.programs || [];
@@ -81,6 +79,10 @@ export class CreateDrive implements OnInit {
     this.dropdownOpen = !this.dropdownOpen;
   }
 
+  closeDropdown(): void {
+    this.dropdownOpen = false;
+  }
+
   toggleProgram(id: number): void {
     const numId = Number(id);
     if (this.selectedPrograms.includes(numId)) {
@@ -94,6 +96,47 @@ export class CreateDrive implements OnInit {
     });
 
     console.log('Programs selected:', this.driveForm.value.eligible_programs);
+  }
+
+  selectAllPrograms(): void {
+    this.selectedPrograms = this.programs.map(program => Number(program.program_id));
+    this.driveForm.patchValue({
+      eligible_programs: [...this.selectedPrograms]
+    });
+  }
+
+  clearPrograms(): void {
+    this.selectedPrograms = [];
+    this.driveForm.patchValue({
+      eligible_programs: []
+    });
+    this.driveForm.get('eligible_programs')?.markAsTouched();
+  }
+
+  isAllProgramsSelected(): boolean {
+    return this.programs.length > 0 && this.selectedPrograms.length === this.programs.length;
+  }
+
+  get selectedProgramsSummary(): string {
+    if (this.selectedPrograms.length === 0) {
+      return 'Select Programs';
+    }
+
+    if (this.selectedPrograms.length === 1) {
+      return this.getProgramName(this.selectedPrograms[0]);
+    }
+
+    return `${this.selectedPrograms.length} programs selected`;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.dropdownOpen) return;
+
+    const target = event.target as Node | null;
+    if (target && !this.elementRef.nativeElement.contains(target)) {
+      this.closeDropdown();
+    }
   }
 
   getProgramName(id: number): string {
@@ -120,7 +163,7 @@ export class CreateDrive implements OnInit {
 
     this.loading = true;
 
-    this.http.post(this.drivesUrl, this.driveForm.value).subscribe({
+    this.http.post('http://localhost:5050/api/placement-drives', this.driveForm.value).subscribe({
       next: () => {
         this.successMessage = 'Drive published successfully';
 

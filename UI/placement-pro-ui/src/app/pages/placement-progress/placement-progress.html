@@ -46,21 +46,60 @@
 
     <div class="card tpo-card" *ngIf="isTpoView">
       <div class="section-title">Placement Control</div>
-      <p class="muted">Update the student placement outcome directly from the progress view.</p>
-      <div class="control-row">
-        <select [(ngModel)]="selectedPlacementStatus">
-          <option value="NOT_PLACED">Not Placed</option>
-          <option value="PLACED">Placed</option>
-        </select>
-        <button class="primary-btn" (click)="savePlacementStatus()" [disabled]="savingPlacement">
-          {{ savingPlacement ? 'Saving...' : 'Save Status' }}
-        </button>
+      <p class="muted">{{ placementSummary }}</p>
+      <div class="control-grid">
+        <label class="field-block">
+          <span class="field-label">Placement Status</span>
+          <select [(ngModel)]="selectedPlacementStatus" (ngModelChange)="onPlacementStatusChange()">
+            <option value="NOT_PLACED">Not Placed</option>
+            <option value="PLACED">Placed</option>
+          </select>
+        </label>
+
+        <ng-container *ngIf="isPlacedSelection">
+          <label class="field-block">
+            <span class="field-label">Placement Mode</span>
+            <select [(ngModel)]="selectedPlacementMode">
+              <option *ngFor="let option of placementModeOptions" [value]="option.value">{{ option.label }}</option>
+            </select>
+          </label>
+
+          <label class="field-block">
+            <span class="field-label">Placed Company / Outcome</span>
+            <input
+              type="text"
+              [(ngModel)]="placedCompany"
+              placeholder="Company name, institute, or outcome detail" />
+          </label>
+
+          <label class="field-block">
+            <span class="field-label">Placement Package (LPA)</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              [(ngModel)]="placementPackage"
+              placeholder="e.g. 12.50" />
+          </label>
+
+          <label class="field-block">
+            <span class="field-label">Placed Date</span>
+            <input type="date" [(ngModel)]="placedAt" />
+          </label>
+        </ng-container>
+
+        <div class="control-actions">
+          <button class="primary-btn" (click)="savePlacementStatus()" [disabled]="savingPlacement">
+            {{ savingPlacement ? 'Saving...' : 'Save Status' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="message success" *ngIf="successMessage">{{ successMessage }}</div>
   <div class="message error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
 
   <div class="stats-grid">
     <div class="stat-card card">
@@ -215,6 +254,7 @@
             <tr>
               <th>Company</th>
               <th>Role</th>
+              <th>Round Update</th>
               <th>Result</th>
               <th>Drive</th>
               <th>Applied On</th>
@@ -227,6 +267,12 @@
                 <div class="table-sub">{{ app.job_type || 'Role not specified' }}</div>
               </td>
               <td>{{ app.job_role || '—' }}</td>
+              <td>
+                <div class="table-title">
+                  {{ app.current_round_name ? ('Round ' + app.current_round_order + ': ' + app.current_round_name) : 'Awaiting round update' }}
+                </div>
+                <div class="table-sub">{{ formatRoundStatus(app.current_round_status) }}</div>
+              </td>
               <td>
                 <span class="result-pill"
                   [ngClass]="{

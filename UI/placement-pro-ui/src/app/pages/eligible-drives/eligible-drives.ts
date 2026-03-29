@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { API_BASE_URL, buildApiUrl } from '../../api.config';
 
 @Component({
   selector: 'app-eligible-drives',
@@ -16,7 +15,7 @@ export class EligibleDrives implements OnInit {
   drives: any[] = [];
   loading = true;
 
-  private API = API_BASE_URL;
+  private API = 'http://localhost:5050/api';
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -53,7 +52,7 @@ applyNow(driveId: number) {
   };
 
   this.http.post(
-    buildApiUrl('/applications/apply'),
+    'http://localhost:5050/api/applications/apply',
     payload,
     {
       headers: {

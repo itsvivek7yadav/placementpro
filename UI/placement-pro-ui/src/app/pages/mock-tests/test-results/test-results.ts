@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import * as XLSX from 'xlsx';
-import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-test-results',
@@ -19,7 +18,7 @@ export class TestResults implements OnInit {
   loading   = true;
   testId!:  number;
 
-  private API = buildApiUrl('/mock-tests');
+  private API = 'http://localhost:5050/api/mock-tests';
 
   constructor(
     private route:  ActivatedRoute,

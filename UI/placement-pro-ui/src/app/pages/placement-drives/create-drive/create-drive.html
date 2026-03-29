@@ -45,13 +45,13 @@
           </div>
 
           <div class="form-group">
-            <label>CTC / Stipend</label>
+            <label>CTC / Stipend *</label>
             <input type="text" formControlName="ctc" placeholder="e.g. 6 LPA – 8 LPA" />
             <small>You can enter a range using '–' if needed</small>
           </div>
 
           <div class="form-group full-width">
-            <label>Job Description</label>
+            <label>Job Description *</label>
             <textarea formControlName="description" rows="4"
               placeholder="Describe role responsibilities, required skills, selection rounds, etc."></textarea>
             <small>This will be visible to eligible students.</small>
@@ -73,16 +73,27 @@
           <div class="form-group full-width">
             <label>Eligible Programs *</label>
             <div class="custom-multi-select">
-              <div class="select-box" (click)="toggleDropdown()">
-                <span class="placeholder" *ngIf="selectedPrograms.length === 0">Select Programs</span>
-                <div class="selected-chips">
+              <button type="button" class="select-box" (click)="toggleDropdown()" [class.open]="dropdownOpen">
+                <div class="select-box-copy">
+                  <span class="field-label">Selection of Programme</span>
+                  <span class="placeholder" *ngIf="selectedPrograms.length === 0">{{ selectedProgramsSummary }}</span>
+                  <span class="selection-summary" *ngIf="selectedPrograms.length > 0">{{ selectedProgramsSummary }}</span>
+                </div>
+                <div class="selected-chips" *ngIf="selectedPrograms.length > 0">
                   <span class="chip" *ngFor="let id of selectedPrograms">
                     {{ getProgramName(id) }}
                   </span>
                 </div>
-                <span class="arrow">▼</span>
-              </div>
+                <span class="arrow">{{ dropdownOpen ? '▲' : '▼' }}</span>
+              </button>
               <div class="dropdown" *ngIf="dropdownOpen">
+                <div class="dropdown-toolbar">
+                  <button type="button" class="dropdown-action" (click)="selectAllPrograms()">
+                    {{ isAllProgramsSelected() ? 'All selected' : 'Select all' }}
+                  </button>
+                  <button type="button" class="dropdown-action" (click)="clearPrograms()">Clear</button>
+                  <button type="button" class="dropdown-action done" (click)="closeDropdown()">Done</button>
+                </div>
                 <div class="dropdown-item" *ngFor="let program of programs">
                   <input type="checkbox"
                     [checked]="selectedPrograms.includes(program.program_id)"
@@ -91,7 +102,7 @@
                 </div>
               </div>
             </div>
-            <small>Select one or more eligible programs</small>
+            <small>Choose one or more programmes. Click Done when you finish, or click anywhere outside to close.</small>
           </div>
 
           <div class="form-group">

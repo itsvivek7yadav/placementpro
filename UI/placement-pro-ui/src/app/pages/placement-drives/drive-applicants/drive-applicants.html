@@ -1,182 +1,191 @@
 <div class="page">
-
-  <!-- ── Toast ── -->
-  <div class="toast" *ngIf="toastMessage" [ngClass]="toastType">
-    <span class="toast-icon">{{ toastType === 'success' ? '✅' : '❌' }}</span>
-    {{ toastMessage }}
-  </div>
-
-  <!-- ── Header ── -->
-  <div class="page-header">
-    <div class="header-left">
-      <button class="back-btn" (click)="goBack()">← Back</button>
-      <div>
-        <h2 class="page-title">Drive Applicants</h2>
-        <p class="page-sub">Drive #{{ driveId }} — {{ totalCount }} total applicants</p>
-      </div>
+  <section class="hero">
+    <div>
+      <button mat-stroked-button type="button" class="back-btn" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to drives
+      </button>
+      <h2 class="page-title">Drive Applicants</h2>
+      <p class="page-sub">Drive #{{ driveId }} with dynamic round tracking for {{ totalCount }} applicant{{ totalCount !== 1 ? 's' : '' }}</p>
     </div>
-    <button class="export-btn" (click)="exportToExcel()" [disabled]="loading || totalCount === 0">
-      <span>⬇</span> Export CSV
-    </button>
-  </div>
+    <div class="hero-actions">
+      <button mat-stroked-button type="button" (click)="openManageRoundsDialog()">
+        <mat-icon>tune</mat-icon>
+        Manage Rounds
+      </button>
+      <button mat-flat-button type="button" color="primary" (click)="exportToCsv()" [disabled]="loading || filteredApplicants.length === 0">
+        Export CSV
+      </button>
+    </div>
+  </section>
 
-  <!-- ── Stats Bar ── -->
-  <div class="stats-bar" *ngIf="!loading">
-    <div class="stat-card" (click)="setFilter('ALL')" [class.active]="filterResult === 'ALL'">
-      <span class="stat-value">{{ totalCount }}</span>
+  <section class="stats-grid" *ngIf="!loading">
+    <article class="stat-card">
       <span class="stat-label">Total</span>
-    </div>
-    <div class="stat-card pending" (click)="setFilter('PENDING')" [class.active]="filterResult === 'PENDING'">
-      <span class="stat-value">{{ pendingCount }}</span>
-      <span class="stat-label">Pending</span>
-    </div>
-    <div class="stat-card selected" (click)="setFilter('SELECTED')" [class.active]="filterResult === 'SELECTED'">
-      <span class="stat-value">{{ selectedCount }}</span>
+      <strong class="stat-value">{{ totalCount }}</strong>
+    </article>
+    <article class="stat-card pending">
+      <span class="stat-label">Pending Result</span>
+      <strong class="stat-value">{{ pendingCount }}</strong>
+    </article>
+    <article class="stat-card selected">
       <span class="stat-label">Selected</span>
-    </div>
-    <div class="stat-card rejected" (click)="setFilter('REJECTED')" [class.active]="filterResult === 'REJECTED'">
-      <span class="stat-value">{{ rejectedCount }}</span>
+      <strong class="stat-value">{{ selectedCount }}</strong>
+    </article>
+    <article class="stat-card rejected">
       <span class="stat-label">Rejected</span>
-    </div>
-  </div>
+      <strong class="stat-value">{{ rejectedCount }}</strong>
+    </article>
+  </section>
 
-  <!-- ── Toolbar ── -->
-  <div class="toolbar" *ngIf="!loading">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
+  <section class="filters-card" *ngIf="!loading">
+    <mat-form-field appearance="outline">
+      <mat-label>Search applicants</mat-label>
       <input
-        type="text"
-        placeholder="Search by name, PRN, email or program…"
+        matInput
         [(ngModel)]="searchQuery"
-        (input)="onSearch()" />
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search by student name or roll number" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Round</mat-label>
+      <mat-select [ngModel]="filterRoundId" (ngModelChange)="onRoundFilterChange($event)">
+        <mat-option [value]="null">All rounds</mat-option>
+        <mat-option *ngFor="let round of rounds; trackBy: trackByRoundId" [value]="round.round_id">
+          {{ round.round_name }} (Round {{ round.round_order }})
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select [ngModel]="filterStatus" (ngModelChange)="onStatusFilterChange($event)">
+        <mat-option [value]="null">All statuses</mat-option>
+        <mat-option value="PENDING">PENDING</mat-option>
+        <mat-option value="CLEARED">CLEARED</mat-option>
+        <mat-option value="REJECTED">REJECTED</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="filter-meta">
+      <span>{{ filteredApplicants.length }} visible</span>
+      <span>{{ selectedApplicants.length }} selected</span>
     </div>
+  </section>
 
-    <!-- Bulk Actions — only shown when pending exist -->
-    <div class="bulk-actions" >
-      <span class="bulk-label">Bulk:</span>
-      <button class="bulk-btn bulk-select" (click)="bulkUpdate('SELECTED')" [disabled]="bulkUpdating">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Select All Pending
-      </button>
-      <button class="bulk-btn bulk-reject" (click)="bulkUpdate('REJECTED')" [disabled]="bulkUpdating">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        Reject All Pending
-      </button>
+  <section class="rounds-banner" *ngIf="!loading && rounds.length === 0">
+    <strong>No rounds defined for this drive yet.</strong>
+    Click "Manage Rounds" to define the hiring rounds before tracking applicants.
+  </section>
+
+  <section class="bulk-bar" *ngIf="selectedApplicants.length > 0 && !loading">
+    <div>
+      <strong>{{ selectedApplicants.length }}</strong>
+      applicant{{ selectedApplicants.length !== 1 ? 's' : '' }} selected
     </div>
+    <div class="bulk-actions">
+      <span [matTooltip]="!filterRoundId ? 'Select a round filter first' : ''">
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="bulkUpdate('CLEARED')"
+          [disabled]="bulkUpdating || !filterRoundId">
+          Mark all Cleared
+        </button>
+      </span>
+      <span [matTooltip]="!filterRoundId ? 'Select a round filter first' : ''">
+        <button
+          mat-stroked-button
+          type="button"
+          class="reject-btn"
+          (click)="bulkUpdate('REJECTED')"
+          [disabled]="bulkUpdating || !filterRoundId">
+          Mark all Rejected
+        </button>
+      </span>
+    </div>
+  </section>
 
-    <span class="result-count">{{ filtered.length }} result{{ filtered.length !== 1 ? 's' : '' }}</span>
-  </div>
+  <section class="loading-state" *ngIf="loading">
+    <mat-spinner diameter="44"></mat-spinner>
+    <p>Loading applicant rounds...</p>
+  </section>
 
-  <!-- ── Loading ── -->
-  <div class="loading-state" *ngIf="loading">
-    <div class="spinner"></div>
-    <span>Loading applicants…</span>
-  </div>
+  <section class="empty-state" *ngIf="!loading && filteredApplicants.length === 0">
+    <h3>No applicants match the current filters</h3>
+    <p *ngIf="totalCount === 0">This drive does not have any applications yet.</p>
+    <p *ngIf="totalCount > 0">Try a different round, status, or search term.</p>
+  </section>
 
-  <!-- ── Empty ── -->
-  <div class="empty-state" *ngIf="!loading && filtered.length === 0">
-    <div class="empty-icon">👤</div>
-    <p *ngIf="totalCount === 0">No one has applied to this drive yet.</p>
-    <p *ngIf="totalCount > 0">No applicants match your current filter.</p>
-  </div>
+  <section class="table-shell" *ngIf="!loading && filteredApplicants.length > 0">
+    <table mat-table [dataSource]="filteredApplicants" class="applicants-table">
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox
+            [checked]="allFilteredSelected"
+            [indeterminate]="someFilteredSelected"
+            (change)="toggleSelectAll($event.checked)">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let applicant">
+          <mat-checkbox
+            [checked]="!!applicant.selected"
+            (change)="onToggleApplicant(applicant, $event.checked)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
 
-  <!-- ── Table ── -->
-<!-- ── Table ── -->
-<div class="table-wrapper" *ngIf="!loading && filtered.length > 0">
-  <table class="applicants-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Personal Email</th>
-        <th>Phone</th>
-        <th>Gender</th>
-        <th>UG Degree</th>
-        <th>UG Specialization</th>
-        <th>UG %</th>
-        <th>PG Degree</th>
-        <th>PG Specialization</th>
-        <th>PG %</th>
-        <th>Backlog</th>
-        <th>State</th>
-        <th>CGPA</th>
-        <th>Applied</th>
-        <th>Result</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let app of filtered; let i = index"
-          [ngClass]="{
-            'row-selected': app.result === 'SELECTED',
-            'row-rejected': app.result === 'REJECTED'
-          }">
-
-        <td class="col-index">{{ i + 1 }}</td>
-
-        <td class="col-student">
-          <div class="student-avatar">{{ app.student_name?.charAt(0) }}</div>
-          <div class="student-info">
-            <span class="student-name">{{ app.student_name }}</span>
-            <span class="student-email">{{ app.student_email }}</span>
+      <ng-container matColumnDef="student">
+        <th mat-header-cell *matHeaderCellDef>Student</th>
+        <td mat-cell *matCellDef="let applicant">
+          <div class="student-cell">
+            <div class="student-avatar">{{ applicant.student_name?.charAt(0) }}</div>
+            <div>
+              <div class="student-name">{{ applicant.student_name }}</div>
+              <div class="student-meta">{{ applicant.roll_number }} · {{ applicant.email }}</div>
+            </div>
           </div>
         </td>
+      </ng-container>
 
-        <td class="col-text">{{ app.personal_email || '—' }}</td>
-        <td class="col-text">{{ app.phone_number   || '—' }}</td>
-        <td class="col-text">{{ app.gender         || '—' }}</td>
-        <td class="col-text">{{ app.ug_course_name || '—' }}</td>
-        <td class="col-text">{{ app.ug_specialization || '—' }}</td>
-        <td class="col-text">{{ app.ug_percentage ? (app.ug_percentage + '%') : '—' }}</td>
-        <td class="col-text">{{ app.pg_degree         || '—' }}</td>
-        <td class="col-text">{{ app.pg_specialization || '—' }}</td>
-        <td class="col-text">{{ app.pg_percentage ? (app.pg_percentage + '%') : '—' }}</td>
+      <ng-container *ngFor="let round of rounds; trackBy: trackByRoundId" [matColumnDef]="'round_' + round.round_id">
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="round-header">
+            <strong>{{ round.round_name }}</strong>
+            <span>Round {{ round.round_order }}</span>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let applicant" [ngClass]="getRoundCellClass(applicant, round)">
+          <ng-container *ngIf="isRoundReachable(applicant, round); else notReached">
+            <mat-button-toggle-group
+              class="round-toggle"
+              [value]="getRoundStatus(applicant, round).status"
+              (change)="updateRoundStatus(applicant, round, $event)"
+              [disabled]="updatingId === applicant.application_id || bulkUpdating">
+              <mat-button-toggle value="PENDING">Pending</mat-button-toggle>
+              <mat-button-toggle value="CLEARED">Cleared</mat-button-toggle>
+              <mat-button-toggle value="REJECTED">Rejected</mat-button-toggle>
+            </mat-button-toggle-group>
+          </ng-container>
+          <ng-template #notReached>
+            <span class="not-reached" matTooltip="Not reached yet">—</span>
+          </ng-template>
+        </td>
+      </ng-container>
 
-        <td class="col-text">
-          <span class="backlog-badge" [ngClass]="app.backlog ? 'backlog-yes' : 'backlog-no'">
-            {{ app.backlog ? 'Yes' : 'No' }}
+      <ng-container matColumnDef="result">
+        <th mat-header-cell *matHeaderCellDef>Result</th>
+        <td mat-cell *matCellDef="let applicant">
+          <span class="result-badge" [ngClass]="getResultBadgeClass(applicant.result)">
+            {{ applicant.result }}
           </span>
         </td>
+      </ng-container>
 
-        <td class="col-text">{{ app.native_state || '—' }}</td>
-
-        <td class="col-cgpa">
-          <span class="cgpa-badge">{{ app.cgpa | number:'1.2-2' }}</span>
-        </td>
-
-        <td class="col-date">{{ app.applied_at | date:'dd MMM yyyy' }}</td>
-
-        <td class="col-result">
-          <span class="result-badge"
-            [ngClass]="{
-              'badge-pending':  app.result === 'PENDING',
-              'badge-selected': app.result === 'SELECTED',
-              'badge-rejected': app.result === 'REJECTED'
-            }">
-            {{ app.result }}
-          </span>
-        </td>
-
-        <td class="col-actions">
-          <button class="action-btn select-btn"
-            [class.active-result]="app.result === 'SELECTED'"
-            (click)="updateResult(app.application_id, 'SELECTED')"
-            [disabled]="updatingId === app.application_id || bulkUpdating">
-            <span class="btn-spinner" *ngIf="updatingId === app.application_id"></span>
-            <span *ngIf="updatingId !== app.application_id">✓</span>
-          </button>
-          <button class="action-btn reject-btn"
-            [class.active-result]="app.result === 'REJECTED'"
-            (click)="updateResult(app.application_id, 'REJECTED')"
-            [disabled]="updatingId === app.application_id || bulkUpdating">
-            <span class="btn-spinner" *ngIf="updatingId === app.application_id"></span>
-            <span *ngIf="updatingId !== app.application_id">✕</span>
-          </button>
-        </td>
-
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </section>
 </div>

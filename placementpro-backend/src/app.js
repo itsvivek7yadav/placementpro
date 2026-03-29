@@ -27,6 +27,7 @@ require('./config/db');
 
 // ─── Cron Jobs ─────────────────────────────────────────────────────────────
 require('./cron/closeExpiredDrives');
+require('./cron/closeExpiredMockTests');
 require('./cron/remailWorker');
 
 // ─── Off-Campus Cron Jobs ─────────────────────────────────────────────────
@@ -41,6 +42,7 @@ const userRoutes              = require('./routes/userRoutes');
 const placementDriveRoutes    = require('./routes/placementDriveRoutes');
 const studentDriveRoutes      = require('./routes/studentDriveRoutes');
 const applicationRoutes       = require('./routes/applicationRoutes');
+const driveRoundRoutes        = require('./routes/driveRoundRoutes');
 const applicationReviewRoutes = require('./routes/applicationReviewRoutes');
 const tpoDashboardRoutes      = require('./routes/tpoDashboardRoutes');
 const bulkUploadRoutes        = require('./routes/bulkUploadRoutes');
@@ -60,6 +62,7 @@ app.use('/api/users',              userRoutes);
 app.use('/api/placement-drives',   placementDriveRoutes);
 app.use('/api/student-drives',     studentDriveRoutes);
 app.use('/api/applications',       applicationRoutes);
+app.use('/api/drives',             driveRoundRoutes);
 app.use('/api/application-review', applicationReviewRoutes);
 app.use('/api/tpo/dashboard',      tpoDashboardRoutes);
 app.use('/api/bulk-upload',        bulkUploadRoutes);

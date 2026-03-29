@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { buildApiUrl } from '../../api.config';
 
 @Component({
   selector: 'app-students',
@@ -13,7 +12,6 @@ import { buildApiUrl } from '../../api.config';
   styleUrls: ['./students.scss']
 })
 export class Students implements OnInit {
-  private readonly studentsUrl = buildApiUrl('/students');
 
   students: any[] = [];
   filteredStudents: any[] = [];
@@ -45,7 +43,7 @@ export class Students implements OnInit {
   }
 
   loadStudents() {
-    this.http.get<{ students: any[] }>(this.studentsUrl)
+    this.http.get<{ students: any[] }>('http://localhost:5050/api/students')
       .subscribe({
         next: (res) => {
           this.students = res.students;

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { buildApiUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-closed-drives',
@@ -16,7 +15,7 @@ export class ClosedDrives implements OnInit {
   drives: any[] = [];
   loading = true;
 
-private baseUrl = buildApiUrl('/placement-drives');
+private baseUrl = 'http://localhost:5050/api/placement-drives';
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -45,4 +44,5 @@ private baseUrl = buildApiUrl('/placement-drives');
   viewApplicants(id: number) {
     this.router.navigate(['/placement-drives/applicants', id]);
   }
+
 }

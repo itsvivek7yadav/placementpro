@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { API_BASE_URL } from '../../api.config';
 
 @Component({
   selector: 'app-drive-detail',
@@ -19,7 +18,7 @@ export class DriveDetail implements OnInit {
   errorMessage = '';
 
   // 🔥 Change this later to production backend URL
-  private API = API_BASE_URL;
+  private API = 'http://localhost:5050/api';
 
   constructor(
     private route: ActivatedRoute,

@@ -1,5 +1,60 @@
 const db = require('../config/db');
 
+async function attachRoundDetails(applications) {
+  if (!applications.length) {
+    return applications;
+  }
+
+  const applicationIds = applications.map((application) => application.application_id);
+  const placeholders = applicationIds.map(() => '?').join(', ');
+
+  const [roundRows] = await db.query(
+    `SELECT
+        ars.application_id,
+        ars.round_id,
+        ars.status,
+        ars.remarks,
+        dr.round_name,
+        dr.round_order
+     FROM applicant_round_status ars
+     JOIN drive_rounds dr ON dr.round_id = ars.round_id
+     WHERE ars.application_id IN (${placeholders})
+     ORDER BY dr.round_order ASC`,
+    applicationIds
+  );
+
+  const grouped = new Map();
+  roundRows.forEach((row) => {
+    if (!grouped.has(row.application_id)) {
+      grouped.set(row.application_id, []);
+    }
+    grouped.get(row.application_id).push({
+      round_id: row.round_id,
+      round_name: row.round_name,
+      round_order: row.round_order,
+      status: row.status,
+      remarks: row.remarks
+    });
+  });
+
+  return applications.map((application) => {
+    const rounds = grouped.get(application.application_id) || [];
+    const currentRound =
+      rounds.find((round) => round.round_id === application.current_round_id) ||
+      rounds.find((round) => round.status === 'PENDING') ||
+      [...rounds].reverse().find((round) => round.status === 'CLEARED') ||
+      null;
+
+    return {
+      ...application,
+      rounds,
+      current_round_name: currentRound?.round_name || null,
+      current_round_order: currentRound?.round_order || null,
+      current_round_status: currentRound?.status || null
+    };
+  });
+}
+
 /**
  * 🎓 STUDENT — Apply to a drive
  * POST /api/student/applications/apply
@@ -122,6 +177,7 @@ exports.getMyApplications = async (req, res) => {
          a.application_id,
          a.status,
          a.result,
+         a.current_round_id,
          a.notification,
          a.applied_at,
          pd.drive_id,
@@ -134,11 +190,13 @@ exports.getMyApplications = async (req, res) => {
        FROM applications a
        JOIN placement_drives pd ON pd.drive_id = a.drive_id
        WHERE a.student_id = ?
-       ORDER BY a.applied_at DESC`,
+      ORDER BY a.applied_at DESC`,
       [student.student_id]
     );
 
-    res.json({ applications });
+    const applicationsWithRounds = await attachRoundDetails(applications);
+
+    res.json({ applications: applicationsWithRounds });
 
   } catch (err) {
     console.error('Get My Applications Error:', err);

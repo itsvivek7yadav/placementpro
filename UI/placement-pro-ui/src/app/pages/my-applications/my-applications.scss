@@ -98,6 +98,66 @@
   margin-top: 4px;
 }
 
+.round-summary {
+  font-size: 12px;
+  color: #334155;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.round-timeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.round-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 116px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+
+  strong {
+    font-size: 10px;
+    color: #64748b;
+  }
+
+  span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  small {
+    font-size: 11px;
+    color: #64748b;
+  }
+}
+
+.round-cleared {
+  background: rgba(16,185,129,0.08);
+  border-color: rgba(16,185,129,0.22);
+}
+
+.round-pending {
+  background: rgba(59,130,246,0.08);
+  border-color: rgba(59,130,246,0.22);
+}
+
+.round-rejected {
+  background: rgba(239,68,68,0.08);
+  border-color: rgba(239,68,68,0.22);
+}
+
+.round-not-reached {
+  opacity: 0.8;
+}
+
 .result-section {
   display: flex;
   flex-direction: column;
@@ -209,4 +269,20 @@
   margin-top: 4px;
 
   &:hover { background: #2d5ce6; }
+}
+
+@media (max-width: 920px) {
+  .app-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .result-section,
+  .withdraw-btn {
+    width: 100%;
+  }
+
+  .result-section {
+    align-items: flex-start;
+  }
 }

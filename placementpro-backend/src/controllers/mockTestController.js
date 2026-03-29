@@ -1,5 +1,14 @@
 const db = require('../config/db');
 
+async function closeExpiredMockTests(connection = db) {
+  await connection.query(
+    `UPDATE mock_tests
+     SET status = 'CLOSED'
+     WHERE status = 'LIVE'
+       AND end_time <= NOW()`
+  );
+}
+
 exports.createTest = async (req, res) => {
   const connection = await db.getConnection();
   try {
@@ -46,6 +55,8 @@ exports.createTest = async (req, res) => {
 
 exports.getAllTests = async (req, res) => {
   try {
+    await closeExpiredMockTests();
+
     const [tests] = await db.query(
       `SELECT mt.*,
           COUNT(DISTINCT tq.question_id) AS question_count,
@@ -68,6 +79,8 @@ exports.getAllTests = async (req, res) => {
 
 exports.getTestById = async (req, res) => {
   try {
+    await closeExpiredMockTests();
+
     const [[test]] = await db.query(
       `SELECT mt.*,
           GROUP_CONCAT(DISTINCT tpm.program_id) AS program_ids
@@ -140,3 +153,5 @@ exports.deleteTest = async (req, res) => {
     connection.release();
   }
 };
+
+exports.closeExpiredMockTests = closeExpiredMockTests;

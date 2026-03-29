@@ -1,7 +1,18 @@
 const db = require('../config/db');
 
+async function closeExpiredMockTests() {
+  await db.query(
+    `UPDATE mock_tests
+     SET status = 'CLOSED'
+     WHERE status = 'LIVE'
+       AND end_time <= NOW()`
+  );
+}
+
 exports.getMyTests = async (req, res) => {
   try {
+    await closeExpiredMockTests();
+
     const [studentRows] = await db.query(
       `SELECT student_id, program_name, program_batch FROM students WHERE user_id = ?`,
       [req.user.user_id]
@@ -42,6 +53,8 @@ exports.getMyTests = async (req, res) => {
 
 exports.startTest = async (req, res) => {
   try {
+    await closeExpiredMockTests();
+
     const testId = req.params.test_id;
 
     const [studentRows] = await db.query(

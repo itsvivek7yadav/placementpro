@@ -18,7 +18,7 @@ export class TestList implements OnInit {
   toastMsg = '';
   toastType: 'success' | 'error' = 'success';
 
-private API = buildApiUrl('/mock-tests');
+  private readonly apiUrl = buildApiUrl('mock-tests');
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -26,7 +26,7 @@ private API = buildApiUrl('/mock-tests');
 
   loadTests() {
     this.loading = true;
-    this.http.get<any>(this.API).subscribe({
+    this.http.get<any>(this.apiUrl).subscribe({
       next: res => {
         this.tests   = res.tests;
         this.loading = false;
@@ -44,7 +44,7 @@ private API = buildApiUrl('/mock-tests');
   closeTest(testId: number) {
     if (!confirm('Close this test? Students will no longer be able to attempt it.')) return;
 
-    this.http.put(`${this.API}/${testId}/close`, {}).subscribe({
+    this.http.put(`${this.apiUrl}/${testId}/close`, {}).subscribe({
       next: () => {
         this.showToast('Test closed', 'success');
         this.loadTests();
@@ -56,7 +56,7 @@ private API = buildApiUrl('/mock-tests');
   deleteTest(testId: number) {
     if (!confirm('Delete this draft test? This cannot be undone.')) return;
 
-    this.http.delete(`${this.API}/${testId}`).subscribe({
+    this.http.delete(`${this.apiUrl}/${testId}`).subscribe({
       next: () => {
         this.showToast('Test deleted', 'success');
         this.loadTests();

@@ -8,7 +8,9 @@ import { buildApiUrl } from '../../../api.config';
 interface DriveStats {
   drive_id: number;
   company_name: string;
-  status: 'OPEN' | 'CLOSED';
+  status: 'LIVE' | 'CLOSED';
+  statusLabel: string;
+  statusTone: 'open' | 'pending' | 'declared' | 'closed';
   applicationCount: number;
 }
 
@@ -34,7 +36,6 @@ interface TodoItem {
   styleUrls: ['./tpo-dashboard.scss']
 })
 export class TpoDashboard {
-  private readonly statsUrl = buildApiUrl('/tpo/dashboard/stats');
 
   stats: DashboardStats | null = null;
   loading = false;
@@ -77,8 +78,7 @@ export class TpoDashboard {
 
   loadStats() {
     this.loading = true;
-    // ✅ FIX: was /api/tpo-dashboard/stats → correct mount is /api/tpo/dashboard
-    this.http.get<DashboardStats>(this.statsUrl).subscribe({
+    this.http.get<DashboardStats>(buildApiUrl('tpo/dashboard/stats')).subscribe({
       next:  (res) => { this.stats = res; this.loading = false; },
       error: (err) => { console.error(err); this.loading = false; }
     });

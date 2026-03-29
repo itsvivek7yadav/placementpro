@@ -29,7 +29,7 @@ import { LayoutStateService } from '../layout-state.service';
 
       <!-- 🔹 CENTER TITLE -->
       <div class="topbar-center" *ngIf="!isMobile">
-        Institute Placement Management System
+(Institute)Campus Placement Management System
       </div>
 
       <div class="topbar-right">

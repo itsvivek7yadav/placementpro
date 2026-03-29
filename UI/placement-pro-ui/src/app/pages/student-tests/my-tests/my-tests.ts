@@ -16,14 +16,14 @@ export class MyTests implements OnInit {
   tests:   any[] = [];
   loading  = true;
 
-  private API = buildApiUrl('/student-tests');
+  private readonly apiUrl = buildApiUrl('student-tests');
 
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() { this.loadTests(); }
 
   loadTests() {
-    this.http.get<any>(this.API).subscribe({
+    this.http.get<any>(this.apiUrl).subscribe({
       next: res => {
         this.tests   = res.tests;
         this.loading = false;
@@ -45,7 +45,8 @@ export class MyTests implements OnInit {
 
   getButtonLabel(test: any): string {
     if (test.attempt_status === 'SUBMITTED') return '✅ Submitted';
-    if (!this.isLive(test))                  return '⏳ Not Started Yet';
+    if (test.status === 'CLOSED' || new Date() > new Date(test.end_time)) return '🔒 Window Closed';
+    if (new Date() < new Date(test.start_time)) return '⏳ Not Started Yet';
     return '▶ Start Test';
   }
 }
