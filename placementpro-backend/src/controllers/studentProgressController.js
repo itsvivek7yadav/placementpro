@@ -111,6 +111,8 @@ async function attachRoundDetails(applications) {
     const currentRound =
       rounds.find((round) => round.round_id === application.current_round_id) ||
       rounds.find((round) => round.status === 'PENDING') ||
+      [...rounds].reverse().find((round) => round.status === 'ABSENT') ||
+      [...rounds].reverse().find((round) => round.status === 'REJECTED') ||
       [...rounds].reverse().find((round) => round.status === 'CLEARED') ||
       null;
 
@@ -129,6 +131,7 @@ function buildProgressResponse(student, applications, tests) {
   const startedTests = tests.filter(test => !!test.attempt_status);
   const selectedApplications = applications.filter(app => app.result === 'SELECTED');
   const rejectedApplications = applications.filter(app => app.result === 'REJECTED');
+  const absentApplications = applications.filter(app => app.result === 'ABSENT');
   const pendingApplications = applications.filter(app => app.result === 'PENDING');
   const distinctCompanies = new Set(applications.map(app => app.company_name).filter(Boolean));
 
@@ -147,7 +150,7 @@ function buildProgressResponse(student, applications, tests) {
     ? roundTo(Math.max(...testPercentages))
     : 0;
 
-  const decidedApplications = selectedApplications.length + rejectedApplications.length;
+  const decidedApplications = selectedApplications.length + rejectedApplications.length + absentApplications.length;
   const applicationSuccessRate = decidedApplications
     ? roundTo((selectedApplications.length / decidedApplications) * 100)
     : 0;

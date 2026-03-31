@@ -42,6 +42,8 @@ async function attachRoundDetails(applications) {
     const currentRound =
       rounds.find((round) => round.round_id === application.current_round_id) ||
       rounds.find((round) => round.status === 'PENDING') ||
+      [...rounds].reverse().find((round) => round.status === 'ABSENT') ||
+      [...rounds].reverse().find((round) => round.status === 'REJECTED') ||
       [...rounds].reverse().find((round) => round.status === 'CLEARED') ||
       null;
 

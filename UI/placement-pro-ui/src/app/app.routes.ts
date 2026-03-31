@@ -75,6 +75,13 @@ export const routes: Routes = [
       },
 
       {
+        path: 'reports/placement-dashboard',
+        loadComponent: () =>
+          import('./pages/reports/placement-report-dashboard/placement-report-dashboard')
+            .then(m => m.PlacementReportDashboard)
+      },
+
+      {
         path: 'drives',
         loadComponent: () =>
           import('./pages/eligible-drives/eligible-drives')

@@ -56,7 +56,7 @@ interface ProgressApplication {
   ctc?: number;
   drive_status: string;
   application_status: string;
-  result: 'PENDING' | 'SELECTED' | 'REJECTED';
+  result: 'PENDING' | 'SELECTED' | 'REJECTED' | 'ABSENT';
   applied_at: string;
   application_deadline?: string;
   current_round_name?: string | null;

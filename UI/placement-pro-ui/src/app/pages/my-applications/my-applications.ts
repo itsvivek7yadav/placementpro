@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { buildApiUrl } from '../../api.config';
+import { AuthService } from '../../auth/auth';
 
 @Component({
   selector: 'app-my-applications',
@@ -19,15 +20,10 @@ export class MyApplications implements OnInit {
 
   private readonly apiBase = buildApiUrl();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit() {
     this.loadApplications();
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token') || '';
-    return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 
   loadApplications() {
@@ -35,7 +31,7 @@ export class MyApplications implements OnInit {
 
     this.http.get<any>(
       `${this.apiBase}/applications/my`,
-      { headers: this.getAuthHeaders() }
+      { headers: this.authService.getAuthHeaders() }
     ).subscribe({
       next:  (res) => { this.applications = res.applications; this.loading = false; },
       error: (err) => { console.error(err); this.loading = false; }
@@ -56,6 +52,8 @@ export class MyApplications implements OnInit {
         return 'Cleared';
       case 'REJECTED':
         return 'Rejected';
+      case 'ABSENT':
+        return 'Absent';
       case 'PENDING':
         return 'In Progress';
       default:
@@ -85,7 +83,7 @@ export class MyApplications implements OnInit {
 
     this.http.delete(
       `${this.apiBase}/applications/withdraw/${applicationId}`,
-      { headers: this.getAuthHeaders() }
+      { headers: this.authService.getAuthHeaders() }
     ).subscribe({
       next: () => {
         this.loadApplications();

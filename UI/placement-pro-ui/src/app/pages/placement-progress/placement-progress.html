@@ -277,7 +277,7 @@
                 <span class="result-pill"
                   [ngClass]="{
                     'selected': app.result === 'SELECTED',
-                    'rejected': app.result === 'REJECTED',
+                    'rejected': app.result === 'REJECTED' || app.result === 'ABSENT',
                     'pending': app.result === 'PENDING'
                   }">
                   {{ app.result }}

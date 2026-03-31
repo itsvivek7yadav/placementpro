@@ -58,7 +58,6 @@ export class StudentSidebar implements OnInit, OnDestroy {
       const userJson = localStorage.getItem('user');
       
       if (!userJson) {
-        console.warn('No user data found in localStorage');
         this.setDefaultUserData();
         return;
       }

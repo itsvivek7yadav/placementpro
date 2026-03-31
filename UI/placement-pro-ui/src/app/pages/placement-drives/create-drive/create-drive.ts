@@ -95,8 +95,6 @@ export class CreateDrive implements OnInit {
     this.driveForm.patchValue({
       eligible_programs: [...this.selectedPrograms]
     });
-
-    console.log('Programs selected:', this.driveForm.value.eligible_programs);
   }
 
   selectAllPrograms(): void {
@@ -157,9 +155,6 @@ export class CreateDrive implements OnInit {
   }
 
   submit() {
-    console.log('Form valid:', this.driveForm.valid);
-    console.log('Payload:', this.driveForm.value);
-
     if (this.driveForm.invalid) return;
 
     this.loading = true;

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { buildApiUrl } from '../../api.config';
+import { AuthService } from '../../auth/auth';
 
 @Component({
   selector: 'app-eligible-drives',
@@ -18,7 +19,11 @@ export class EligibleDrives implements OnInit {
 
   private readonly API = buildApiUrl();
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     this.loadDrives();
@@ -46,8 +51,6 @@ applyNow(driveId: number) {
 
   if (!confirm('Apply for this drive?')) return;
 
-  const token = localStorage.getItem('token') || '';
-
   const payload = {
     drive_id: driveId
   };
@@ -56,9 +59,7 @@ applyNow(driveId: number) {
     `${this.API}/applications/apply`,
     payload,
     {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: this.authService.getAuthHeaders()
     }
   )
   .subscribe({

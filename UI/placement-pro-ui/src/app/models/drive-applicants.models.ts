@@ -9,7 +9,7 @@ export interface RoundStatus {
   round_id: number;
   round_name: string;
   round_order: number;
-  status: 'PENDING' | 'CLEARED' | 'REJECTED' | 'NOT_REACHED';
+  status: 'PENDING' | 'CLEARED' | 'REJECTED' | 'ABSENT' | 'NOT_REACHED';
   remarks?: string | null;
 }
 
@@ -59,7 +59,7 @@ export interface Applicant {
   last_company_name?: string | null;
   last_company_industry?: string | null;
   status: string;
-  result: 'PENDING' | 'SELECTED' | 'REJECTED';
+  result: 'PENDING' | 'SELECTED' | 'REJECTED' | 'ABSENT';
   current_round_id: number | null;
   last_round_reached: number | null;
   rounds: RoundStatus[];

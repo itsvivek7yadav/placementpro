@@ -114,6 +114,7 @@
             <div class="notif-time">{{ n.time }}</div>
           </div>
           <div class="result-pill result-selected" *ngIf="n.result === 'SELECTED'">Selected</div>
+          <div class="result-pill result-rejected" *ngIf="isAbsentResult(n.result)">Absent</div>
           <div class="result-pill result-rejected" *ngIf="n.result === 'REJECTED'">Rejected</div>
         </div>
       </div>
@@ -151,10 +152,10 @@
                [ngClass]="{
                  'status-pending':  app.result === 'PENDING',
                  'status-selected': app.result === 'SELECTED',
-                 'status-rejected': app.result === 'REJECTED'
+                 'status-rejected': isRejectedLikeResult(app.result)
                }">
             <span class="status-dot"></span>
-            {{ app.result === 'PENDING' ? 'Awaiting' : app.result === 'SELECTED' ? 'Selected' : 'Rejected' }}
+            {{ getApplicationStatusLabel(app.result) }}
           </div>
         </div>
       </div>

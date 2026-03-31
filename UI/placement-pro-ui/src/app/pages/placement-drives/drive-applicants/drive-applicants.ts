@@ -19,6 +19,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Applicant, DriveRound, RoundStatus } from '../../../models/drive-applicants.models';
 import { ManageRoundsDialogComponent } from './manage-rounds-dialog';
 import { PlacementService } from '../../../services/placement.service';
+import { AuthService } from '../../../auth/auth';
 
 @Component({
   selector: 'app-drive-applicants',
@@ -51,7 +52,7 @@ export class DriveApplicants implements OnInit {
   loading = true;
   searchQuery = '';
   filterRoundId: number | null = null;
-  filterStatus: 'PENDING' | 'CLEARED' | 'REJECTED' | null = null;
+  filterStatus: 'PENDING' | 'CLEARED' | 'REJECTED' | 'ABSENT' | null = null;
   updatingId: number | null = null;
   bulkUpdating = false;
   readonly driveApi = '/api/drives';
@@ -63,7 +64,8 @@ export class DriveApplicants implements OnInit {
     private router: Router,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
-    private placementService: PlacementService
+    private placementService: PlacementService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -72,8 +74,7 @@ export class DriveApplicants implements OnInit {
   }
 
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token') || '';
-    return new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.authService.getAuthHeaders();
   }
 
   private normalizeApplicantsResponse(res: unknown): { rounds: DriveRound[]; applications: Applicant[] } {
@@ -200,9 +201,13 @@ export class DriveApplicants implements OnInit {
     this.applyFilters();
   }
 
-  onStatusFilterChange(value: 'PENDING' | 'CLEARED' | 'REJECTED' | null): void {
+  onStatusFilterChange(value: 'PENDING' | 'CLEARED' | 'REJECTED' | 'ABSENT' | null): void {
     this.filterStatus = value;
     this.applyFilters();
+  }
+
+  get bulkTargetApplicants(): Applicant[] {
+    return this.selectedApplicants.length > 0 ? this.selectedApplicants : this.filteredApplicants;
   }
 
   toggleSelectAll(checked: boolean): void {
@@ -279,15 +284,15 @@ export class DriveApplicants implements OnInit {
     });
   }
 
-  bulkUpdate(status: 'CLEARED' | 'REJECTED'): void {
+  bulkUpdate(status: 'CLEARED' | 'REJECTED' | 'ABSENT'): void {
     if (!this.filterRoundId) {
       this.showToast('Select a round filter first', 'error');
       return;
     }
 
-    const targets = this.selectedApplicants;
+    const targets = this.bulkTargetApplicants;
     if (!targets.length) {
-      this.showToast('Select at least one applicant', 'error');
+      this.showToast('No applicants available for this round filter', 'error');
       return;
     }
 
@@ -318,6 +323,7 @@ export class DriveApplicants implements OnInit {
     const status = this.getRoundStatus(applicant, round).status;
     if (status === 'CLEARED') return 'cell-cleared';
     if (status === 'REJECTED') return 'cell-rejected';
+    if (status === 'ABSENT') return 'cell-rejected';
     if (status === 'PENDING') return 'cell-pending';
     return '';
   }
@@ -325,6 +331,7 @@ export class DriveApplicants implements OnInit {
   getResultBadgeClass(result: Applicant['result']): string {
     if (result === 'SELECTED') return 'badge-selected';
     if (result === 'REJECTED') return 'badge-rejected';
+    if (result === 'ABSENT') return 'badge-rejected';
     return 'badge-pending';
   }
 
@@ -509,5 +516,9 @@ export class DriveApplicants implements OnInit {
 
   get rejectedCount(): number {
     return this.applicants.filter((applicant) => applicant.result === 'REJECTED').length;
+  }
+
+  get absentCount(): number {
+    return this.applicants.filter((applicant) => applicant.result === 'ABSENT').length;
   }
 }

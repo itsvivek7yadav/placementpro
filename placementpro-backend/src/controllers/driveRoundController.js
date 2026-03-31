@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-const VALID_ROUND_STATUSES = new Set(['PENDING', 'CLEARED', 'REJECTED']);
+const VALID_ROUND_STATUSES = new Set(['PENDING', 'CLEARED', 'REJECTED', 'ABSENT']);
 
 function toNullableString(value) {
   if (value === undefined || value === null) return null;
@@ -41,11 +41,11 @@ function computeApplicationState(rounds, statusRows) {
   }
 
   const currentStatus = statusMap.get(firstNonCleared.round_id)?.status ?? null;
-  if (currentStatus === 'REJECTED') {
+  if (currentStatus === 'REJECTED' || currentStatus === 'ABSENT') {
     return {
       current_round_id: firstNonCleared.round_id,
-      result: 'REJECTED',
-      status: 'REJECTED'
+      result: currentStatus,
+      status: currentStatus
     };
   }
 
@@ -455,7 +455,7 @@ exports.updateApplicationRound = async (req, res) => {
       [applicationId, roundId, status, remarks]
     );
 
-    if (status === 'REJECTED') {
+    if (status === 'REJECTED' || status === 'ABSENT') {
       await connection.query(
         `DELETE ars
          FROM applicant_round_status ars
@@ -573,7 +573,7 @@ exports.bulkUpdateRoundStatus = async (req, res) => {
     );
 
     const rejectedIds = updates
-      .filter((update) => String(update.status).toUpperCase() === 'REJECTED')
+      .filter((update) => ['REJECTED', 'ABSENT'].includes(String(update.status).toUpperCase()))
       .map((update) => Number(update.application_id));
 
     if (rejectedIds.length) {

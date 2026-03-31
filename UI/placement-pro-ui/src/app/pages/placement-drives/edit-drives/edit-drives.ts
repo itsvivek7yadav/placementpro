@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { buildApiUrl } from '../../../api.config';
+import { AuthService } from '../../../auth/auth';
 
 @Component({
   selector: 'app-edit-drive',
@@ -33,7 +34,8 @@ export class EditDrive implements OnInit {
     private fb:     FormBuilder,
     private http:   HttpClient,
     private route:  ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -41,10 +43,6 @@ export class EditDrive implements OnInit {
     this.isReopen = this.route.snapshot.queryParamMap.get('mode') === 'reopen';
     this.initForm();
     this.loadPrograms();
-  }
-
-  private headers(): HttpHeaders {
-    return new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('token') || ''}` });
   }
 
   private initForm() {
@@ -72,7 +70,7 @@ export class EditDrive implements OnInit {
   }
 
   loadDrive() {
-    this.http.get<any>(`${this.baseUrl}/${this.driveId}`, { headers: this.headers() })
+    this.http.get<any>(`${this.baseUrl}/${this.driveId}`, { headers: this.authService.getAuthHeaders() })
       .subscribe({
         next: res => {
           const d = res.drive;
@@ -132,7 +130,7 @@ export class EditDrive implements OnInit {
       ? `${this.baseUrl}/${this.driveId}/reopen`
       : `${this.baseUrl}/${this.driveId}`;
 
-    this.http.put(endpoint, this.driveForm.value, { headers: this.headers() })
+    this.http.put(endpoint, this.driveForm.value, { headers: this.authService.getAuthHeaders() })
       .subscribe({
         next: () => {
           this.saving = false;

@@ -1,0 +1,279 @@
+<div class="report-page">
+  <section class="hero-card">
+    <div>
+      <p class="eyebrow">TPO Analytics</p>
+      <h1>Placement Report Dashboard</h1>
+      <p class="hero-copy">
+        Analyze eligibility, offers, recruiter performance, and program outcomes in one clean view.
+      </p>
+      <div class="hero-meta" *ngIf="report">
+        <span>Generated {{ report.generatedAt | date:'medium' }}</span>
+        <span>{{ report.studentTableData.length }} student records</span>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button mat-flat-button color="primary" type="button" (click)="loadReport()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+      <button mat-stroked-button type="button" (click)="downloadReport()" [disabled]="!report || exporting">
+        <mat-icon>download</mat-icon>
+        {{ exporting ? 'Preparing...' : 'Download Report' }}
+      </button>
+    </div>
+  </section>
+
+  <section class="filters-card">
+    <div class="filters-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Batch</mat-label>
+        <mat-select [(ngModel)]="selectedBatch">
+          <mat-option value="">All Batches</mat-option>
+          <mat-option *ngFor="let batch of filters.batches" [value]="batch">{{ batch }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Program</mat-label>
+        <mat-select multiple [(ngModel)]="selectedPrograms">
+          <mat-option *ngFor="let program of filters.programs" [value]="program">{{ program }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Academic Year</mat-label>
+        <mat-select [(ngModel)]="selectedAcademicYear">
+          <mat-option [value]="null">All Academic Years</mat-option>
+          <mat-option *ngFor="let year of filters.academicYears" [value]="year.value">{{ year.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="filter-actions">
+      <button mat-flat-button color="primary" type="button" (click)="loadReport()" [disabled]="loading">
+        Apply Filters
+      </button>
+      <button mat-stroked-button type="button" (click)="resetFilters()" [disabled]="loading">
+        Reset
+      </button>
+    </div>
+  </section>
+
+  <section class="loading-state" *ngIf="loading">
+    <mat-spinner diameter="42"></mat-spinner>
+    <p>Building the placement report...</p>
+  </section>
+
+  <section class="error-state" *ngIf="!loading && errorMessage">
+    <h3>Could not load report</h3>
+    <p>{{ errorMessage }}</p>
+    <button mat-flat-button color="primary" type="button" (click)="loadReport()">Try Again</button>
+  </section>
+
+  <ng-container *ngIf="!loading && report as data">
+    <section class="kpi-grid">
+      <article class="kpi-card" *ngFor="let card of kpiCards" [class]="'tone-' + card.tone">
+        <span class="kpi-label">{{ card.label }}</span>
+        <strong class="kpi-value">{{ card.value }}</strong>
+      </article>
+    </section>
+
+    <section class="insight-grid">
+      <article class="card chart-card">
+        <div class="section-head">
+          <div>
+            <h3>Program-wise Performance</h3>
+            <p>Placement percentage by program</p>
+          </div>
+        </div>
+
+        <div class="bar-list" *ngIf="data.trends.programPerformance.length; else emptyPrograms">
+          <div class="bar-row" *ngFor="let row of data.trends.programPerformance">
+            <div class="bar-meta">
+              <strong>{{ row.programName }}</strong>
+              <span>{{ row.placedStudents }}/{{ row.eligibleStudents }} placed</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="row.placementPercentage"></div>
+            </div>
+            <div class="bar-value">{{ row.placementPercentage }}%</div>
+          </div>
+        </div>
+
+        <ng-template #emptyPrograms>
+          <div class="empty-block">No program performance data available.</div>
+        </ng-template>
+      </article>
+
+      <article class="card chart-card">
+        <div class="section-head">
+          <div>
+            <h3>Job Type Distribution</h3>
+            <p>Placement mix across offer categories</p>
+          </div>
+        </div>
+
+        <div class="pie-layout">
+          <div class="pie-shell">
+            <div class="pie-chart" [ngStyle]="pieChartStyle"></div>
+            <div class="pie-hole">
+              <strong>{{ data.summaryKPIs.totalOffersMade }}</strong>
+              <span>Offers</span>
+            </div>
+          </div>
+
+          <div class="legend">
+            <div class="legend-row" *ngFor="let slice of data.jobTypeDistribution">
+              <span class="dot" [style.background]="slice.color"></span>
+              <span class="legend-label">{{ slice.label }}</span>
+              <strong>{{ slice.value }}</strong>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="insight-grid">
+      <article class="card compact-card">
+        <div class="section-head">
+          <div>
+            <h3>Company Snapshot</h3>
+            <p>Recruiter participation and offer conversion</p>
+          </div>
+        </div>
+
+        <div class="snapshot-grid">
+          <div class="snapshot-item">
+            <span>Total Companies</span>
+            <strong>{{ data.companyStats.totalCompanies }}</strong>
+          </div>
+          <div class="snapshot-item">
+            <span>Recruiters with Selections</span>
+            <strong>{{ data.summaryKPIs.recruitersWithSelections }}</strong>
+          </div>
+          <div class="snapshot-item">
+            <span>Pending Result Students</span>
+            <strong>{{ data.summaryKPIs.studentsAwaitingResult }}</strong>
+          </div>
+          <div class="snapshot-item">
+            <span>Absent Students</span>
+            <strong>{{ data.summaryKPIs.studentsMarkedAbsent }}</strong>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="table-grid">
+      <article class="card">
+        <div class="section-head">
+          <div>
+            <h3>Top Recruiters</h3>
+            <p>Companies with the strongest conversion</p>
+          </div>
+        </div>
+
+        <div class="table-shell" *ngIf="data.companyStats.topRecruiters.length; else emptyRecruiters">
+          <table>
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Offers</th>
+                <th>Avg Package</th>
+                <th>Highest Package</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let recruiter of data.companyStats.topRecruiters">
+                <td>{{ recruiter.companyName }}</td>
+                <td>{{ recruiter.offers }}</td>
+                <td>{{ recruiter.avgPackage }} LPA</td>
+                <td>{{ recruiter.highestPackage }} LPA</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ng-template #emptyRecruiters>
+          <div class="empty-block">No selected recruiters found for the current filters.</div>
+        </ng-template>
+      </article>
+
+      <article class="card">
+        <div class="section-head">
+          <div>
+            <h3>Companies with 0 Selections</h3>
+            <p>Useful for recruiter follow-up and pipeline review</p>
+          </div>
+        </div>
+
+        <div class="table-shell" *ngIf="data.companyStats.zeroSelectionCompanies.length; else emptyZeroSelection">
+          <table>
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Applications</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let company of data.companyStats.zeroSelectionCompanies">
+                <td>{{ company.companyName }}</td>
+                <td>{{ company.applications }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ng-template #emptyZeroSelection>
+          <div class="empty-block">Every company has at least one selection in this filtered view.</div>
+        </ng-template>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <h3>Student Report Table</h3>
+          <p>Filtered student-level report data for export and follow-up</p>
+        </div>
+      </div>
+
+      <div class="table-shell table-scroll" *ngIf="data.studentTableData.length; else emptyStudents">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>PRN</th>
+              <th>Program</th>
+              <th>Batch</th>
+              <th>Status</th>
+              <th>No of Applications</th>
+              <th>Absent</th>
+              <th>Company</th>
+              <th>Best Package</th>
+              <th>Last Applied</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of data.studentTableData">
+              <td>{{ row.studentName }}</td>
+              <td>{{ row.prn }}</td>
+              <td>{{ row.programName }}</td>
+              <td>{{ row.batch }}</td>
+              <td>{{ row.placementStatus }}</td>
+              <td>{{ row.applicationsCount }}</td>
+              <td>{{ row.absentCount }}</td>
+              <td>{{ row.selectedCompany || '—' }}</td>
+              <td>{{ row.bestPackage ? (row.bestPackage + ' LPA') : '—' }}</td>
+              <td>{{ row.lastAppliedAt ? (row.lastAppliedAt | date:'mediumDate') : '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #emptyStudents>
+        <div class="empty-block">No student report data available for the selected filters.</div>
+      </ng-template>
+    </section>
+  </ng-container>
+</div>

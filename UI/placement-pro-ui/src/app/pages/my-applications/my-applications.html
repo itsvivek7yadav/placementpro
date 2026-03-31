@@ -46,7 +46,7 @@
               'round-pending': round.status === 'PENDING',
               'round-cleared': round.status === 'CLEARED',
               'round-rejected': round.status === 'REJECTED',
-              'round-not-reached': round.status !== 'PENDING' && round.status !== 'CLEARED' && round.status !== 'REJECTED'
+              'round-not-reached': round.status !== 'PENDING' && round.status !== 'CLEARED' && round.status !== 'REJECTED' && round.status !== 'ABSENT'
             }">
             <strong>R{{ round.round_order }}</strong>
             <span>{{ round.round_name }}</span>
@@ -61,10 +61,10 @@
              [ngClass]="{
                'result-pending':  app.result === 'PENDING',
                'result-selected': app.result === 'SELECTED',
-               'result-rejected': app.result === 'REJECTED'
+               'result-rejected': app.result === 'REJECTED' || app.result === 'ABSENT'
              }">
           <span class="rdot"></span>
-          {{ app.result === 'PENDING' ? 'Awaiting Result' : app.result === 'SELECTED' ? '🎉 Selected' : 'Rejected' }}
+          {{ app.result === 'PENDING' ? 'Awaiting Result' : app.result === 'SELECTED' ? '🎉 Selected' : app.result === 'ABSENT' ? 'Absent' : 'Rejected' }}
         </div>
         <div class="drive-status-note">
           Drive: {{ app.drive_status === 'LIVE' ? 'Open' : 'Closed' }}

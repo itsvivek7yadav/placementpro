@@ -14,14 +14,14 @@ interface Notification {
   text: string;
   time: string;
   type: 'result' | 'drive' | 'general';
-  result?: 'SELECTED' | 'REJECTED';
+  result?: 'SELECTED' | 'REJECTED' | 'ABSENT';
   read: boolean;
 }
 
 interface Application {
   company: string;
   role: string;
-  result: 'PENDING' | 'SELECTED' | 'REJECTED';
+  result: 'PENDING' | 'SELECTED' | 'REJECTED' | 'ABSENT';
 }
 
 @Component({
@@ -51,6 +51,21 @@ placementStatus = 'SEEKING';
 
   get unreadCount(): number {
     return this.notifications.filter(n => !n.read).length;
+  }
+
+  isAbsentResult(result?: string | null): boolean {
+    return result === 'ABSENT';
+  }
+
+  isRejectedLikeResult(result?: string | null): boolean {
+    return result === 'REJECTED' || result === 'ABSENT';
+  }
+
+  getApplicationStatusLabel(result: Application['result']): string {
+    if (result === 'PENDING') return 'Awaiting';
+    if (result === 'SELECTED') return 'Selected';
+    if (result === 'ABSENT') return 'Absent';
+    return 'Rejected';
   }
 
   constructor(private http: HttpClient) {}

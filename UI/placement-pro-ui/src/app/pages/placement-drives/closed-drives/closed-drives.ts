@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { buildApiUrl } from '../../../api.config';
+import { AuthService } from '../../../auth/auth';
 
 @Component({
   selector: 'app-closed-drives',
@@ -16,19 +17,19 @@ export class ClosedDrives implements OnInit {
   drives: any[] = [];
   loading = true;
 
-private readonly baseUrl = buildApiUrl('placement-drives');
+  private readonly baseUrl = buildApiUrl('placement-drives');
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() { this.loadDrives(); }
 
-  private headers(): HttpHeaders {
-    return new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('token') || ''}` });
-  }
-
   loadDrives() {
     this.loading = true;
-    this.http.get<{ drives: any[] }>(`${this.baseUrl}/closed`, { headers: this.headers() })
+    this.http.get<{ drives: any[] }>(`${this.baseUrl}/closed`, { headers: this.authService.getAuthHeaders() })
       .subscribe({
         next:  res => { this.drives = res.drives || []; this.loading = false; },
         error: err => { console.error(err); this.loading = false; }

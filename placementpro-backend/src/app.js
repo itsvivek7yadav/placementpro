@@ -1,6 +1,3 @@
-console.log("EMAIL USER:", process.env.EMAIL_USER);
-console.log("EMAIL PASS LOADED:", process.env.EMAIL_PASSWORD ? "YES" : "NO");
-
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -10,8 +7,15 @@ dotenv.config();
 const app = express();
 
 // ─── CORS Middleware (MUST BE FIRST) ────────────────────────────────────────
+const allowedOrigins = [
+  'http://localhost:4200',
+  'http://localhost:3000',
+  'http://127.0.0.1:4200',
+  process.env.FRONTEND_ORIGIN
+].filter(Boolean);
+
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://localhost:3000', 'http://127.0.0.1:4200'],
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -45,6 +49,7 @@ const applicationRoutes       = require('./routes/applicationRoutes');
 const driveRoundRoutes        = require('./routes/driveRoundRoutes');
 const applicationReviewRoutes = require('./routes/applicationReviewRoutes');
 const tpoDashboardRoutes      = require('./routes/tpoDashboardRoutes');
+const reportRoutes            = require('./routes/reportRoutes');
 const bulkUploadRoutes        = require('./routes/bulkUploadRoutes');
 const studentRoutes           = require('./routes/studentRoutes');
 const programRoutes           = require('./routes/programRoutes');
@@ -65,6 +70,7 @@ app.use('/api/applications',       applicationRoutes);
 app.use('/api/drives',             driveRoundRoutes);
 app.use('/api/application-review', applicationReviewRoutes);
 app.use('/api/tpo/dashboard',      tpoDashboardRoutes);
+app.use('/api/reports',            reportRoutes);
 app.use('/api/bulk-upload',        bulkUploadRoutes);
 app.use('/api/students',           studentRoutes);
 app.use('/api/programs',           programRoutes);
@@ -75,13 +81,14 @@ app.use('/api/student-tests',      studentTestRoutes);
 app.use('/api/resume',             resumeRoutes);
 app.use('/api/tpo/email-campaigns', emailRoutes);
 app.use('/api/offcampus',          offCampusRoutes);  // ← NEW
-// temp test
-// TEMP: manual scraper trigger — remove after testing
-app.get('/api/run-scraper', async (req, res) => {
-  const { runAllScrapers } = require('./cron/offCampusScraperJob');
-  const result = await runAllScrapers();
-  res.json(result);
-});
+
+if (process.env.ALLOW_MANUAL_SCRAPER === 'true') {
+  app.get('/api/run-scraper', async (req, res) => {
+    const { runAllScrapers } = require('./cron/offCampusScraperJob');
+    const result = await runAllScrapers();
+    res.json(result);
+  });
+}
 
 
 // 
@@ -112,7 +119,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5050;
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
   console.log(`✅ CORS enabled`);
   console.log(`✅ Resume API available at /api/resume`);
   console.log(`✅ Email Campaign API available at /api/tpo/email-campaigns`);
