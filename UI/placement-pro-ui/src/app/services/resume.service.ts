@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { buildApiUrl } from '../api.config';
+import { AuthService } from '../auth/auth';
 
 export interface ResumeData {
   personalSummary: string;
@@ -61,66 +62,13 @@ export interface StudentData {
 export class ResumeService {
   private readonly apiUrl = buildApiUrl('resume');
 
-  constructor(private http: HttpClient) {}
-
-  /**
-   * Finds the JWT token by checking every common key name,
-   * and also looks inside stored user/auth objects.
-   * 
-   * TO DEBUG: open browser console while logged in and run:
-   *   Object.keys(localStorage).forEach(k => console.log(k, localStorage.getItem(k)));
-   * Then update TOKEN_KEYS below with your actual key name.
-   */
-  private getToken(): string | null {
-    // ── 1. Check flat string keys (most common) ──────────────────────────
-    const TOKEN_KEYS = [
-      'authToken',
-      'token',
-      'jwtToken',
-      'jwt',
-      'access_token',
-      'accessToken',
-      'id_token',
-      'bearerToken',
-      'auth_token',
-    ];
-
-    for (const key of TOKEN_KEYS) {
-      const val = localStorage.getItem(key) || sessionStorage.getItem(key);
-      if (val && val.length > 20) return val;  // basic sanity check
-    }
-
-    // ── 2. Check inside stored user/auth objects ─────────────────────────
-    const OBJECT_KEYS = ['user', 'auth', 'currentUser', 'userData', 'session'];
-
-    for (const key of OBJECT_KEYS) {
-      try {
-        const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
-        if (!raw) continue;
-        const obj = JSON.parse(raw);
-        const token =
-          obj?.token     ||
-          obj?.authToken ||
-          obj?.jwtToken  ||
-          obj?.jwt       ||
-          obj?.access_token ||
-          obj?.accessToken;
-        if (token && token.length > 20) return token;
-      } catch {
-        // not valid JSON, skip
-      }
-    }
-
-    // ── 3. Nothing found — log all keys to help diagnose ─────────────────
-    console.warn(
-      '[ResumeService] No auth token found. localStorage keys present:',
-      Object.keys(localStorage)
-    );
-    return null;
-  }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   private getAuthHeaders(): HttpHeaders {
-    const token = this.getToken();
+    const token = this.authService.getToken();
 
     let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 

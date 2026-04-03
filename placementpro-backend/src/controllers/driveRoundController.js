@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { notifyRoundStatusUpdate } = require('../services/notificationService');
 
 const VALID_ROUND_STATUSES = new Set(['PENDING', 'CLEARED', 'REJECTED', 'ABSENT']);
 
@@ -428,6 +429,13 @@ exports.updateApplicationRound = async (req, res) => {
       return res.status(404).json({ error: 'Application or round not found' });
     }
 
+    const [[existingStatusRow]] = await connection.query(
+      `SELECT status
+       FROM applicant_round_status
+       WHERE application_id = ? AND round_id = ?`,
+      [applicationId, roundId]
+    );
+
     if (target.round_order > 1) {
       const [[previousRound]] = await connection.query(
         `SELECT ars.status
@@ -469,6 +477,14 @@ exports.updateApplicationRound = async (req, res) => {
 
     await syncApplicationsForDrive(connection, target.drive_id, [applicationId]);
     await connection.commit();
+
+    if (existingStatusRow?.status !== status) {
+      try {
+        await notifyRoundStatusUpdate(applicationId, roundId, status);
+      } catch (notificationError) {
+        console.error('Round notification error:', notificationError);
+      }
+    }
 
     res.json({ success: true });
   } catch (err) {
@@ -551,6 +567,16 @@ exports.bulkUpdateRoundStatus = async (req, res) => {
       }
     }
 
+    const [existingStatusRows] = await connection.query(
+      `SELECT application_id, status
+       FROM applicant_round_status
+       WHERE round_id = ?
+         AND application_id IN (${buildInClause(applicationIds)})`,
+      [roundId, ...applicationIds]
+    );
+
+    const existingStatusMap = new Map(existingStatusRows.map((row) => [row.application_id, row.status]));
+
     const valuePlaceholders = updates.map(() => '(?, ?, ?, ?, NOW())').join(', ');
     const params = [];
     updates.forEach((update) => {
@@ -590,6 +616,20 @@ exports.bulkUpdateRoundStatus = async (req, res) => {
 
     await syncApplicationsForDrive(connection, driveId, applicationIds);
     await connection.commit();
+
+    for (const update of updates) {
+      const applicationId = Number(update.application_id);
+      const nextStatus = String(update.status).toUpperCase();
+      if (existingStatusMap.get(applicationId) === nextStatus) {
+        continue;
+      }
+
+      try {
+        await notifyRoundStatusUpdate(applicationId, roundId, nextStatus);
+      } catch (notificationError) {
+        console.error('Bulk round notification error:', notificationError);
+      }
+    }
 
     res.json({ success: true, updated: updates.length });
   } catch (err) {

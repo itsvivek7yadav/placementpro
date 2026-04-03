@@ -1,0 +1,42 @@
+<div class="notifications-page">
+  <section class="page-header">
+    <div>
+      <p class="eyebrow">Communication Center</p>
+      <h1>Notifications</h1>
+      <p class="subtitle">Track drive alerts, results, round updates, and important announcements.</p>
+    </div>
+
+    <div class="actions">
+      <div class="unread-chip">{{ unreadCount }} unread</div>
+      <button mat-stroked-button type="button" (click)="markAllAsRead()" [disabled]="unreadCount === 0">
+        Mark all as read
+      </button>
+    </div>
+  </section>
+
+  <section class="loading-state" *ngIf="loading">
+    <p>Loading notifications...</p>
+  </section>
+
+  <section class="empty-state" *ngIf="!loading && notifications.length === 0">
+    <h3>No notifications yet</h3>
+    <p>Important drive alerts and updates will appear here.</p>
+  </section>
+
+  <section class="notifications-list" *ngIf="!loading && notifications.length > 0">
+    <article class="notification-card" *ngFor="let item of notifications" [class.unread]="!item.isRead" (click)="markAsRead(item)">
+      <div class="card-top">
+        <div>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.message }}</p>
+        </div>
+        <span class="status-pill" *ngIf="!item.isRead">Unread</span>
+      </div>
+
+      <div class="card-meta">
+        <span>{{ item.type | titlecase }}</span>
+        <span>{{ item.createdAt | date:'medium' }}</span>
+      </div>
+    </article>
+  </section>
+</div>

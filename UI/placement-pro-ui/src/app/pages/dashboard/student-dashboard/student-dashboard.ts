@@ -1,7 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { AuthService } from '../../../auth/auth';
+import { NotificationsService } from '../../../services/notifications.service';
 
 interface StudentStats {
   eligibleDrives: number;
@@ -11,11 +15,13 @@ interface StudentStats {
 }
 
 interface Notification {
+  id: number;
   text: string;
   time: string;
-  type: 'result' | 'drive' | 'general';
+  type: 'result' | 'drive' | 'general' | 'announcement';
   result?: 'SELECTED' | 'REJECTED' | 'ABSENT';
   read: boolean;
+  link?: string | null;
 }
 
 interface Application {
@@ -31,7 +37,8 @@ interface Application {
   templateUrl: './student-dashboard.html',
   styleUrls: ['./student-dashboard.scss']
 })
-export class StudentDashboard implements OnInit {
+export class StudentDashboard implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
 studentName = '';
 studentProgram = '';
@@ -68,11 +75,20 @@ placementStatus = 'SEEKING';
     return 'Rejected';
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private notificationsService: NotificationsService
+  ) {}
 
   ngOnInit() {
     this.setGreeting();
     this.loadData();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   setGreeting() {
@@ -91,9 +107,6 @@ placementStatus = 'SEEKING';
   }
 
   loadData() {
-    // Replace with real API when ready:
-    // this.http.get<any>('http://localhost:5050/api/student/dashboard').subscribe(...)
-
     this.placementStatus = 'SEEKING';
 
     this.stats = {
@@ -103,18 +116,52 @@ placementStatus = 'SEEKING';
       selected: 1
     };
 
-    this.notifications = [
-      { text: 'TCS Drive — Result declared',     time: '2 hrs ago',  type: 'result', result: 'SELECTED', read: false },
-      { text: 'New Drive published — Deloitte',  time: 'Yesterday',  type: 'drive',                      read: false },
-      { text: 'Infosys Drive — Result declared', time: '3 days ago', type: 'result', result: 'REJECTED', read: true  }
-    ];
+    this.notificationsService.startPolling();
+    this.notificationsService.notifications$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((items) => {
+        this.notifications = items.slice(0, 4).map((item) => {
+          const normalizedMessage = item.message.toLowerCase();
+          return {
+            id: item.id,
+            text: item.title,
+            time: new Date(item.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
+            type: item.type === 'result' ? 'result' : item.type === 'new_drive' || item.type === 'drive_update' || item.type === 'drive_reopened' ? 'drive' : 'announcement',
+            result: normalizedMessage.includes('selected')
+              ? 'SELECTED'
+              : normalizedMessage.includes('rejected')
+                ? 'REJECTED'
+                : normalizedMessage.includes('absent')
+                  ? 'ABSENT'
+                  : undefined,
+            read: item.isRead,
+            link: item.link
+          };
+        });
+      });
+    this.notificationsService.refresh();
 
-    this.applications = [
-      { company: 'TCS',       role: 'Software Engineer',   result: 'SELECTED' },
-      { company: 'Infosys',   role: 'Systems Engineer',    result: 'REJECTED' },
-      { company: 'Deloitte',  role: 'Business Analyst',    result: 'PENDING'  },
-      { company: 'Wipro',     role: 'Project Engineer',    result: 'PENDING'  },
-      { company: 'Cognizant', role: 'Associate Developer', result: 'PENDING'  }
-    ];
+    this.http.get<any>('/api/student/applications/my', {
+      headers: this.authService.getAuthHeaders()
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        const applications = Array.isArray(response?.applications) ? response.applications : [];
+        this.applications = applications.slice(0, 5).map((app: any) => ({
+          company: app.company_name,
+          role: app.job_role,
+          result: app.result
+        }));
+
+        this.stats = {
+          eligibleDrives: this.stats.eligibleDrives,
+          applied: applications.length,
+          resultsAwaited: applications.filter((app: any) => app.result === 'PENDING').length,
+          selected: applications.filter((app: any) => app.result === 'SELECTED').length
+        };
+      },
+      error: () => {
+        this.applications = [];
+      }
+    });
   }
 }

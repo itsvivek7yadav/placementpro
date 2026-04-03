@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { notifyApplicationSubmitted } = require('../services/notificationService');
 
 async function attachRoundDetails(applications) {
   if (!applications.length) {
@@ -145,6 +146,12 @@ exports.applyToDrive = async (req, res) => {
        VALUES (?, ?, 'APPLIED', 'PENDING')`,
       [student.student_id, drive_id]
     );
+
+    try {
+      await notifyApplicationSubmitted(result.insertId);
+    } catch (notificationError) {
+      console.error('Application confirmation notification error:', notificationError);
+    }
 
     res.status(201).json({
       message: 'Applied successfully',

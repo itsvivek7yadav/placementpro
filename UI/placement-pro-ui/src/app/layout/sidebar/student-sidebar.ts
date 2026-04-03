@@ -149,8 +149,6 @@ export class StudentSidebar implements OnInit, OnDestroy {
       });
     } catch (error) {
       console.error('Error during logout:', error);
-      // Force redirect as fallback
-      window.location.href = '/login';
     }
   }
 

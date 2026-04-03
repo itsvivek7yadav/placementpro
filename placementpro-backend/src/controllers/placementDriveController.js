@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { notifyEligibleStudentsForDrive } = require('../services/notificationService');
 
 // ── GET OPEN DRIVES ────────────────────────────────────────
 exports.getOpenDrives = async (req, res) => {
@@ -124,6 +125,13 @@ exports.updateDrive = async (req, res) => {
     }
 
     await connection.commit();
+
+    try {
+      await notifyEligibleStudentsForDrive(driveId, 'updated');
+    } catch (notificationError) {
+      console.error('Drive update notification error:', notificationError);
+    }
+
     res.json({ message: 'Drive updated successfully' });
 
   } catch (err) {
@@ -179,6 +187,13 @@ exports.reopenDrive = async (req, res) => {
     }
 
     await connection.commit();
+
+    try {
+      await notifyEligibleStudentsForDrive(driveId, 'reopened');
+    } catch (notificationError) {
+      console.error('Drive reopen notification error:', notificationError);
+    }
+
     res.json({ message: 'Drive reopened successfully' });
 
   } catch (err) {

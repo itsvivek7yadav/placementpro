@@ -119,13 +119,9 @@ export class TpoSidebar implements OnInit, OnDestroy {
       // Navigate to login
       this.router.navigate(['/login']).catch(error => {
         console.error('Logout navigation error:', error);
-        // Force redirect as fallback
-        window.location.href = '/login';
       });
     } catch (error) {
       console.error('Error during logout:', error);
-      // Force redirect as fallback
-      window.location.href = '/login';
     }
   }
 

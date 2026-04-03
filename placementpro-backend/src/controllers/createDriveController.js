@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { notifyEligibleStudentsForDrive } = require('../services/notificationService');
 
 exports.createDrive = async (req, res) => {
 
@@ -72,6 +73,12 @@ exports.createDrive = async (req, res) => {
     }
 
     await connection.commit();
+
+    try {
+      await notifyEligibleStudentsForDrive(driveId, 'created');
+    } catch (notificationError) {
+      console.error('Drive publish notification error:', notificationError);
+    }
 
     res.status(201).json({
       message: 'Drive created successfully',

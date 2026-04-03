@@ -133,6 +133,36 @@
   white-space: nowrap;
 }
 
+.announcement-card {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.announcement-head {
+  grid-column: 1 / -1;
+}
+
+.announcement-head strong {
+  display: block;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.announcement-head p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.announcement-message {
+  grid-column: 1 / -1;
+}
+
+.announcement-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .bulk-bar {
   display: flex;
   align-items: center;

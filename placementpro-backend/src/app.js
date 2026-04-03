@@ -50,6 +50,7 @@ const driveRoundRoutes        = require('./routes/driveRoundRoutes');
 const applicationReviewRoutes = require('./routes/applicationReviewRoutes');
 const tpoDashboardRoutes      = require('./routes/tpoDashboardRoutes');
 const reportRoutes            = require('./routes/reportRoutes');
+const notificationRoutes      = require('./routes/notificationRoutes');
 const bulkUploadRoutes        = require('./routes/bulkUploadRoutes');
 const studentRoutes           = require('./routes/studentRoutes');
 const programRoutes           = require('./routes/programRoutes');
@@ -71,6 +72,7 @@ app.use('/api/drives',             driveRoundRoutes);
 app.use('/api/application-review', applicationReviewRoutes);
 app.use('/api/tpo/dashboard',      tpoDashboardRoutes);
 app.use('/api/reports',            reportRoutes);
+app.use('/api/notifications',      notificationRoutes);
 app.use('/api/bulk-upload',        bulkUploadRoutes);
 app.use('/api/students',           studentRoutes);
 app.use('/api/programs',           programRoutes);
@@ -119,11 +121,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5050;
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ CORS enabled`);
-  console.log(`✅ Resume API available at /api/resume`);
-  console.log(`✅ Email Campaign API available at /api/tpo/email-campaigns`);
-  console.log(`✅ Off-Campus Feed API available at /api/offcampus`);  // ← NEW
+  console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = app;

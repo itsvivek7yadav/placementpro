@@ -102,6 +102,12 @@ export const routes: Routes = [
             .then(m => m.MyApplications)
       },
       {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./pages/notifications/notifications')
+            .then(m => m.NotificationsPage)
+      },
+      {
         path: 'my-progress',
         loadComponent: () =>
           import('./pages/placement-progress/placement-progress')

@@ -19,6 +19,44 @@
     </div>
   </section>
 
+  <section class="filters-card announcement-card" *ngIf="!loading">
+    <div class="announcement-head">
+      <div>
+        <strong>Drive Announcement</strong>
+        <p>Send a custom message to all applicants or everyone eligible for this drive.</p>
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Audience</mat-label>
+      <mat-select [(ngModel)]="announcementAudience">
+        <mat-option value="APPLICANTS">All applicants</mat-option>
+        <mat-option value="ELIGIBLE">All eligible students</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Title</mat-label>
+      <input matInput [(ngModel)]="announcementTitle" placeholder="Eg. Interview slots released" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="announcement-message">
+      <mat-label>Message</mat-label>
+      <textarea matInput rows="3" [(ngModel)]="announcementMessage" placeholder="Write the notification message"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Optional Link</mat-label>
+      <input matInput [(ngModel)]="announcementLink" placeholder="/applications or external URL" />
+    </mat-form-field>
+
+    <div class="announcement-actions">
+      <button mat-flat-button color="primary" type="button" (click)="sendAnnouncement()" [disabled]="sendingAnnouncement">
+        {{ sendingAnnouncement ? 'Sending...' : 'Send Notification' }}
+      </button>
+    </div>
+  </section>
+
   <section class="stats-grid" *ngIf="!loading">
     <article class="stat-card">
       <span class="stat-label">Total</span>

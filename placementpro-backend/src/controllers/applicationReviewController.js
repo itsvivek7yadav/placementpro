@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { notifyApplicationResultUpdate } = require('../services/notificationService');
 
 // ── Get all applications for a drive ──────────────────────
 exports.getApplicationsByDrive = async (req, res) => {
@@ -58,7 +59,7 @@ exports.updateApplicationResult = async (req, res) => {
     }
 
     const [rows] = await db.query(
-      `SELECT application_id FROM applications WHERE application_id = ?`,
+      `SELECT application_id, result FROM applications WHERE application_id = ?`,
       [application_id]
     );
 
@@ -66,10 +67,20 @@ exports.updateApplicationResult = async (req, res) => {
       return res.status(404).json({ message: 'Application not found' });
     }
 
+    if (rows[0].result === result) {
+      return res.json({ message: `Result already set to ${result}` });
+    }
+
     await db.query(
       `UPDATE applications SET result = ? WHERE application_id = ?`,
       [result, application_id]
     );
+
+    try {
+      await notifyApplicationResultUpdate(Number(application_id), result);
+    } catch (notificationError) {
+      console.error('Single result notification error:', notificationError);
+    }
 
     res.json({ message: `Result updated to ${result}` });
 
@@ -88,12 +99,27 @@ exports.bulkUpdateResult = async (req, res) => {
       return res.status(400).json({ message: 'drive_id and valid result required' });
     }
 
+    const [pendingApplications] = await db.query(
+      `SELECT application_id
+       FROM applications
+       WHERE drive_id = ? AND result = 'PENDING'`,
+      [drive_id]
+    );
+
     const [updateResult] = await db.query(
       `UPDATE applications
        SET result = ?
        WHERE drive_id = ? AND result = 'PENDING'`,
       [result, drive_id]
     );
+
+    for (const application of pendingApplications) {
+      try {
+        await notifyApplicationResultUpdate(application.application_id, result);
+      } catch (notificationError) {
+        console.error('Bulk result notification error:', notificationError);
+      }
+    }
 
     res.json({
       message: `${updateResult.affectedRows} application(s) marked as ${result}`,

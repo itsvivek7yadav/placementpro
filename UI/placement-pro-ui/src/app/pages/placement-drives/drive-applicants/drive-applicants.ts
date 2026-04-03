@@ -20,6 +20,7 @@ import { Applicant, DriveRound, RoundStatus } from '../../../models/drive-applic
 import { ManageRoundsDialogComponent } from './manage-rounds-dialog';
 import { PlacementService } from '../../../services/placement.service';
 import { AuthService } from '../../../auth/auth';
+import { NotificationsService } from '../../../services/notifications.service';
 
 @Component({
   selector: 'app-drive-applicants',
@@ -55,6 +56,11 @@ export class DriveApplicants implements OnInit {
   filterStatus: 'PENDING' | 'CLEARED' | 'REJECTED' | 'ABSENT' | null = null;
   updatingId: number | null = null;
   bulkUpdating = false;
+  sendingAnnouncement = false;
+  announcementAudience: 'APPLICANTS' | 'ELIGIBLE' = 'APPLICANTS';
+  announcementTitle = '';
+  announcementMessage = '';
+  announcementLink = '';
   readonly driveApi = '/api/drives';
   readonly applicationApi = '/api/applications';
 
@@ -65,7 +71,8 @@ export class DriveApplicants implements OnInit {
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private placementService: PlacementService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationsService: NotificationsService
   ) {}
 
   ngOnInit(): void {
@@ -315,6 +322,37 @@ export class DriveApplicants implements OnInit {
       error: (err) => {
         this.bulkUpdating = false;
         this.showToast(err.error?.error || 'Bulk update failed', 'error');
+      }
+    });
+  }
+
+  sendAnnouncement(): void {
+    const title = this.announcementTitle.trim();
+    const message = this.announcementMessage.trim();
+
+    if (!title || !message) {
+      this.showToast('Announcement title and message are required', 'error');
+      return;
+    }
+
+    this.sendingAnnouncement = true;
+    this.notificationsService.sendDriveAnnouncement({
+      driveId: this.driveId,
+      audience: this.announcementAudience,
+      title,
+      message,
+      link: this.announcementLink.trim() || `/drives/${this.driveId}`
+    }).subscribe({
+      next: (response: any) => {
+        this.sendingAnnouncement = false;
+        this.announcementTitle = '';
+        this.announcementMessage = '';
+        this.announcementLink = '';
+        this.showToast(`Notification sent to ${response?.created ?? 0} student(s)`, 'success');
+      },
+      error: (err) => {
+        this.sendingAnnouncement = false;
+        this.showToast(err.error?.message || 'Failed to send announcement', 'error');
       }
     });
   }
