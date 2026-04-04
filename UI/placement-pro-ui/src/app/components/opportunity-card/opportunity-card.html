@@ -2,8 +2,8 @@
 <article class="opp-card" [class.opp-card--saved]="isBookmarked" (click)="onCardClick()">
   <div class="card-top">
     <span class="src-badge src-badge--{{ type }}">
-      <mat-icon>{{ isJob ? 'work_outline' : 'event' }}</mat-icon>
-      {{ isJob ? job.source : event.source }}
+      <mat-icon>work_outline</mat-icon>
+      {{ job.source }}
     </span>
     <span class="role-badge role-badge--{{ badgeColor }}">{{ badgeLabel }}</span>
   </div>
@@ -25,13 +25,7 @@
     <span class="meta-it" *ngIf="displayDate">
       <mat-icon>schedule</mat-icon>{{ displayDate }}
     </span>
-    <span class="meta-it meta-it--free" *ngIf="!isJob && event.is_free">
-      <mat-icon>sell</mat-icon>Free
-    </span>
-    <span class="meta-it meta-it--online" *ngIf="!isJob && event.is_online">
-      <mat-icon>videocam</mat-icon>Online
-    </span>
-    <span class="meta-it" *ngIf="isJob && job.job_type">
+    <span class="meta-it" *ngIf="job.job_type">
       <mat-icon>business_center</mat-icon>{{ job.job_type }}
     </span>
   </div>
@@ -43,7 +37,7 @@
     <span class="skill skill--more" *ngIf="displaySkills.length > 4">+{{ displaySkills.length - 4 }}</span>
   </div>
 
-  <div class="card-tip" *ngIf="isJob && job.application_tip">
+  <div class="card-tip" *ngIf="job.application_tip">
     <mat-icon>lightbulb</mat-icon>
     <span>{{ job.application_tip }}</span>
   </div>
@@ -51,7 +45,7 @@
   <div class="card-footer">
     <button class="btn-apply" (click)="onApplyClick($event)">
       <mat-icon>arrow_forward</mat-icon>
-      {{ isJob ? 'Apply Now' : 'Register' }}
+      Apply Now
     </button>
     <button
       class="btn-bm"

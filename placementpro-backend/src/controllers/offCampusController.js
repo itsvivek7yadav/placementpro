@@ -18,20 +18,6 @@ async function getJobs(req, res) {
   }
 }
 
-async function getEvents(req, res) {
-  try {
-    const { event_type, is_online, is_free, date_from, date_to, source, page = 1, limit = 10 } = req.query;
-    const filters = { event_type, is_online, is_free, date_from, date_to, source };
-    Object.keys(filters).forEach(k => filters[k] === undefined && delete filters[k]);
-    const userId = req.user?.user_id || null;
-    const result = await OffCampusService.getEvents(filters, { page, limit }, userId);
-    return res.status(200).json({ success: true, data: result });
-  } catch (err) {
-    console.error('[offCampusController.getEvents] Error:', err.message);
-    return res.status(500).json({ success: false, message: 'Failed to fetch events' });
-  }
-}
-
 async function getJobById(req, res) {
   try {
     const { id } = req.params;
@@ -52,7 +38,7 @@ async function toggleBookmark(req, res) {
     if (!userId) return res.status(401).json({ success: false, message: 'Authentication required' });
     const { opportunityId, opportunityType } = req.body;
     if (!opportunityId || !opportunityType) return res.status(400).json({ success: false, message: 'opportunityId and opportunityType are required' });
-    if (!['job', 'event'].includes(opportunityType)) return res.status(400).json({ success: false, message: 'opportunityType must be "job" or "event"' });
+    if (opportunityType !== 'job') return res.status(400).json({ success: false, message: 'Only job bookmarks are supported' });
     const result = await OffCampusService.toggleBookmark(userId, Number(opportunityId), opportunityType);
     return res.status(200).json({ success: true, data: result });
   } catch (err) {
@@ -93,7 +79,6 @@ async function getUserBookmarks(req, res) {
 
 module.exports = {
   getJobs,
-  getEvents,
   getJobById,
   toggleBookmark,
   getRecommendations,

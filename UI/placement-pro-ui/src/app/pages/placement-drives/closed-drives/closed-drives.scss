@@ -1,27 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
 :host {
-  --accent:       #2563eb;
+  --accent:       var(--app-primary);
   --accent-light: #eff6ff;
-  --success:      #16a34a;
+  --success:      var(--app-success);
   --success-light:#dcfce7;
-  --text-primary: #0f172a;
-  --text-muted:   #64748b;
-  --border:       #e2e8f0;
-  --card-bg:      #ffffff;
-  --page-bg:      #f8fafc;
-  --radius:       14px;
-  --shadow:       0 2px 12px rgba(15, 23, 42, 0.07);
-  --shadow-hover: 0 8px 28px rgba(15, 23, 42, 0.12);
+  --text-primary: var(--app-text);
+  --text-muted:   var(--app-text-soft);
+  --border:       var(--app-border);
+  --card-bg:      var(--app-surface);
+  --radius:       var(--app-radius-md);
+  --shadow:       var(--app-shadow-sm);
+  --shadow-hover: var(--app-shadow-md);
 }
 
 * { box-sizing: border-box; }
 
 .page {
-  padding: 36px 40px;
-  background: var(--page-bg);
   min-height: 100vh;
-  font-family: 'DM Sans', sans-serif;
 }
 
 .page-header {
@@ -32,7 +26,6 @@
 }
 
 .page-header h2 {
-  font-family: 'Syne', sans-serif;
   font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
@@ -57,6 +50,7 @@
   padding: 80px 0;
   color: var(--text-muted);
   font-size: 14px;
+  border-radius: var(--app-radius-md);
 }
 
 .spinner {
@@ -74,6 +68,7 @@
   text-align: center;
   padding: 80px 0;
   color: var(--text-muted);
+  border-radius: var(--app-radius-md);
 }
 
 .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
@@ -98,6 +93,7 @@
   animation: fadeUp 0.3s ease both;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
 
   /* Subtle closed stripe */
   &::before {
@@ -135,7 +131,7 @@
   border-radius: 10px;
   background: #fef2f2;
   color: #dc2626;
-  font-family: 'Syne', sans-serif;
+  font-family: inherit;
   font-size: 18px;
   font-weight: 700;
   display: flex;
@@ -147,7 +143,6 @@
 .company-info { flex: 1; }
 
 .company-name {
-  font-family: 'Syne', sans-serif;
   font-size: 17px;
   font-weight: 700;
   color: var(--text-primary);
@@ -213,7 +208,7 @@
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.18s ease;
   display: flex;

@@ -64,15 +64,20 @@ async function attachRoundDetails(applications) {
  */
 exports.applyToDrive = async (req, res) => {
   try {
-    const { drive_id } = req.body;
+    const { drive_id, resume_slot } = req.body;
 
     if (!drive_id) {
       return res.status(400).json({ message: 'drive_id is required' });
     }
 
+    if (![1, 2, '1', '2'].includes(resume_slot)) {
+      return res.status(400).json({ message: 'Please select a resume before applying' });
+    }
+
     // Get student
     const [studentRows] = await db.query(
-      `SELECT student_id, program_name, program_batch, placement_status, cgpa
+      `SELECT student_id, program_name, program_batch, placement_status, cgpa,
+              cv_link, cv_name, cv_link_2, cv_name_2
        FROM students WHERE user_id = ?`,
       [req.user.user_id]
     );
@@ -82,9 +87,18 @@ exports.applyToDrive = async (req, res) => {
     }
 
     const student = studentRows[0];
+    const selectedResumeSlot = Number(resume_slot);
+    const resumeLinkColumn = selectedResumeSlot === 1 ? 'cv_link' : 'cv_link_2';
+    const resumeNameColumn = selectedResumeSlot === 1 ? 'cv_name' : 'cv_name_2';
+    const resumeLink = student[resumeLinkColumn];
+    const resumeName = student[resumeNameColumn];
 
     if (student.placement_status === 'PLACED') {
       return res.status(403).json({ message: 'Already placed students cannot apply' });
+    }
+
+    if (!resumeLink) {
+      return res.status(400).json({ message: 'Selected resume is not available. Please upload your resume first.' });
     }
 
     // Get drive
@@ -142,9 +156,12 @@ exports.applyToDrive = async (req, res) => {
 
     // Insert application
     const [result] = await db.query(
-      `INSERT INTO applications (student_id, drive_id, status, result)
-       VALUES (?, ?, 'APPLIED', 'PENDING')`,
-      [student.student_id, drive_id]
+      `INSERT INTO applications (
+         student_id, drive_id, status, result,
+         applied_cv_slot, applied_cv_name, applied_cv_link
+       )
+       VALUES (?, ?, 'APPLIED', 'PENDING', ?, ?, ?)`,
+      [student.student_id, drive_id, selectedResumeSlot, resumeName || null, resumeLink]
     );
 
     try {
@@ -194,6 +211,9 @@ exports.getMyApplications = async (req, res) => {
          pd.job_role,
          pd.job_type,
          pd.ctc,
+         a.applied_cv_slot,
+         a.applied_cv_name,
+         a.applied_cv_link,
          pd.application_deadline,
          pd.status  AS drive_status
        FROM applications a

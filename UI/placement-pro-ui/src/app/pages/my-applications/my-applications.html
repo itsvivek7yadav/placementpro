@@ -37,6 +37,9 @@
           · {{ app.job_type === 'FTE' ? 'Full-Time' : app.job_type }}
           <span *ngIf="app.ctc"> · {{ app.ctc }}</span>
         </div>
+        <div class="app-resume" *ngIf="app.applied_cv_name">
+          Resume used: {{ app.applied_cv_name }}
+        </div>
         <div class="round-summary">{{ getCurrentRoundSummary(app) }}</div>
         <div class="round-timeline" *ngIf="hasRounds(app)">
           <div

@@ -72,7 +72,9 @@ export class OffCampusJobsComponent implements OnInit, OnDestroy {
   readonly sourceOptions = [
     { value: '',         label: 'All Sources' },
     { value: 'adzuna',   label: 'Adzuna'      },
-    { value: 'linkedin', label: 'LinkedIn'    }
+    { value: 'linkedin', label: 'LinkedIn'    },
+    { value: 'hirist',   label: 'Hirist'      },
+    { value: 'jooble',   label: 'Jooble'      }
   ];
 
   private destroy$ = new Subject<void>();
@@ -146,7 +148,7 @@ export class OffCampusJobsComponent implements OnInit, OnDestroy {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  onBookmarkToggle(event: { id: number; type: 'job' | 'event' }): void {
+  onBookmarkToggle(event: { id: number; type: 'job' }): void {
     this.bookmarkLoadingIds.add(event.id);
 
     this.offCampusService.toggleBookmark(event.id, 'job')
@@ -169,7 +171,7 @@ export class OffCampusJobsComponent implements OnInit, OnDestroy {
       });
   }
 
-  onViewDetail(_event: { id: number; type: 'job' | 'event' }): void {
+  onViewDetail(_event: { id: number; type: 'job' }): void {
     // this.router.navigate(['/off-campus/jobs', event.id]);
   }
 

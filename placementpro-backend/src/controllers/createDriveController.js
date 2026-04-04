@@ -1,6 +1,18 @@
 const db = require('../config/db');
 const { notifyEligibleStudentsForDrive } = require('../services/notificationService');
 
+function normalizeProgramIds(value) {
+  if (Array.isArray(value)) {
+    return value.map(Number).filter(Boolean);
+  }
+
+  if (value === undefined || value === null || value === '') {
+    return [];
+  }
+
+  return [Number(value)].filter(Boolean);
+}
+
 exports.createDrive = async (req, res) => {
 
   const {
@@ -14,14 +26,15 @@ exports.createDrive = async (req, res) => {
     min_cgpa,
     eligible_programs
   } = req.body;
+  const driveDocumentUrl = req.file ? `/uploads/drive-documents/${req.file.filename}` : null;
+  const normalizedPrograms = normalizeProgramIds(eligible_programs);
 
   if (
     !company_name ||
     !job_role ||
     !application_deadline ||
     !eligible_batch ||
-    !eligible_programs ||
-    eligible_programs.length === 0
+    normalizedPrograms.length === 0
   ) {
     return res.status(400).json({
       message: 'Missing required fields'
@@ -43,8 +56,8 @@ exports.createDrive = async (req, res) => {
     const [driveResult] = await connection.query(
       `INSERT INTO placement_drives
       (company_name, job_role, description, job_type, ctc,
-       eligible_batch, application_deadline, min_cgpa, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       eligible_batch, application_deadline, min_cgpa, created_by, drive_document_url)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         company_name,
         job_role,
@@ -54,14 +67,15 @@ exports.createDrive = async (req, res) => {
         eligible_batch,
         deadline,
         min_cgpa,
-        created_by
+        created_by,
+        driveDocumentUrl
       ]
     );
 
     const driveId = driveResult.insertId;
 
     // ✅ Insert program mapping
-    for (const programId of eligible_programs) {
+    for (const programId of normalizedPrograms) {
 
       await connection.query(
         `INSERT INTO drive_program_mapping

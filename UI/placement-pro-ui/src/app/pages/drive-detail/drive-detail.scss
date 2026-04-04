@@ -179,6 +179,32 @@
   &.highlight { color: #10b981; font-weight: 600; font-size: 18px; }
 }
 
+.action-link {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.action-link:hover {
+  text-decoration: underline;
+}
+
+.profile-link-btn {
+  width: 100%;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .deadline-time { font-size: 12px; color: #94a3b8; }
 
 .status-pill {
@@ -264,6 +290,125 @@
   background: rgba(239,68,68,0.06);
   padding: 8px 12px;
   border-radius: 8px;
+}
+
+.resume-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 1100;
+}
+
+.resume-picker-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(92vw, 520px);
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+  padding: 22px;
+  z-index: 1101;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.resume-picker-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+
+  h3 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    color: #1a202c;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.resume-option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resume-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+}
+
+.resume-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resume-option-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.resume-option-link {
+  width: fit-content;
+  color: #2563eb;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.resume-option-link:hover {
+  text-decoration: underline;
+}
+
+.resume-picker-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.secondary-btn,
+.primary-btn {
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background: white;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+.primary-btn {
+  background: #2563eb;
+  border: none;
+  color: white;
 }
 
 // ── Skeleton ───────────────────────────────────────────────

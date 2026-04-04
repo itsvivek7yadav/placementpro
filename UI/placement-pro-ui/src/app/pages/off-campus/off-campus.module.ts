@@ -14,13 +14,7 @@ const routes: Routes = [
   },
   {
     path: 'jobs/:id',
-    component: OpportunityDetailComponent,
-    data: { type: 'job' }
-  },
-  {
-    path: 'events/:id',
-    component: OpportunityDetailComponent,
-    data: { type: 'event' }
+    component: OpportunityDetailComponent
   }
 ];
 

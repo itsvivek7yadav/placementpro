@@ -71,6 +71,18 @@
         </div>
       </div>
 
+      <div class="action-row" *ngIf="drive.drive_document_url">
+        <div class="action-label">Drive Document</div>
+        <a
+          class="action-link"
+          [href]="driveDocumentUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View attachment
+        </a>
+      </div>
+
       <div class="divider"></div>
 
       <!-- Already applied -->
@@ -88,17 +100,44 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         {{ applying ? 'Submitting...' : 'Apply Now' }}
       </button>
-      <button
-          class="btn-apply"
-          *ngIf="!drive.my_application_id"
-          (click)="applyNow(drive.drive_id)">
-          Apply Now
-        </button>
-
       <!-- Error -->
       <div class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</div>
 
+      <button class="profile-link-btn" type="button" *ngIf="!resumeOptions.length" (click)="goToProfile()">
+        Upload Resume in Profile
+      </button>
+
     </div>
+  </div>
+</div>
+
+<div class="resume-picker-backdrop" *ngIf="resumePickerOpen" (click)="closeResumePicker()"></div>
+<div class="resume-picker-modal" *ngIf="resumePickerOpen">
+  <div class="resume-picker-header">
+    <div>
+      <h3>Select Resume</h3>
+      <p>Choose which uploaded resume you want to use for this application.</p>
+    </div>
+    <button type="button" class="modal-close" (click)="closeResumePicker()">×</button>
+  </div>
+
+  <div class="resume-option-list">
+    <label class="resume-option" *ngFor="let resume of resumeOptions">
+      <input type="radio" name="resumeSlot" [value]="resume.slot" [(ngModel)]="selectedResumeSlot" />
+      <div class="resume-option-body">
+        <div class="resume-option-title">Slot {{ resume.slot }} · {{ resume.name }}</div>
+        <a class="resume-option-link" [href]="getResumeUrl(resume.path)" target="_blank" rel="noopener noreferrer">
+          Preview resume
+        </a>
+      </div>
+    </label>
+  </div>
+
+  <div class="resume-picker-actions">
+    <button type="button" class="secondary-btn" (click)="closeResumePicker()">Cancel</button>
+    <button type="button" class="primary-btn" [disabled]="!selectedResumeSlot || applying" (click)="applyNow(drive.drive_id)">
+      {{ applying ? 'Submitting...' : 'Apply with Selected Resume' }}
+    </button>
   </div>
 </div>
 

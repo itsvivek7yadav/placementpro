@@ -22,8 +22,10 @@ export class StudentProfile implements OnInit {
   saving        = false;
   successMessage = '';
   errorMessage   = '';
-
-  newCvFile: File | null = null;
+  resumeSlots: Array<{ slot: number; name: string; path: string }> = [];
+  resumeUploads: Record<number, File | null> = { 1: null, 2: null };
+  resumeLoading = false;
+  resumeSavingSlot: number | null = null;
 
   private readonly API = buildApiUrl('student-profile');
 
@@ -34,6 +36,7 @@ export class StudentProfile implements OnInit {
 
   ngOnInit() {
     this.loadProfile();
+    this.loadResumeSlots();
   }
 
   get fullName(): string {
@@ -52,6 +55,10 @@ export class StudentProfile implements OnInit {
     return buildBackendUrl(path);
   }
 
+  getResumeForSlot(slot: number): { slot: number; name: string; path: string } | undefined {
+    return this.resumeSlots.find((resume) => resume.slot === slot);
+  }
+
   loadProfile() {
     this.loading = true;
     this.http.get<any>(this.API, {
@@ -64,6 +71,21 @@ export class StudentProfile implements OnInit {
       error: (err) => {
         console.error(err);
         this.loading = false;
+      }
+    });
+  }
+
+  loadResumeSlots() {
+    this.resumeLoading = true;
+    this.http.get<any>(`${this.API}/resumes`, {
+      headers: this.authService.getAuthHeaders()
+    }).subscribe({
+      next: (res) => {
+        this.resumeSlots = res.resumes || [];
+        this.resumeLoading = false;
+      },
+      error: () => {
+        this.resumeLoading = false;
       }
     });
   }
@@ -114,7 +136,6 @@ export class StudentProfile implements OnInit {
 
   cancelEdit() {
     this.editMode  = false;
-    this.newCvFile = null;
     this.form      = {};
     this.errorMessage = '';
   }
@@ -131,13 +152,6 @@ export class StudentProfile implements OnInit {
       formData.append(key, this.form[key] ?? '');
     });
 
-    // Append CV file if selected
-    if (this.newCvFile) {
-      formData.append('cv', this.newCvFile);
-    } else if (this.profile.cv_link) {
-      formData.append('cv_link', this.profile.cv_link);
-    }
-
     this.http.put<any>(this.API, formData, {
       headers: this.authService.getAuthHeaders()
     }).subscribe({
@@ -145,7 +159,6 @@ export class StudentProfile implements OnInit {
         this.successMessage = 'Profile updated successfully!';
         this.saving   = false;
         this.editMode = false;
-        this.newCvFile = null;
         this.loadProfile(); // reload fresh data
         setTimeout(() => this.successMessage = '', 4000);
       },
@@ -156,16 +169,68 @@ export class StudentProfile implements OnInit {
     });
   }
 
-  onCvSelect(event: Event) {
+  onCvSelect(slot: number, event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.newCvFile = input.files[0];
+      this.resumeUploads[slot] = input.files[0];
     }
   }
 
-  onCvDrop(event: DragEvent) {
+  onCvDrop(slot: number, event: DragEvent) {
     event.preventDefault();
     const file = event.dataTransfer?.files[0];
-    if (file) this.newCvFile = file;
+    if (file) this.resumeUploads[slot] = file;
+  }
+
+  uploadResume(slot: number) {
+    const file = this.resumeUploads[slot];
+    if (!file) {
+      return;
+    }
+
+    this.resumeSavingSlot = slot;
+    this.errorMessage = '';
+
+    const formData = new FormData();
+    formData.append('resume', file);
+
+    this.http.post<any>(`${this.API}/resumes/${slot}`, formData, {
+      headers: this.authService.getAuthHeaders()
+    }).subscribe({
+      next: () => {
+        this.resumeUploads[slot] = null;
+        this.resumeSavingSlot = null;
+        this.successMessage = `Resume uploaded to slot ${slot}`;
+        this.loadProfile();
+        this.loadResumeSlots();
+      },
+      error: (err) => {
+        this.resumeSavingSlot = null;
+        this.errorMessage = err?.error?.message || 'Failed to upload resume';
+      }
+    });
+  }
+
+  deleteResume(slot: number) {
+    if (!confirm(`Remove resume from slot ${slot}?`)) {
+      return;
+    }
+
+    this.resumeSavingSlot = slot;
+    this.http.delete<any>(`${this.API}/resumes/${slot}`, {
+      headers: this.authService.getAuthHeaders()
+    }).subscribe({
+      next: () => {
+        this.resumeUploads[slot] = null;
+        this.resumeSavingSlot = null;
+        this.successMessage = `Resume removed from slot ${slot}`;
+        this.loadProfile();
+        this.loadResumeSlots();
+      },
+      error: (err) => {
+        this.resumeSavingSlot = null;
+        this.errorMessage = err?.error?.message || 'Failed to delete resume';
+      }
+    });
   }
 }

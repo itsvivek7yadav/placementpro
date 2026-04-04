@@ -1,6 +1,36 @@
 const db = require('../config/db');
 const { notifyEligibleStudentsForDrive } = require('../services/notificationService');
 
+function normalizeProgramIds(value) {
+  if (Array.isArray(value)) {
+    return value.map(Number).filter(Boolean);
+  }
+
+  if (value === undefined || value === null || value === '') {
+    return [];
+  }
+
+  return [Number(value)].filter(Boolean);
+}
+
+function getDriveDocumentUpdateClause(req) {
+  if (req.file) {
+    return {
+      clause: ', drive_document_url = ?',
+      values: [`/uploads/drive-documents/${req.file.filename}`]
+    };
+  }
+
+  if (req.body.remove_drive_document === 'true' || req.body.remove_drive_document === true) {
+    return {
+      clause: ', drive_document_url = NULL',
+      values: []
+    };
+  }
+
+  return { clause: '', values: [] };
+}
+
 // ── GET OPEN DRIVES ────────────────────────────────────────
 exports.getOpenDrives = async (req, res) => {
   try {
@@ -93,6 +123,8 @@ exports.updateDrive = async (req, res) => {
       ctc, eligible_batch, application_deadline,
       min_cgpa, eligible_programs
     } = req.body;
+    const documentUpdate = getDriveDocumentUpdateClause(req);
+    const normalizedPrograms = normalizeProgramIds(eligible_programs);
 
     if (!application_deadline) {
       return res.status(400).json({ message: 'Application deadline is required' });
@@ -107,16 +139,17 @@ exports.updateDrive = async (req, res) => {
           company_name = ?, job_role = ?, description = ?,
           job_type = ?, ctc = ?, eligible_batch = ?,
           application_deadline = ?, min_cgpa = ?
+          ${documentUpdate.clause}
        WHERE drive_id = ? AND status = 'LIVE'`,
       [company_name, job_role, description, job_type,
-       ctc, eligible_batch, deadline, min_cgpa, driveId]
+       ctc, eligible_batch, deadline, min_cgpa, ...documentUpdate.values, driveId]
     );
 
-    if (eligible_programs && eligible_programs.length > 0) {
+    if (normalizedPrograms.length > 0) {
       await connection.query(
         `DELETE FROM drive_program_mapping WHERE drive_id = ?`, [driveId]
       );
-      for (const programId of eligible_programs) {
+      for (const programId of normalizedPrograms) {
         await connection.query(
           `INSERT INTO drive_program_mapping (drive_id, program_id) VALUES (?, ?)`,
           [driveId, programId]
@@ -154,6 +187,8 @@ exports.reopenDrive = async (req, res) => {
       ctc, eligible_batch, application_deadline,
       min_cgpa, eligible_programs
     } = req.body;
+    const documentUpdate = getDriveDocumentUpdateClause(req);
+    const normalizedPrograms = normalizeProgramIds(eligible_programs);
 
     if (!application_deadline) {
       return res.status(400).json({ message: 'New application deadline is required to reopen' });
@@ -168,17 +203,18 @@ exports.reopenDrive = async (req, res) => {
           company_name = ?, job_role = ?, description = ?,
           job_type = ?, ctc = ?, eligible_batch = ?,
           application_deadline = ?, min_cgpa = ?,
+          ${documentUpdate.clause}
           status = 'LIVE', closed_at = NULL, close_type = NULL
        WHERE drive_id = ?`,
       [company_name, job_role, description, job_type,
-       ctc, eligible_batch, deadline, min_cgpa, driveId]
+       ctc, eligible_batch, deadline, min_cgpa, ...documentUpdate.values, driveId]
     );
 
-    if (eligible_programs && eligible_programs.length > 0) {
+    if (normalizedPrograms.length > 0) {
       await connection.query(
         `DELETE FROM drive_program_mapping WHERE drive_id = ?`, [driveId]
       );
-      for (const programId of eligible_programs) {
+      for (const programId of normalizedPrograms) {
         await connection.query(
           `INSERT INTO drive_program_mapping (drive_id, program_id) VALUES (?, ?)`,
           [driveId, programId]

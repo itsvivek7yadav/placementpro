@@ -28,7 +28,7 @@ export class SavedOpportunitiesComponent implements OnInit, OnDestroy {
   // ✅ MATCH HTML
   isLoading = true;
   hasError = false;
-  filter: 'all' | 'job' | 'event' = 'all';
+  filter: 'all' | 'job' = 'all';
 
   bookmarkLoadingIds = new Set<number>();
 
@@ -81,16 +81,12 @@ export class SavedOpportunitiesComponent implements OnInit, OnDestroy {
     return this.items.filter(i => i.opportunity_type === 'job').length;
   }
 
-  get eventCount(): number {
-    return this.items.filter(i => i.opportunity_type === 'event').length;
-  }
-
-  setFilter(f: 'all' | 'job' | 'event') {
+  setFilter(f: 'all' | 'job') {
     this.filter = f;
   }
 
   // ✅ REQUIRED
-  onBookmarkToggle(e: { id: number; type: 'job' | 'event' }) {
+  onBookmarkToggle(e: { id: number; type: 'job' }) {
     this.bookmarkLoadingIds.add(e.id);
 
     this.offCampusService.toggleBookmark(e.id, e.type)

@@ -1,18 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-
 :host {
   display: block;
-  font-family: 'Inter', sans-serif;
 }
 
 // ── Page ───────────────────────────────────────────────────
 .dash-page {
-  padding: 32px 40px;
-  background: #f0f2f5;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: var(--section-gap);
 }
 
 // ── Header ─────────────────────────────────────────────────
@@ -32,7 +27,7 @@
 .dash-title {
   font-size: 26px;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--app-text);
   letter-spacing: -0.5px;
   line-height: 1.2;
   span { color: #10b981; }
@@ -40,7 +35,7 @@
 
 .dash-subtitle {
   font-size: 13.5px;
-  color: #64748b;
+  color: var(--app-text-soft);
   font-weight: 400;
 }
 
@@ -50,20 +45,20 @@
   justify-content: center;
   gap: 6px;
   padding: 8px 16px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: 8px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface-solid);
+  border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
-  color: #64748b;
+  color: var(--app-text-soft);
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
 
   &:hover:not(.spinning) {
-    border-color: #cbd5e1;
+    border-color: var(--app-border-strong);
     background: #f8fafc;
-    color: #475569;
+    color: var(--app-text);
   }
 
   svg {
@@ -107,27 +102,28 @@
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 1rem;
   width: 100%;
 }
 
 .kpi-card {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-top: 3px solid var(--accent);
-  border-radius: 12px;
+  border-radius: var(--app-radius-md);
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--app-shadow-sm);
+  backdrop-filter: blur(10px);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   animation: cardIn 0.4s ease both;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    border-color: #cbd5e1;
+    box-shadow: var(--app-shadow-md);
+    border-color: var(--app-border-strong);
   }
 
   &:nth-child(1) { animation-delay: 0.05s; }
@@ -160,7 +156,7 @@
 .kpi-label {
   font-size: 11px;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--app-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.7px;
 }
@@ -168,14 +164,14 @@
 .kpi-value {
   font-size: 32px;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--app-text);
   letter-spacing: -0.8px;
   line-height: 1;
 }
 
 .kpi-trend {
   font-size: 12px;
-  color: #64748b;
+  color: var(--app-text-soft);
   font-weight: 500;
 
   &.kpi-trend--live {
@@ -201,9 +197,9 @@
 
 // ── Skeleton ───────────────────────────────────────────────
 .kpi-skeleton {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
   height: 140px;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -212,24 +208,25 @@
 .dash-bottom {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 1rem;
   width: 100%;
 }
 
 // ── Shared Card Base ───────────────────────────────────────
 .dash-card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--app-shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 18px;
   transition: box-shadow 0.2s ease;
+  backdrop-filter: blur(10px);
 
   &:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--app-shadow-md);
   }
 }
 
@@ -239,13 +236,13 @@
   justify-content: space-between;
   gap: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--app-border);
 }
 
 .card-title {
   font-size: 15px;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--app-text);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -255,6 +252,20 @@
     width: 16px;
     height: 16px;
     flex-shrink: 0;
+  }
+}
+
+@media (max-width: 1100px) {
+  .kpi-grid,
+  .dash-bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .kpi-grid,
+  .dash-bottom {
+    grid-template-columns: 1fr;
   }
 }
 

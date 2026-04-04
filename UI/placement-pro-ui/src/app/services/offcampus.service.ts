@@ -29,24 +29,6 @@ export interface Job {
   is_bookmarked?: boolean;
 }
 
-export interface IndustryEvent {
-  id: number;
-  title: string;
-  organizer: string;
-  location: string;
-  event_url: string;
-  source: string;
-  description: string;
-  summary: string;
-  event_type: string;
-  tags: string[];
-  is_online: boolean;
-  is_free: boolean;
-  event_date: string;
-  registration_deadline: string;
-  is_bookmarked?: boolean;
-}
-
 export interface PaginatedResult<T> {
   items: T[];
   total: number;
@@ -62,16 +44,6 @@ export interface JobFilters {
   date_from?: string;
   date_to?: string;
   source?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface EventFilters {
-  event_type?: string;
-  is_online?: boolean;
-  is_free?: boolean;
-  date_from?: string;
-  date_to?: string;
   page?: number;
   limit?: number;
 }
@@ -143,48 +115,12 @@ export class OffCampusService {
   }
 
   // ─────────────────────────────────────────────
-  // EVENTS
-  // ─────────────────────────────────────────────
-
-  getEvents(filters: EventFilters = {}): Observable<PaginatedResult<IndustryEvent>> {
-    let params = new HttpParams();
-
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        params = params.set(key, String(value));
-      }
-    });
-
-    return this.http
-      .get<{ success: boolean; data: any }>(`${this.base}/events`, { params })
-      .pipe(
-        map(res => ({
-          items:      res.data.events     as IndustryEvent[],
-          total:      res.data.total      as number,
-          page:       res.data.page       as number,
-          limit:      res.data.limit      as number,
-          totalPages: res.data.totalPages as number
-        })),
-        catchError(err => throwError(() => err))
-      );
-  }
-
-  getEventById(id: number): Observable<IndustryEvent> {
-    return this.http
-      .get<{ success: boolean; data: IndustryEvent }>(`${this.base}/events/${id}`)
-      .pipe(
-        map(res => res.data),
-        catchError(err => throwError(() => err))
-      );
-  }
-
-  // ─────────────────────────────────────────────
   // BOOKMARKS (🔥 FIXED)
   // ─────────────────────────────────────────────
 
   toggleBookmark(
     opportunityId: number,
-    opportunityType: 'job' | 'event'
+    opportunityType: 'job'
   ): Observable<{ action: string }> {
     return this.http
       .post<{ success: boolean; data: { action: string } }>(

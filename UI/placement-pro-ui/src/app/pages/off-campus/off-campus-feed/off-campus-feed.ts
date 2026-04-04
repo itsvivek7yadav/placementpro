@@ -2,26 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
-// ✅ IMPORT CHILD COMPONENTS
 import { OffCampusJobsComponent } from '../off-campus-jobs/off-campus-jobs';
-import { IndustryEventsComponent } from '../industry-events/industry-events';
 import { SavedOpportunitiesComponent } from '../saved-opportunities/saved-opportunities';
-
-// ✅ SERVICE
 import { OffCampusService } from '../../../services/offcampus.service';
 
-export type FeedTab = 'jobs' | 'events' | 'saved';
+export type FeedTab = 'jobs' | 'saved';
 
 @Component({
   selector: 'app-off-campus-feed',
   standalone: true,
 
-  // 🔥 THIS IS THE MAIN FIX
   imports: [
     CommonModule,
     MatIconModule,
     OffCampusJobsComponent,
-    IndustryEventsComponent,
     SavedOpportunitiesComponent
   ],
 

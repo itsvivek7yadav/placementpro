@@ -65,7 +65,9 @@ import { LayoutStateService } from '../layout-state.service';
 
     .content {
       flex: 1;
-      background: #f0f2f5;
+      background:
+        radial-gradient(circle at top center, rgba(37, 99, 235, 0.06), transparent 24%),
+        linear-gradient(180deg, var(--app-bg-accent) 0%, var(--app-bg) 24%, var(--app-bg) 100%);
       overflow-y: auto;
       overflow-x: hidden;
       scroll-behavior: smooth;

@@ -2,8 +2,14 @@
 
   <!-- Header -->
   <div class="page-header">
-    <h1 class="page-title">Publish Placement Drive</h1>
-    <p class="page-subtitle">Fill in the details below to create a new drive for students.</p>
+    <div class="page-header-copy">
+      <h1 class="page-title">Publish Placement Drive</h1>
+      <p class="page-subtitle">Fill in the details below to create a new drive for students.</p>
+    </div>
+    <div class="page-header-meta">
+      <div class="meta-pill">3 sections</div>
+      <div class="meta-pill">Live eligibility setup</div>
+    </div>
   </div>
 
   <!-- Success / Error -->
@@ -14,6 +20,7 @@
     ❌ {{ errorMessage }}
   </div>
 
+  <div class="create-drive-layout">
   <form [formGroup]="driveForm" (ngSubmit)="submit()" class="drive-form">
 
     <!-- ── Basic Info ── -->
@@ -147,4 +154,38 @@
     </div>
 
   </form>
+
+  <aside class="document-panel">
+    <div class="document-panel-card">
+      <div class="document-panel-head">
+        <div>
+          <h3>Drive Document</h3>
+          <p>Upload an optional company JD, brochure, or PPT for students to view.</p>
+        </div>
+      </div>
+
+      <label class="upload-dropzone" for="driveDocument">
+        <input
+          id="driveDocument"
+          type="file"
+          accept=".pdf,.doc,.docx,.ppt,.pptx"
+          (change)="onDocumentSelected($event)"
+        />
+        <div class="upload-icon">📄</div>
+        <div class="upload-title">{{ selectedDocumentName || 'Choose a document to upload' }}</div>
+        <div class="upload-subtitle">PDF, DOC, DOCX, PPT, or PPTX up to 10 MB</div>
+      </label>
+
+      <div class="document-selected" *ngIf="selectedDocumentName">
+        <div class="document-name">{{ selectedDocumentName }}</div>
+        <button type="button" class="clear-document-btn" (click)="clearSelectedDocument()">Remove</button>
+      </div>
+
+      <div class="document-hint-list">
+        <div class="document-hint">Students can download the file from the drive details page.</div>
+        <div class="document-hint">Use this for role descriptions, process details, or campus circulars.</div>
+      </div>
+    </div>
+  </aside>
+  </div>
 </div>

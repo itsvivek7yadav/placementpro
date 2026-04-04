@@ -8,8 +8,8 @@ const db = require('../config/db');
 const BookmarkModel = {
 
   async bookmarkOpportunity(userId, opportunityId, opportunityType) {
-    if (!['job', 'event'].includes(opportunityType)) {
-      throw new Error('opportunityType must be "job" or "event"');
+    if (opportunityType !== 'job') {
+      throw new Error('opportunityType must be "job"');
     }
 
     try {
@@ -69,33 +69,11 @@ const BookmarkModel = {
           ORDER BY b.created_at DESC
         `, [userId]);
 
-        // Parse JSON skills
         rows = [
           ...rows,
           ...jobRows.map(j => ({
             ...j,
             skills: typeof j.skills === 'string' ? JSON.parse(j.skills) : (j.skills || [])
-          }))
-        ];
-      }
-
-      if (!type || type === 'event') {
-        const [evtRows] = await db.query(`
-          SELECT e.*, b.created_at AS bookmarked_at, 'event' AS opportunity_type
-          FROM industry_events e
-          JOIN bookmarked_opportunities b
-            ON b.opportunity_id = e.id AND b.opportunity_type = 'event'
-          WHERE b.user_id = ?
-          ORDER BY b.created_at DESC
-        `, [userId]);
-
-        rows = [
-          ...rows,
-          ...evtRows.map(e => ({
-            ...e,
-            tags:      typeof e.tags === 'string' ? JSON.parse(e.tags) : (e.tags || []),
-            is_online: e.is_online === 1,
-            is_free:   e.is_free   === 1
           }))
         ];
       }
@@ -126,9 +104,6 @@ const BookmarkModel = {
 
   async getUserRecommendations(userId, limit = 10) {
     try {
-      const half = Math.floor(limit / 2);
-      const ceil = Math.ceil(limit / 2);
-
       const [jobRows] = await db.query(`
         SELECT j.*, r.score, r.reason, r.is_seen, 'job' AS opportunity_type
         FROM offcampus_jobs j
@@ -137,28 +112,12 @@ const BookmarkModel = {
         WHERE r.user_id = ? AND j.is_active = 1 AND j.expires_at > NOW()
         ORDER BY r.score DESC
         LIMIT ?
-      `, [userId, half]);
-
-      const [evtRows] = await db.query(`
-        SELECT e.*, r.score, r.reason, r.is_seen, 'event' AS opportunity_type
-        FROM industry_events e
-        JOIN recommended_opportunities r
-          ON r.opportunity_id = e.id AND r.opportunity_type = 'event'
-        WHERE r.user_id = ? AND e.is_active = 1 AND e.expires_at > NOW()
-        ORDER BY r.score DESC
-        LIMIT ?
-      `, [userId, ceil]);
+      `, [userId, limit]);
 
       return [
         ...jobRows.map(j => ({
           ...j,
           skills: typeof j.skills === 'string' ? JSON.parse(j.skills) : (j.skills || [])
-        })),
-        ...evtRows.map(e => ({
-          ...e,
-          tags:      typeof e.tags === 'string' ? JSON.parse(e.tags) : (e.tags || []),
-          is_online: e.is_online === 1,
-          is_free:   e.is_free   === 1
         }))
       ].sort((a, b) => b.score - a.score);
     } catch (err) {

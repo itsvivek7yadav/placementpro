@@ -12,7 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Subject, Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { OffCampusService, Job, IndustryEvent } from '../../../services/offcampus.service';
+import { OffCampusService, Job } from '../../../services/offcampus.service';
 
 @Component({
   selector: 'app-opportunity-detail',
@@ -31,8 +31,7 @@ import { OffCampusService, Job, IndustryEvent } from '../../../services/offcampu
 })
 export class OpportunityDetailComponent implements OnInit, OnDestroy {
 
-  opportunity: Job | IndustryEvent | null = null;
-  type: 'job' | 'event' = 'job';
+  opportunity: Job | null = null;
   isLoading = true;
   hasError = false;
   bookmarkLoading = false;
@@ -51,7 +50,6 @@ export class OpportunityDetailComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
         const id  = Number(params['id']);
-        this.type = (this.route.snapshot.data['type'] as 'job' | 'event') || 'job';
         this.loadOpportunity(id);
       });
   }
@@ -66,14 +64,12 @@ export class OpportunityDetailComponent implements OnInit, OnDestroy {
     this.hasError  = false;
 
     // typed as Observable<any> to avoid union type mismatch between Job and IndustryEvent
-    const request$: Observable<any> = this.type === 'job'
-      ? this.offCampusService.getJobById(id)
-      : this.offCampusService.getEventById(id);
+    const request$: Observable<any> = this.offCampusService.getJobById(id);
 
     request$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data: Job | IndustryEvent) => {
+        next: (data: Job) => {
           this.opportunity = data;
           this.isLoading   = false;
         },
@@ -84,14 +80,12 @@ export class OpportunityDetailComponent implements OnInit, OnDestroy {
       });
   }
 
-  get isJob(): boolean { return this.type === 'job'; }
   get job(): Job { return this.opportunity as Job; }
-  get event(): IndustryEvent { return this.opportunity as IndustryEvent; }
   get isBookmarked(): boolean { return !!(this.opportunity as any)?.is_bookmarked; }
 
   get applyUrl(): string {
     if (!this.opportunity) return '';
-    return this.isJob ? this.job.source_url : this.event.event_url;
+    return this.job.source_url;
   }
 
   onApply(): void {
@@ -102,7 +96,7 @@ export class OpportunityDetailComponent implements OnInit, OnDestroy {
     if (!this.opportunity) return;
     this.bookmarkLoading = true;
 
-    this.offCampusService.toggleBookmark(this.opportunity.id, this.type)
+    this.offCampusService.toggleBookmark(this.opportunity.id, 'job')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result: { action: string }) => {

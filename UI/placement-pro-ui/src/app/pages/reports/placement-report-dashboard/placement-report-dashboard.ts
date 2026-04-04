@@ -183,7 +183,7 @@ export class PlacementReportDashboard implements OnInit {
       'Program',
       'Batch',
       'Placement Status',
-      'Total Company Registers',
+      'No of Applications',
       'Absent Count',
       'Selected Company',
       'Selected Job Type',

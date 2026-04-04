@@ -1,10 +1,9 @@
 /**
  * services/offCampusService.js
- * Business logic for off-campus jobs and events
+ * Business logic for off-campus jobs
  */
 
 const OffCampusJobModel = require('../models/offCampusJobModel');
-const IndustryEventModel = require('../models/industryEventModel');
 const BookmarkModel = require('../models/bookmarkModel');
 
 const OffCampusService = {
@@ -45,29 +44,10 @@ const OffCampusService = {
     return job;
   },
 
-  // ─── EVENTS ───────────────────────────────────────────
-
-  /**
-   * Fetch events with filters and pagination
-   */
-  async getEvents(filters = {}, pagination = {}, userId = null) {
-    const result = await IndustryEventModel.getEvents(filters, pagination);
-
-    if (userId && result.events.length > 0) {
-      const bookmarkedIds = await getBookmarkedIds(userId, 'event');
-      result.events = result.events.map(evt => ({
-        ...evt,
-        is_bookmarked: bookmarkedIds.has(evt.id)
-      }));
-    }
-
-    return result;
-  },
-
   // ─── BOOKMARKS ────────────────────────────────────────
 
   /**
-   * Toggle bookmark for a job or event
+   * Toggle bookmark for a job
    * Returns { action: 'bookmarked' | 'removed', item }
    */
   async toggleBookmark(userId, opportunityId, opportunityType) {
@@ -81,13 +61,7 @@ const OffCampusService = {
       await BookmarkModel.removeBookmark(userId, opportunityId, opportunityType);
       return { action: 'removed', opportunityId, opportunityType };
     } else {
-      // Verify the opportunity exists before bookmarking
-      let exists = false;
-      if (opportunityType === 'job') {
-        exists = !!(await OffCampusJobModel.getJobById(opportunityId));
-      } else {
-        exists = !!(await IndustryEventModel.getEventById(opportunityId));
-      }
+      const exists = !!(await OffCampusJobModel.getJobById(opportunityId));
       if (!exists) throw new Error('Opportunity not found');
 
       const bookmark = await BookmarkModel.bookmarkOpportunity(
@@ -101,7 +75,7 @@ const OffCampusService = {
    * Get all bookmarks for a user
    */
   async getUserBookmarks(userId, type) {
-    return BookmarkModel.getUserBookmarks(userId, type);
+    return BookmarkModel.getUserBookmarks(userId, type || 'job');
   },
 
   // ─── RECOMMENDATIONS ──────────────────────────────────

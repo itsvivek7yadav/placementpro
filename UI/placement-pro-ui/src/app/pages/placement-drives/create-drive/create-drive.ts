@@ -27,6 +27,8 @@ export class CreateDrive implements OnInit {
   loading = false;
   successMessage = '';
   errorMessage = '';
+  selectedDocument: File | null = null;
+  selectedDocumentName = '';
 
   constructor(
     private fb: FormBuilder,
@@ -154,12 +156,40 @@ export class CreateDrive implements OnInit {
     });
   }
 
+  onDocumentSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.selectedDocument = file;
+    this.selectedDocumentName = file?.name || '';
+  }
+
+  clearSelectedDocument(): void {
+    this.selectedDocument = null;
+    this.selectedDocumentName = '';
+  }
+
   submit() {
     if (this.driveForm.invalid) return;
 
     this.loading = true;
+    this.errorMessage = '';
 
-    this.http.post(buildApiUrl('placement-drives'), this.driveForm.value).subscribe({
+    const formData = new FormData();
+    const formValue = this.driveForm.value;
+
+    Object.entries(formValue).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((item) => formData.append(key, String(item)));
+      } else if (value !== null && value !== undefined) {
+        formData.append(key, String(value));
+      }
+    });
+
+    if (this.selectedDocument) {
+      formData.append('drive_document', this.selectedDocument);
+    }
+
+    this.http.post(buildApiUrl('placement-drives'), formData).subscribe({
       next: () => {
         this.successMessage = 'Drive published successfully';
 

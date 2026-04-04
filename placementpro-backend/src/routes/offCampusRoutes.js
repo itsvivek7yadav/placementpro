@@ -28,9 +28,6 @@ const optionalAuth = (req, _res, next) => {
 router.get('/jobs',     optionalAuth, controller.getJobs);
 router.get('/jobs/:id', optionalAuth, controller.getJobById);
 
-// Events
-router.get('/events', optionalAuth, controller.getEvents);
-
 // Bookmark toggle
 router.post('/bookmark', verifyToken, controller.toggleBookmark);
 

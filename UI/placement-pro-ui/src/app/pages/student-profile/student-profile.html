@@ -248,49 +248,60 @@
       Resume / CV
     </div>
 
-    <!-- View mode -->
-    <div class="cv-view" *ngIf="!editMode">
-      <div class="cv-current" *ngIf="profile.cv_link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <div class="cv-info">
-          <div class="cv-name">CV Uploaded</div>
-          <div class="cv-path">{{ profile.cv_link }}</div>
-        </div>
-        <a [href]="getCvUrl(profile.cv_link)" target="_blank" class="cv-download">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download
-        </a>
-      </div>
-      <div class="cv-empty" *ngIf="!profile.cv_link">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <p>No CV uploaded yet</p>
-      </div>
+    <div class="resume-note">
+      Upload up to 2 resumes. Students can choose one of these while applying for a drive.
     </div>
 
-    <!-- Edit mode -->
-    <div class="cv-edit" *ngIf="editMode">
-      <div class="cv-current" *ngIf="profile.cv_link && !newCvFile">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <div class="cv-info">
-          <div class="cv-name">Current CV</div>
-          <div class="cv-path">{{ profile.cv_link }}</div>
+    <div class="resume-slot-grid">
+      <div class="resume-slot-card" *ngFor="let slot of [1, 2]">
+        <div class="resume-slot-header">
+          <div>
+            <div class="resume-slot-title">Resume Slot {{ slot }}</div>
+            <div class="resume-slot-subtitle">
+              {{ getResumeForSlot(slot) ? 'Ready to use for applications' : 'No resume uploaded yet' }}
+            </div>
+          </div>
+          <span class="resume-slot-badge" [class.filled]="getResumeForSlot(slot)">
+            {{ getResumeForSlot(slot) ? 'Available' : 'Empty' }}
+          </span>
         </div>
-      </div>
 
-      <div class="upload-zone"
-           [class.has-file]="newCvFile"
-           (click)="cvInput.click()"
-           (dragover)="$event.preventDefault()"
-           (drop)="onCvDrop($event)">
-        <input #cvInput type="file" accept=".pdf,.doc,.docx" style="display:none" (change)="onCvSelect($event)"/>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <div *ngIf="!newCvFile">
-          <p class="upload-title">Click or drag your CV here</p>
-          <p class="upload-sub">PDF, DOC, DOCX — max 5MB</p>
+        <div class="cv-current" *ngIf="getResumeForSlot(slot)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <div class="cv-info">
+            <div class="cv-name">{{ getResumeForSlot(slot)?.name }}</div>
+            <div class="cv-path">{{ getResumeForSlot(slot)?.path }}</div>
+          </div>
+          <a [href]="getCvUrl(getResumeForSlot(slot)?.path || '')" target="_blank" class="cv-download">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </a>
         </div>
-        <div *ngIf="newCvFile" class="upload-ready">
-          <p class="upload-title">{{ newCvFile.name }}</p>
-          <p class="upload-sub">{{ (newCvFile.size / 1024).toFixed(0) }} KB — ready to upload</p>
+
+        <div class="upload-zone"
+             [class.has-file]="resumeUploads[slot]"
+             (click)="resumeInput.click()"
+             (dragover)="$event.preventDefault()"
+             (drop)="onCvDrop(slot, $event)">
+          <input #resumeInput type="file" accept=".pdf,.doc,.docx" style="display:none" (change)="onCvSelect(slot, $event)"/>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <div *ngIf="!resumeUploads[slot]">
+            <p class="upload-title">{{ getResumeForSlot(slot) ? 'Replace resume in this slot' : 'Click or drag your resume here' }}</p>
+            <p class="upload-sub">PDF, DOC, DOCX — max 5MB</p>
+          </div>
+          <div *ngIf="resumeUploads[slot]" class="upload-ready">
+            <p class="upload-title">{{ resumeUploads[slot]?.name }}</p>
+            <p class="upload-sub">{{ ((resumeUploads[slot]?.size || 0) / 1024).toFixed(0) }} KB — ready to upload</p>
+          </div>
+        </div>
+
+        <div class="resume-slot-actions">
+          <button class="btn-secondary" type="button" [disabled]="!resumeUploads[slot] || resumeSavingSlot === slot" (click)="uploadResume(slot)">
+            {{ resumeSavingSlot === slot ? 'Uploading...' : getResumeForSlot(slot) ? 'Replace Resume' : 'Upload Resume' }}
+          </button>
+          <button class="btn-danger" type="button" *ngIf="getResumeForSlot(slot)" [disabled]="resumeSavingSlot === slot" (click)="deleteResume(slot)">
+            Remove
+          </button>
         </div>
       </div>
     </div>

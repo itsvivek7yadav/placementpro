@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { buildApiUrl } from '../../api.config';
-import { AuthService } from '../../auth/auth';
 
 @Component({
   selector: 'app-eligible-drives',
@@ -21,8 +20,7 @@ export class EligibleDrives implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private router: Router,
-    private authService: AuthService
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -48,30 +46,7 @@ export class EligibleDrives implements OnInit {
   }
 
 applyNow(driveId: number) {
-
-  if (!confirm('Apply for this drive?')) return;
-
-  const payload = {
-    drive_id: driveId
-  };
-
-  this.http.post(
-    `${this.API}/applications/apply`,
-    payload,
-    {
-      headers: this.authService.getAuthHeaders()
-    }
-  )
-  .subscribe({
-    next: () => {
-      alert('Application submitted successfully 🎉');
-    },
-
-    error: err => {
-      console.error('Application failed', err);
-      alert(err.error?.message || 'Failed to apply');
-    }
-  });
+  this.router.navigate(['/drives', driveId], { queryParams: { apply: 'true' } });
 }
 
 

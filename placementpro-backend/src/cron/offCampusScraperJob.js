@@ -1,12 +1,13 @@
 /**
  * cron/offCampusScraperJob.js
- * Runs all scrapers every 6 hours
+ * Runs all scrapers every 3 hours
  */
 
 const cron = require('node-cron');
 const { scrapeAdzuna }   = require('../scrapers/adzunaScraper');
 const { scrapeLinkedIn } = require('../scrapers/linkedinScraper');
-const { scrapeEvents }   = require('../scrapers/eventsScraper');
+const { scrapeHirist }   = require('../scrapers/hiristScraper');
+const { scrapeJooble }   = require('../scrapers/joobleScraper');
 
 /**
  * Run all scrapers sequentially
@@ -15,7 +16,7 @@ const { scrapeEvents }   = require('../scrapers/eventsScraper');
 async function runAllScrapers() {
   console.log(`[ScraperJob] ===== Starting full scrape at ${new Date().toISOString()} =====`);
 
-  const results = { adzuna: null, linkedin: null, events: null };
+  const results = { adzuna: null, linkedin: null, hirist: null, jooble: null };
 
   try {
     console.log('[ScraperJob] Running Adzuna scraper...');
@@ -34,11 +35,19 @@ async function runAllScrapers() {
   }
 
   try {
-    console.log('[ScraperJob] Running Events scraper...');
-    results.events = await scrapeEvents();
+    console.log('[ScraperJob] Running Hirist scraper...');
+    results.hirist = await scrapeHirist();
   } catch (err) {
-    console.error('[ScraperJob] Events failed:', err.message);
-    results.events = { error: err.message };
+    console.error('[ScraperJob] Hirist failed:', err.message);
+    results.hirist = { error: err.message };
+  }
+
+  try {
+    console.log('[ScraperJob] Running Jooble scraper...');
+    results.jooble = await scrapeJooble();
+  } catch (err) {
+    console.error('[ScraperJob] Jooble failed:', err.message);
+    results.jooble = { error: err.message };
   }
 
   console.log('[ScraperJob] ===== Scrape complete =====');
@@ -48,13 +57,13 @@ async function runAllScrapers() {
 }
 
 /**
- * Schedule: every 6 hours
- * Cron pattern: 0 slash-6 star star star (at minute 0 of every 6th hour)
+ * Schedule: every 3 hours
+ * Cron pattern: 0 slash-3 star star star (at minute 0 of every 3rd hour)
  */
 function startScraperJob() {
-  console.log('[ScraperJob] Scheduling scraper cron (every 6 hours)...');
+  console.log('[ScraperJob] Scheduling scraper cron (every 3 hours)...');
 
-  const job = cron.schedule('0 */6 * * *', async () => {
+  const job = cron.schedule('0 */3 * * *', async () => {
     try {
       await runAllScrapers();
     } catch (err) {
@@ -65,7 +74,7 @@ function startScraperJob() {
     timezone: 'Asia/Kolkata'
   });
 
-  console.log('[ScraperJob] Scraper cron started. Next run in up to 6 hours.');
+  console.log('[ScraperJob] Scraper cron started. Next run in up to 3 hours.');
 
   return job;
 }

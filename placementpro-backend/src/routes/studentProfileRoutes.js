@@ -31,6 +31,9 @@ const upload = multer({
 });
 
 router.get('/',    verifyToken, controller.getProfile);
-router.put('/',    verifyToken, upload.single('cv'), controller.updateProfile);
+router.put('/',    verifyToken, controller.updateProfile);
+router.get('/resumes', verifyToken, controller.getResumeSlots);
+router.post('/resumes/:slot', verifyToken, upload.single('resume'), controller.uploadResumeToSlot);
+router.delete('/resumes/:slot', verifyToken, controller.deleteResumeFromSlot);
 
 module.exports = router;

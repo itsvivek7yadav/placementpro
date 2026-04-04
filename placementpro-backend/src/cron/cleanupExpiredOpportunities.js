@@ -1,11 +1,10 @@
 /**
  * cron/cleanupExpiredOpportunities.js
- * Runs daily at 3 AM - deletes expired jobs/events NOT bookmarked
+ * Runs daily at 3 AM - deletes expired jobs NOT bookmarked
  */
 
 const cron = require('node-cron');
 const OffCampusJobModel  = require('../models/offCampusJobModel');
-const IndustryEventModel = require('../models/industryEventModel');
 
 /**
  * Execute cleanup: removes expired, non-bookmarked records
@@ -13,7 +12,7 @@ const IndustryEventModel = require('../models/industryEventModel');
 async function runCleanup() {
   console.log(`[CleanupJob] ===== Starting cleanup at ${new Date().toISOString()} =====`);
 
-  let jobsDeleted = 0, eventsDeleted = 0;
+  let jobsDeleted = 0;
 
   try {
     jobsDeleted = await OffCampusJobModel.deleteExpiredUnbookmarkedJobs();
@@ -22,15 +21,8 @@ async function runCleanup() {
     console.error('[CleanupJob] Job cleanup error:', err.message);
   }
 
-  try {
-    eventsDeleted = await IndustryEventModel.deleteExpiredUnbookmarkedEvents();
-    console.log(`[CleanupJob] Deleted ${eventsDeleted} expired events`);
-  } catch (err) {
-    console.error('[CleanupJob] Event cleanup error:', err.message);
-  }
-
-  console.log(`[CleanupJob] ===== Cleanup complete. Jobs: ${jobsDeleted}, Events: ${eventsDeleted} =====`);
-  return { jobsDeleted, eventsDeleted };
+  console.log(`[CleanupJob] ===== Cleanup complete. Jobs: ${jobsDeleted} =====`);
+  return { jobsDeleted };
 }
 
 /**
