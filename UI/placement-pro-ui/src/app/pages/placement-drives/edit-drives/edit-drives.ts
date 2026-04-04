@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { buildApiUrl } from '../../../api.config';
+import { buildApiUrl, buildBackendUrl } from '../../../api.config';
 import { AuthService } from '../../../auth/auth';
 
 @Component({
@@ -27,6 +27,11 @@ export class EditDrive implements OnInit {
   driveId!: number;
   successMessage = '';
   errorMessage   = '';
+  selectedDocument: File | null = null;
+  selectedDocumentName = '';
+  currentDocumentUrl = '';
+  currentDocumentName = '';
+  removeCurrentDocument = false;
 
   private readonly baseUrl = buildApiUrl('placement-drives');
 
@@ -95,6 +100,15 @@ export class EditDrive implements OnInit {
           });
 
           this.selectedPrograms = res.selectedProgramIds || [];
+          this.currentDocumentUrl = d.drive_document_url
+            ? buildBackendUrl(d.drive_document_url)
+            : '';
+          this.currentDocumentName = d.drive_document_url
+            ? String(d.drive_document_url).split('/').pop() || 'Attached document'
+            : '';
+          this.removeCurrentDocument = false;
+          this.selectedDocument = null;
+          this.selectedDocumentName = '';
           this.loading = false;
         },
         error: err => {
@@ -120,6 +134,24 @@ export class EditDrive implements OnInit {
     return this.programs.find(p => p.program_id === id)?.program_name || '';
   }
 
+  onDocumentSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.selectedDocument = file;
+    this.selectedDocumentName = file?.name || '';
+    if (file) {
+      this.removeCurrentDocument = false;
+    }
+  }
+
+  removeAttachment(): void {
+    this.selectedDocument = null;
+    this.selectedDocumentName = '';
+    this.currentDocumentUrl = '';
+    this.currentDocumentName = '';
+    this.removeCurrentDocument = true;
+  }
+
   submit() {
     if (this.driveForm.invalid || this.saving) return;
     this.saving = true;
@@ -130,7 +162,26 @@ export class EditDrive implements OnInit {
       ? `${this.baseUrl}/${this.driveId}/reopen`
       : `${this.baseUrl}/${this.driveId}`;
 
-    this.http.put(endpoint, this.driveForm.value, { headers: this.authService.getAuthHeaders() })
+    const formData = new FormData();
+    const formValue = this.driveForm.value;
+
+    Object.entries(formValue).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((item) => formData.append(key, String(item)));
+      } else if (value !== null && value !== undefined) {
+        formData.append(key, String(value));
+      }
+    });
+
+    if (this.selectedDocument) {
+      formData.append('drive_document', this.selectedDocument);
+    }
+
+    if (this.removeCurrentDocument) {
+      formData.append('remove_drive_document', 'true');
+    }
+
+    this.http.put(endpoint, formData, { headers: this.authService.getAuthHeaders() })
       .subscribe({
         next: () => {
           this.saving = false;

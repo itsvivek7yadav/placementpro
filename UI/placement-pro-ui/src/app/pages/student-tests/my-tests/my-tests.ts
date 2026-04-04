@@ -44,9 +44,9 @@ export class MyTests implements OnInit {
   }
 
   getButtonLabel(test: any): string {
-    if (test.attempt_status === 'SUBMITTED') return '✅ Submitted';
-    if (test.status === 'CLOSED' || new Date() > new Date(test.end_time)) return '🔒 Window Closed';
-    if (new Date() < new Date(test.start_time)) return '⏳ Not Started Yet';
+    if (test.attempt_status === 'SUBMITTED') return 'Submitted';
+    if (test.status === 'CLOSED' || new Date() > new Date(test.end_time)) return 'Window Closed';
+    if (new Date() < new Date(test.start_time)) return 'Not Started Yet';
     return '▶ Start Test';
   }
 }

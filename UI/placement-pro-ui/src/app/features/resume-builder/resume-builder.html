@@ -1,11 +1,9 @@
 <div class="resume-builder-container">
 
-  <!-- Page Header -->
   <div class="page-header">
-    <div class="page-header-icon">📄</div>
     <div>
-      <h1>Standard CV Builder</h1>
-      <p>Create one clean, professional resume in a standard top-to-bottom format</p>
+      <h1>Resume Generator</h1>
+      <p>Build one clean, recruiter-ready resume in a structured format that stays consistent across preview and PDF export.</p>
     </div>
     <div class="header-status">
       <div class="status-pill">{{ completionScore }}% complete</div>
@@ -13,52 +11,31 @@
     </div>
   </div>
 
-  <!-- Alert -->
   <div *ngIf="message" [ngClass]="'alert alert-' + messageType">
-    {{ messageType === 'success' ? '✅' : '⚠️' }} {{ message }}
+    {{ message }}
+  </div>
+
+  <div class="builder-guide">
+    <div class="guide-card">
+      <strong>Before you start</strong>
+      <span>Keep your summary crisp, use measurable impact in bullets, and save regularly before previewing or downloading the PDF.</span>
+    </div>
+    <div class="guide-card">
+      <strong>Recommended flow</strong>
+      <span>Complete summary, experience, skills, and projects first. Then preview once to refine spacing and wording before export.</span>
+    </div>
   </div>
 
   <div class="main-grid">
-
-    <!-- ── SIDEBAR ──────────────────────────────────────────────────────── -->
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-icon">✓</div>
-        <h3>Resume Status</h3>
-      </div>
-
-      <div class="sidebar-body">
-        <div class="standard-resume-note">
-          One standard resume format is used across preview and PDF export.
-        </div>
-
-        <div class="resume-card active">
-          <div class="resume-card-header">
-            <h4>Professional CV</h4>
-            <span class="template-badge">standard</span>
-          </div>
-          <p class="standard-resume-copy">
-            A single polished format focused on readability, strong hierarchy, and recruiter-friendly flow.
-          </p>
-          <div class="resume-card-actions">
-            <button *ngIf="currentResumeId" (click)="downloadSavedResume(currentResumeId)" class="btn-download" [disabled]="loading">⬇️ PDF</button>
-            <button *ngIf="currentResumeId" (click)="deleteResume(currentResumeId)" class="btn-delete" [disabled]="loading">🗑️</button>
-            <button *ngIf="!currentResumeId" (click)="startNewResume()" class="btn-edit" [disabled]="loading">Start</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── MAIN PANEL ────────────────────────────────────────────────────── -->
     <div class="form-panel">
 
       <!-- Tabs -->
       <div class="tabs">
         <button class="tab-btn" [class.active]="activeTab === 'edit'" (click)="activeTab = 'edit'">
-          ✏️ Edit Resume
+          Edit Resume
         </button>
         <button class="tab-btn" [class.active]="activeTab === 'preview'" (click)="activeTab = 'preview'">
-          👁️ Preview
+          Preview
         </button>
       </div>
 
@@ -78,7 +55,7 @@
         <!-- Professional Summary -->
         <div class="form-section">
           <div class="section-title">
-            <div class="section-title-icon">💼</div>
+            <div class="section-title-icon">1</div>
             <h3>Professional Summary <span style="color:var(--red)">*</span></h3>
           </div>
           <div class="form-group">
@@ -94,12 +71,12 @@
         <!-- Experience -->
         <div class="form-section">
           <div class="section-title">
-            <div class="section-title-icon">🏢</div>
+            <div class="section-title-icon">2</div>
             <h3>Experience</h3>
           </div>
 
           <div *ngFor="let exp of resumeData.experience; let i = index" class="form-item">
-            <button (click)="removeExperience(i)" class="btn-remove-item">✕</button>
+            <button (click)="removeExperience(i)" class="btn-remove-item">Remove</button>
 
             <div class="form-row">
               <div class="form-group">
@@ -142,7 +119,7 @@
         <!-- Skills -->
         <div class="form-section">
           <div class="section-title">
-            <div class="section-title-icon">⚡</div>
+            <div class="section-title-icon">3</div>
             <h3>Skills</h3>
           </div>
 
@@ -159,7 +136,7 @@
             <div class="skill-tags">
               <span *ngFor="let skill of resumeData.skills.technical; let i = index" class="skill-tag">
                 {{ skill }}
-                <button (click)="removeSkill('technical', i)" class="btn-remove-skill">✕</button>
+                <button (click)="removeSkill('technical', i)" class="btn-remove-skill">Remove</button>
               </span>
             </div>
           </div>
@@ -177,7 +154,7 @@
             <div class="skill-tags">
               <span *ngFor="let skill of resumeData.skills.soft; let i = index" class="skill-tag">
                 {{ skill }}
-                <button (click)="removeSkill('soft', i)" class="btn-remove-skill">✕</button>
+                <button (click)="removeSkill('soft', i)" class="btn-remove-skill">Remove</button>
               </span>
             </div>
           </div>
@@ -186,12 +163,12 @@
         <!-- Projects -->
         <div class="form-section">
           <div class="section-title">
-            <div class="section-title-icon">🚀</div>
+            <div class="section-title-icon">4</div>
             <h3>Projects</h3>
           </div>
 
           <div *ngFor="let project of resumeData.projects; let i = index" class="form-item">
-            <button (click)="removeProject(i)" class="btn-remove-item">✕</button>
+            <button (click)="removeProject(i)" class="btn-remove-item">Remove</button>
 
             <div class="form-group">
               <label>Project Title</label>
@@ -219,12 +196,12 @@
         <!-- Certifications -->
         <div class="form-section">
           <div class="section-title">
-            <div class="section-title-icon">🎓</div>
+            <div class="section-title-icon">5</div>
             <h3>Certifications</h3>
           </div>
 
           <div *ngFor="let cert of resumeData.certifications; let i = index" class="form-item">
-            <button (click)="removeCertification(i)" class="btn-remove-item">✕</button>
+            <button (click)="removeCertification(i)" class="btn-remove-item">Remove</button>
             <div class="form-row-3">
               <div class="form-group">
                 <label>Certificate Name</label>
@@ -246,12 +223,12 @@
 
         <div class="form-section">
           <div class="section-title">
-            <div class="section-title-icon">🌍</div>
+            <div class="section-title-icon">6</div>
             <h3>Languages</h3>
           </div>
 
           <div *ngFor="let language of resumeData.languages; let i = index" class="form-item">
-            <button (click)="removeLanguage(i)" class="btn-remove-item">✕</button>
+            <button (click)="removeLanguage(i)" class="btn-remove-item">Remove</button>
             <div class="form-row">
               <div class="form-group">
                 <label>Language</label>
@@ -275,12 +252,12 @@
 
         <div class="form-section">
           <div class="section-title">
-            <div class="section-title-icon">🏆</div>
+            <div class="section-title-icon">7</div>
             <h3>Achievements</h3>
           </div>
 
           <div *ngFor="let achievement of resumeData.achievements; let i = index" class="form-item">
-            <button (click)="removeAchievement(i)" class="btn-remove-item">✕</button>
+            <button (click)="removeAchievement(i)" class="btn-remove-item">Remove</button>
             <div class="form-group">
               <label>Title</label>
               <input type="text" [(ngModel)]="achievement.title" placeholder="Hackathon finalist">
@@ -297,10 +274,10 @@
         <!-- Actions -->
         <div class="action-buttons">
           <button (click)="saveResume()" class="btn btn-primary" [disabled]="saving">
-            💾 Save Resume
+            Save Resume
           </button>
           <button (click)="activeTab = 'preview'" class="btn btn-secondary">
-            👁️ Preview
+            Preview
           </button>
         </div>
 
@@ -312,7 +289,7 @@
         <div class="preview-shell">
           <div class="preview-sidebar">
             <div class="preview-notice">
-              ℹ️ This is your final standard resume layout. Save first, then download the PDF.
+              This is your final standard resume layout. Save first, then download the PDF.
             </div>
             <div class="preview-checklist">
               <strong>Before you export</strong>
@@ -328,10 +305,10 @@
 
         <div class="action-buttons" style="margin-top:24px">
           <button (click)="saveResume()" class="btn btn-primary" [disabled]="saving">
-            💾 Save Resume
+            Save Resume
           </button>
           <button (click)="downloadPDF()" class="btn btn-secondary">
-            ⬇️ Download PDF
+            Download PDF
           </button>
           <button (click)="activeTab = 'edit'" class="btn btn-secondary">
             ← Back to Edit

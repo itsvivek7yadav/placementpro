@@ -1,40 +1,42 @@
 <!-- src/app/pages/off-campus/off-campus-feed/off-campus-feed.html -->
 <div class="feed-page">
-
-  <div class="hero">
-    <div class="hero-dots"></div>
-    <div class="hero-glow"></div>
-    <div class="hero-content">
-      <div class="live-pill">
+  <section class="feed-hero">
+    <div class="feed-hero__content">
+      <div class="feed-hero__eyebrow">
         <span class="live-dot"></span>
-        Live feed · updated every 3 hours
+        Updated every 3 hours
       </div>
-      <h1 class="hero-title">Off-Campus Oportunity Feed</h1>
-      <p class="hero-sub">Curated job opportunities for Business Analysts, Data Analysts, Consultants &amp; Freshers</p>
-      <!-- <div class="hero-stats">
-        <div class="stat-chip"><mat-icon>work_outline</mat-icon> Jobs from Adzuna &amp; LinkedIn</div>
-        <div class="stat-chip"><mat-icon>event</mat-icon> Hackathons &amp; events</div>
-        <div class="stat-chip"><mat-icon>bookmark_border</mat-icon> Save for later</div>
-      </div> -->
+      <div class="feed-hero__copy">
+        <h1 class="feed-hero__title">Off-Campus Opportunity Feed</h1>
+        <p class="feed-hero__subtitle">
+          Discover curated roles from public sources, bookmark strong fits, and keep your off-campus search organized in one place.
+        </p>
+      </div>
+      <div class="feed-hero__chips">
+        <span class="hero-chip">Guest-public listings</span>
+        <span class="hero-chip">Roles for freshers</span>
+        <span class="hero-chip">Save and revisit later</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="feed-shell">
+    <div class="tabs-wrap">
+      <nav class="tabs-nav" aria-label="Off-campus feed sections">
+        <button class="tab" [class.active]="activeTab==='jobs'" (click)="setTab('jobs')">
+        <mat-icon>work_outline</mat-icon> Off Campus Jobs
+        </button>
+        <button class="tab tab-saved" [class.active]="activeTab==='saved'" (click)="setTab('saved')">
+          <mat-icon>{{ activeTab==='saved' ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+          Saved Opportunities
+          <span class="saved-badge" *ngIf="savedCount > 0">{{ savedCount }}</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="content-wrap">
+      <app-off-campus-jobs *ngIf="activeTab==='jobs'" (bookmarkChanged)="onBookmarkChanged()"></app-off-campus-jobs>
+      <app-saved-opportunities *ngIf="activeTab==='saved'" (countChanged)="onCountChanged($event)"></app-saved-opportunities>
     </div>
   </div>
-
-  <div class="tabs-wrap">
-    <nav class="tabs-nav">
-      <button class="tab" [class.active]="activeTab==='jobs'" (click)="setTab('jobs')">
-        <mat-icon>work_outline</mat-icon> Off Campus Jobs
-      </button>
-      <button class="tab tab-saved" [class.active]="activeTab==='saved'" (click)="setTab('saved')">
-        <mat-icon>{{ activeTab==='saved' ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-        Saved
-        <span class="saved-badge" *ngIf="savedCount > 0">{{ savedCount }}</span>
-      </button>
-    </nav>
-  </div>
-
-  <div class="content-wrap">
-    <app-off-campus-jobs *ngIf="activeTab==='jobs'" (bookmarkChanged)="onBookmarkChanged()"></app-off-campus-jobs>
-    <app-saved-opportunities *ngIf="activeTab==='saved'" (countChanged)="onCountChanged($event)"></app-saved-opportunities>
-  </div>
-
 </div>

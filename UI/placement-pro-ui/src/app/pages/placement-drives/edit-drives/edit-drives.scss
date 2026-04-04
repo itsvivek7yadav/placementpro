@@ -105,16 +105,11 @@
 .section-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0;
   padding: 16px 22px;
   border-bottom: 1px solid var(--border);
   background: #fafbfc;
   border-radius: var(--radius) var(--radius) 0 0;
-
-  .section-icon {
-    font-size: 16px;
-    line-height: 1;
-  }
 
   h3 {
     font-family: 'Syne', sans-serif;
@@ -243,6 +238,80 @@
 
   input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
   &:hover { background: var(--accent-light); }
+}
+
+.document-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #f8fbff;
+  margin-bottom: 1rem;
+}
+
+.document-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.document-copy a {
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.document-copy a:hover {
+  text-decoration: underline;
+}
+
+.remove-link-btn {
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.upload-dropzone {
+  border: 1.5px dashed var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.upload-dropzone:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.upload-dropzone input {
+  display: none;
+}
+
+.upload-title {
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.upload-subtitle {
+  color: var(--text-muted);
+  font-size: 0.8rem;
 }
 
 /* ── Footer ── */

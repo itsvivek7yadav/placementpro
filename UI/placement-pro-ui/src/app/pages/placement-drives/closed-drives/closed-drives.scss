@@ -26,10 +26,44 @@
 }
 
 .page-header h2 {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-size: var(--title-1);
+  font-weight: 750;
+  color: #136089;
   margin: 0;
+  line-height: var(--heading-line);
+  letter-spacing: var(--heading-tight);
+}
+
+.filter-bar {
+  display: grid;
+  grid-template-columns: minmax(180px, 210px) minmax(160px, 190px) minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.filter-bar select,
+.filter-bar input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 12px;
+  padding: 0 0.9rem;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.filter-bar select:focus,
+.filter-bar input:focus {
+  border-color: rgba(6, 6, 104, 0.28);
+  background: #fff;
+}
+
+.filter-bar input::placeholder {
+  color: var(--text-muted);
 }
 
 .drive-count {
@@ -71,7 +105,6 @@
   border-radius: var(--app-radius-md);
 }
 
-.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
 .empty-state p { font-size: 15px; margin: 0; }
 
 .drives-grid {
@@ -260,3 +293,13 @@
 .meta-item.full-col { grid-column: span 2; }
 
 .closed-time { color: #dc2626; font-weight: 500; }
+
+@media (max-width: 900px) {
+  .filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .drives-grid {
+    grid-template-columns: 1fr;
+  }
+}

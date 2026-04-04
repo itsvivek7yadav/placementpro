@@ -3,7 +3,6 @@
   <!-- ── Page Header ── -->
   <div class="page-header">
     <div class="profile-hero">
-      <div class="avatar-circle">{{ initials }}</div>
       <div class="hero-info">
         <h1 class="hero-name">{{ fullName }}</h1>
         <div class="hero-meta">
@@ -38,8 +37,8 @@
   </div>
 
   <!-- ── Success / Error ── -->
-  <div class="alert alert-success" *ngIf="successMessage">✓ {{ successMessage }}</div>
-  <div class="alert alert-error"   *ngIf="errorMessage">✕ {{ errorMessage }}</div>
+  <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+  <div class="alert alert-error"   *ngIf="errorMessage">{{ errorMessage }}</div>
 
   <!-- ════════════════════════════════════════════════
        SECTION 1 — Account Info (view only)

@@ -4,7 +4,7 @@
   <div class="attempt-topbar">
     <div class="test-title-bar">{{ test.title }}</div>
     <div class="timer" [class.timer-low]="isTimeLow">
-      ⏱ {{ formattedTime }}
+      {{ formattedTime }}
     </div>
     <div class="progress-bar-text">
       {{ answeredCount }} / {{ totalCount }} answered
@@ -62,7 +62,7 @@
           ← Previous
         </button>
         <button class="btn-submit" (click)="submitTest()" [disabled]="submitting">
-          {{ submitting ? 'Submitting...' : '✅ Submit Test' }}
+          {{ submitting ? 'Submitting...' : 'Submit Test' }}
         </button>
         <button class="btn-nav" (click)="next()"
           [disabled]="currentIndex === questions.length - 1">

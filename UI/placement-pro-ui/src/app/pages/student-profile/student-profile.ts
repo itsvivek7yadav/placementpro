@@ -45,12 +45,6 @@ export class StudentProfile implements OnInit {
     return name || this.profile.name || 'Student';
   }
 
-  get initials(): string {
-    const f = this.profile.first_name?.charAt(0) || '';
-    const l = this.profile.last_name?.charAt(0)  || '';
-    return (f + l).toUpperCase() || 'S';
-  }
-
   getCvUrl(path: string): string {
     return buildBackendUrl(path);
   }

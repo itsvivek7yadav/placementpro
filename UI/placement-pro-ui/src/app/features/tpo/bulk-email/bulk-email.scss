@@ -1,8 +1,7 @@
 .campaign-container {
-  max-width: 1000px;
+  max-width: var(--page-max-width);
   margin: auto;
-  padding: 30px;
-  font-family: Arial, sans-serif;
+  padding: var(--page-padding-y) var(--page-padding-x);
 }
 
 /* ─── Page Header ───────────────────────────────────── */
@@ -23,8 +22,11 @@
 }
 
 .title {
-  font-size: 22px;
-  color: #2c3e50;
+  font-size: var(--title-1);
+  font-weight: 750;
+  line-height: var(--heading-line);
+  letter-spacing: var(--heading-tight);
+  color: #136089;
   margin: 0;
 }
 

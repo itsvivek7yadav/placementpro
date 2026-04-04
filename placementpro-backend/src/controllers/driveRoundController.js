@@ -1,5 +1,13 @@
 const db = require('../config/db');
 const { notifyRoundStatusUpdate } = require('../services/notificationService');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { promises: fsp } = require('fs');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+
+const execFileAsync = promisify(execFile);
 
 const VALID_ROUND_STATUSES = new Set(['PENDING', 'CLEARED', 'REJECTED', 'ABSENT']);
 
@@ -255,6 +263,9 @@ exports.getDriveApplications = async (req, res) => {
           a.status,
           a.result,
           a.current_round_id,
+          a.applied_cv_slot,
+          a.applied_cv_name,
+          a.applied_cv_link,
           COALESCE(u.name, CONCAT('Student ', a.student_id)) AS student_name,
           s.student_id,
           s.prn,
@@ -638,5 +649,87 @@ exports.bulkUpdateRoundStatus = async (req, res) => {
     res.status(500).json({ error: 'Failed to bulk update round statuses', details: err.message });
   } finally {
     connection.release();
+  }
+};
+
+exports.exportApplicantResumesZip = async (req, res) => {
+  try {
+    const driveId = Number(req.params.driveId);
+    const requestedIds = Array.isArray(req.body?.applicationIds)
+      ? req.body.applicationIds.map(Number).filter(Boolean)
+      : [];
+
+    if (!driveId) {
+      return res.status(400).json({ error: 'Valid driveId is required' });
+    }
+
+    const params = [driveId];
+    let applicationFilter = '';
+
+    if (requestedIds.length) {
+      applicationFilter = ` AND a.application_id IN (${buildInClause(requestedIds)})`;
+      params.push(...requestedIds);
+    }
+
+    const [rows] = await db.query(
+      `SELECT
+          a.application_id,
+          a.applied_cv_name,
+          a.applied_cv_link,
+          s.prn,
+          COALESCE(u.name, CONCAT_WS(' ', s.first_name, s.middle_name, s.last_name), CONCAT('Student ', s.student_id)) AS student_name
+       FROM applications a
+       JOIN students s ON s.student_id = a.student_id
+       LEFT JOIN users u ON u.user_id = s.user_id
+       WHERE a.drive_id = ?
+         AND a.applied_cv_link IS NOT NULL
+         AND a.applied_cv_link <> ''
+         ${applicationFilter}
+       ORDER BY student_name ASC`,
+      params
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ error: 'No applicant resumes available for export' });
+    }
+
+    const tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), `drive-${driveId}-resumes-`));
+    const zipPath = path.join(tempDir, `drive-${driveId}-applicant-resumes.zip`);
+
+    const copiedFiles = [];
+    for (const row of rows) {
+      const relativePath = String(row.applied_cv_link || '').replace(/^\/+/, '');
+      const sourcePath = path.join(process.cwd(), relativePath);
+
+      if (!fs.existsSync(sourcePath)) {
+        continue;
+      }
+
+      const ext = path.extname(sourcePath) || path.extname(row.applied_cv_name || '') || '.pdf';
+      const safePrn = String(row.prn || row.application_id);
+      const safeName = String(row.student_name || 'student')
+        .replace(/[^a-zA-Z0-9_-]/g, '_')
+        .replace(/_+/g, '_')
+        .slice(0, 50);
+      const targetName = `${safePrn}_${safeName}${ext}`;
+      const targetPath = path.join(tempDir, targetName);
+
+      await fsp.copyFile(sourcePath, targetPath);
+      copiedFiles.push(targetName);
+    }
+
+    if (!copiedFiles.length) {
+      await fsp.rm(tempDir, { recursive: true, force: true });
+      return res.status(404).json({ error: 'Resume files were not found on disk for the selected applicants' });
+    }
+
+    await execFileAsync('zip', ['-j', zipPath, ...copiedFiles], { cwd: tempDir });
+
+    res.download(zipPath, `drive-${driveId}-applicant-resumes.zip`, async () => {
+      await fsp.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+    });
+  } catch (error) {
+    console.error('Export Applicant Resumes Zip Error:', error);
+    res.status(500).json({ error: 'Failed to export applicant resumes zip', details: error.message });
   }
 };

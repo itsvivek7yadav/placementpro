@@ -1,69 +1,61 @@
-<div class="saved-container">
-
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="loading">
-    <mat-spinner></mat-spinner>
+<div class="saved-wrap">
+  <div class="saved-hdr">
+    <div>
+      <h3 class="saved-title">
+        <mat-icon>bookmark</mat-icon>
+        Saved Opportunities
+      </h3>
+      <p class="saved-sub">Keep your bookmarked roles organized and revisit them when you are ready to apply.</p>
+    </div>
   </div>
 
-  <!-- Error -->
-  <div *ngIf="hasError && !isLoading" class="error">
-    <p>Failed to load saved items</p>
+  <div *ngIf="isLoading" class="state-loading">
+    <mat-spinner diameter="34"></mat-spinner>
+    <span>Loading saved opportunities...</span>
   </div>
 
-  <!-- Empty -->
-  <div *ngIf="!isLoading && !hasError && items.length === 0" class="empty">
-    <p>No saved opportunities yet</p>
+  <div *ngIf="hasError && !isLoading" class="state-empty">
+    <div class="empty-icon-box">
+      <mat-icon>error_outline</mat-icon>
+    </div>
+    <h4>Unable to load saved opportunities</h4>
+    <p>Please refresh the page and try again.</p>
   </div>
 
-  <!-- Content -->
-  <div *ngIf="!isLoading && items.length > 0">
+  <div *ngIf="!isLoading && !hasError && items.length === 0" class="state-empty">
+    <div class="empty-icon-box">
+      <mat-icon>bookmark_border</mat-icon>
+    </div>
+    <h4>No saved opportunities yet</h4>
+    <p>Bookmark interesting roles from the feed and they will appear here for quick access later.</p>
+    <div class="empty-hint">
+      <mat-icon>tips_and_updates</mat-icon>
+      <span>Use the save action on any opportunity card to build your own shortlist.</span>
+    </div>
+  </div>
 
-    <!-- Filters -->
-    <div class="filters">
-      <button mat-button (click)="setFilter('all')">
-        All ({{ items.length }})
+  <ng-container *ngIf="!isLoading && !hasError && items.length > 0">
+    <div class="filter-pills">
+      <button type="button" class="pill" [class.active]="filter === 'all'" (click)="setFilter('all')">
+        All
+        <span class="pill-count">{{ items.length }}</span>
       </button>
-
-      <button mat-button (click)="setFilter('job')">
-        Jobs ({{ jobCount }})
+      <button type="button" class="pill" [class.active]="filter === 'job'" (click)="setFilter('job')">
+        Jobs
+        <span class="pill-count">{{ jobCount }}</span>
       </button>
     </div>
 
-    <!-- Cards -->
-    <div class="cards">
-
-      <div *ngFor="let item of filtered; trackBy: trackById" class="card">
-
-        <h3>{{ item.title }}</h3>
-
-        <p>{{ item.company || item.organizer }}</p>
-
-        <p>{{ item.location }}</p>
-
-        <p>{{ item.summary }}</p>
-
-        <!-- Actions -->
-        <div class="actions">
-
-          <!-- Apply -->
-          <button mat-raised-button color="primary"
-                  (click)="onViewDetail(item)">
-            Apply
-          </button>
-
-          <!-- Remove -->
-          <button mat-stroked-button color="warn"
-                  (click)="onBookmarkToggle({ id: item.id, type: item.opportunity_type })"
-                  [disabled]="isLoading2(item.id)">
-            Remove
-          </button>
-
-        </div>
-
-      </div>
-
+    <div class="saved-grid">
+      <article *ngFor="let item of filtered; trackBy: trackById" class="saved-card">
+        <app-opportunity-card
+          [item]="item"
+          [bookmarkLoading]="isLoading2(item.id)"
+          (bookmarkToggled)="onBookmarkToggle($event)"
+          (viewDetail)="onViewDetail($event)">
+        </app-opportunity-card>
+      </article>
     </div>
-
-  </div>
+  </ng-container>
 
 </div>

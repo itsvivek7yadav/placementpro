@@ -62,7 +62,7 @@ export class DriveDetail implements OnInit {
       return this.drive.drive_document_url;
     }
 
-    return `${this.API}${this.drive.drive_document_url}`;
+    return buildBackendUrl(this.drive.drive_document_url);
   }
 
   get selectedResume(): { slot: number; name: string; path: string } | undefined {

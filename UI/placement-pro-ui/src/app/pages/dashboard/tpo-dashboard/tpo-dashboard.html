@@ -3,7 +3,7 @@
   <!-- Page Header -->
   <header class="dash-header">
     <div>
-      <h1 class="dash-title">Good {{ greeting }}, <span>{{ tpoName }}</span> 👋</h1>
+      <h1 class="dash-title">Good {{ greeting }}, <span>{{ tpoName }}</span></h1>
       <p class="dash-subtitle">{{ today }} · Here's your placement overview</p>
     </div>
     <button class="refresh-btn" (click)="loadStats()" [class.spinning]="loading" title="Refresh dashboard data">
@@ -108,7 +108,6 @@
         <div class="drive-item" *ngFor="let drive of stats.driveStats">
           <div class="drive-info">
             <div class="drive-main">
-              <div class="drive-avatar" [title]="drive.company_name">{{ drive.company_name.charAt(0).toUpperCase() }}</div>
               <div>
                 <div class="drive-name">{{ drive.company_name }}</div>
                 <div class="drive-apps">{{ drive.applicationCount }} application{{ drive.applicationCount !== 1 ? 's' : '' }}</div>

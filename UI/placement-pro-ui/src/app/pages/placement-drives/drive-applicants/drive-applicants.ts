@@ -21,6 +21,7 @@ import { ManageRoundsDialogComponent } from './manage-rounds-dialog';
 import { PlacementService } from '../../../services/placement.service';
 import { AuthService } from '../../../auth/auth';
 import { NotificationsService } from '../../../services/notifications.service';
+import { buildBackendUrl } from '../../../api.config';
 
 @Component({
   selector: 'app-drive-applicants',
@@ -56,6 +57,7 @@ export class DriveApplicants implements OnInit {
   filterStatus: 'PENDING' | 'CLEARED' | 'REJECTED' | 'ABSENT' | null = null;
   updatingId: number | null = null;
   bulkUpdating = false;
+  exportZipLoading = false;
   sendingAnnouncement = false;
   announcementAudience: 'APPLICANTS' | 'ELIGIBLE' = 'APPLICANTS';
   announcementTitle = '';
@@ -474,7 +476,9 @@ export class DriveApplicants implements OnInit {
       'Work Experience',
       'Total Work Experience',
       'Last Company Name',
-      'Last Company Industry'
+      'Last Company Industry',
+      'Applied Resume Name',
+      'Applied Resume Link'
     ];
     const rows = exportApplicants.map((applicant) => {
       const names = this.getExportNames(applicant);
@@ -519,7 +523,9 @@ export class DriveApplicants implements OnInit {
         applicant.work_experience ? 'Yes' : 'No',
         this.pickFirstNonEmpty(applicant.total_work_experience),
         this.pickFirstNonEmpty(applicant.last_company_name),
-        this.pickFirstNonEmpty(applicant.last_company_industry)
+        this.pickFirstNonEmpty(applicant.last_company_industry),
+        this.pickFirstNonEmpty(applicant.applied_cv_name),
+        this.pickFirstNonEmpty(this.getApplicantResumeUrl(applicant))
       ];
     });
 
@@ -534,6 +540,52 @@ export class DriveApplicants implements OnInit {
     anchor.download = `drive-${this.driveId}-round-status.csv`;
     anchor.click();
     URL.revokeObjectURL(url);
+  }
+
+  exportResumesZip(): void {
+    const exportApplicants = this.selectedApplicants.length > 0
+      ? this.selectedApplicants
+      : this.filteredApplicants;
+
+    const applicationIds = exportApplicants.map((applicant) => applicant.application_id).filter(Boolean);
+
+    if (!applicationIds.length) {
+      this.showToast('No applicants available to export', 'error');
+      return;
+    }
+
+    this.exportZipLoading = true;
+    this.http.post(
+      `${this.driveApi}/${this.driveId}/export-resumes`,
+      { applicationIds },
+      { headers: this.getHeaders(), responseType: 'blob' }
+    ).subscribe({
+      next: (blob) => {
+        this.exportZipLoading = false;
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = `drive-${this.driveId}-applicant-resumes.zip`;
+        anchor.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        this.exportZipLoading = false;
+        this.showToast(err?.error?.error || 'Failed to export applicant resumes ZIP', 'error');
+      }
+    });
+  }
+
+  getApplicantResumeUrl(applicant: Applicant): string | null {
+    if (!applicant.applied_cv_link) {
+      return null;
+    }
+
+    if (applicant.applied_cv_link.startsWith('http')) {
+      return applicant.applied_cv_link;
+    }
+
+    return buildBackendUrl(applicant.applied_cv_link);
   }
 
   goBack(): void {

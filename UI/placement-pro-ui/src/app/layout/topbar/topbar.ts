@@ -22,15 +22,10 @@ import { NotificationItem, NotificationsService } from '../../services/notificat
       </button>
 
       <div class="topbar-left">
-        <div class="logo">
-          <span>Pro</span>Launch
+        <div class="brand-lockup">
+          <div class="brand-name"><span>Pro</span>Launch</div>
+          <div class="brand-role">{{ role === 'TPO' ? 'TPO Portal' : 'Student Portal' }}</div>
         </div>
-        <div class="topbar-divider" *ngIf="!isMobile"></div>
-        <div class="user-role">{{ role }}</div>
-      </div>
-
-      <div class="topbar-center" *ngIf="!isMobile">
-        (Institute)Campus Placement Management System
       </div>
 
       <div class="topbar-right">
@@ -76,22 +71,27 @@ import { NotificationItem, NotificationsService } from '../../services/notificat
           </div>
         </div>
 
-        <div class="user-chip">
-          <div class="user-avatar">{{ userInitial }}</div>
+        <button class="topbar-link-btn topbar-link-btn--green" type="button" (click)="openOffCampus()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M3 12h18"></path>
+            <path d="M12 3c2.8 3 4.2 6 4.2 9s-1.4 6-4.2 9c-2.8-3-4.2-6-4.2-9s1.4-6 4.2-9z"></path>
+          </svg>
+          Off Campus Feed
+        </button>
+
+        <button class="user-chip" type="button" (click)="openProfile()">
+          <div class="user-icon" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
           <div class="user-details">
             <div class="user-name">{{ userName }}</div>
           </div>
-        </div>
-
-        <button class="logout-btn" (click)="logout()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Logout
         </button>
       </div>
     </header>
@@ -104,7 +104,7 @@ import { NotificationItem, NotificationsService } from '../../services/notificat
       right: 0;
       z-index: 1000;
       height: 60px;
-      background: #0f172a;
+      background: linear-gradient(90deg, #0f172a 0%, #101a33 52%, #0f172a 100%);
       border-bottom: 1px solid rgba(255,255,255,0.07);
       display: flex;
       align-items: center;
@@ -135,43 +135,79 @@ import { NotificationItem, NotificationsService } from '../../services/notificat
     .topbar-left {
       display: flex;
       align-items: center;
+      min-width: 0;
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: baseline;
       gap: 14px;
+      min-width: 0;
     }
 
-    .logo {
-      font-size: 17px;
-      font-weight: 700;
-      color: #f1f5f9;
-      letter-spacing: -0.3px;
+    .brand-name {
+      font-size: 29px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: -0.6px;
+      line-height: 1;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .logo span {
-      color: #3b82f6;
+    .brand-name span {
+      color: #1d4ed8;
     }
 
-    .topbar-divider {
-      width: 1px;
-      height: 18px;
-      background: rgba(255,255,255,0.12);
-    }
-
-    .topbar-center {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 14px;
+    .brand-role {
+      font-size: 12px;
       font-weight: 600;
-      color: #e2e8f0;
+      color: #9fb2cc;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      text-transform: uppercase;
       white-space: nowrap;
-      pointer-events: none;
-      letter-spacing: 0.3px;
     }
 
     .topbar-right {
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+
+    .topbar-link-btn {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(59, 130, 246, 0.12);
+      color: #e2e8f0;
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar-link-btn:hover {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: rgba(96,165,250,0.26);
+    }
+
+    .topbar-link-btn--green {
+      background: rgba(16, 185, 129, 0.14);
+      border-color: rgba(52, 211, 153, 0.2);
+      color: #d1fae5;
+    }
+
+    .topbar-link-btn--green:hover {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: rgba(52, 211, 153, 0.34);
+      color: #ecfdf5;
     }
 
     .notification-shell {
@@ -305,64 +341,45 @@ import { NotificationItem, NotificationsService } from '../../services/notificat
       gap: 10px;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      padding: 6px 12px 6px 6px;
+      border-radius: 12px;
+      padding: 6px 12px 6px 8px;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: background 0.18s ease, border-color 0.18s ease;
     }
 
-    .user-avatar {
+    .user-chip:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(255,255,255,0.14);
+    }
+
+    .user-icon {
       width: 28px;
       height: 28px;
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
-      border-radius: 6px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
-      font-weight: 600;
-      color: white;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+      color: #cbd5e1;
       flex-shrink: 0;
     }
 
     .user-details {
       display: flex;
-      flex-direction: column;
-      gap: 1px;
+      align-items: center;
+      min-width: 0;
     }
 
     .user-name {
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       color: #e2e8f0;
       line-height: 1;
-    }
-
-    .user-role {
-      font-size: 11px;
-      color: #64748b;
-      line-height: 1;
-    }
-
-    .logout-btn {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      background: rgba(239,68,68,0.12);
-      border: 1px solid rgba(239,68,68,0.25);
-      color: #f87171;
-      padding: 7px 13px;
-      border-radius: 7px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.18s ease;
       white-space: nowrap;
-      font-family: inherit;
-    }
-
-    .logout-btn:hover {
-      background: rgba(239,68,68,0.22);
-      border-color: rgba(239,68,68,0.45);
-      color: #fca5a5;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     @media (max-width: 900px) {
@@ -372,17 +389,12 @@ import { NotificationItem, NotificationsService } from '../../services/notificat
         gap: 10px;
       }
 
-      .topbar-left {
-        gap: 10px;
-        min-width: 0;
+      .brand-name {
+        font-size: 21px;
       }
 
-      .logo {
-        font-size: 15px;
-      }
-
-      .user-role {
-        display: none;
+      .brand-role {
+        font-size: 11px;
       }
 
       .topbar-right {
@@ -390,24 +402,38 @@ import { NotificationItem, NotificationsService } from '../../services/notificat
         gap: 8px;
       }
 
+      .topbar-link-btn {
+        display: none;
+      }
+
+      .brand-lockup {
+        gap: 10px;
+      }
+
       .user-chip {
         padding: 4px 8px 4px 4px;
       }
 
       .user-details {
-        display: none;
+        align-items: center;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .brand-lockup {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
       }
 
-      .logout-btn {
-        padding: 7px 10px;
-        font-size: 12px;
+      .brand-name {
+        font-size: 22px;
       }
     }
   `]
 })
 export class Topbar implements OnInit, OnDestroy {
   userName = '';
-  userInitial = '';
   role = '';
   isMobile = false;
   notificationsOpen = false;
@@ -425,7 +451,6 @@ export class Topbar implements OnInit, OnDestroy {
       const parsed = JSON.parse(user);
       this.userName = parsed.name || '';
       this.role = parsed.role || '';
-      this.userInitial = this.userName.charAt(0).toUpperCase();
     }
   }
 
@@ -480,6 +505,16 @@ export class Topbar implements OnInit, OnDestroy {
     this.router.navigateByUrl('/notifications');
   }
 
+  openOffCampus(): void {
+    this.notificationsOpen = false;
+    this.router.navigateByUrl('/off-campus');
+  }
+
+  openProfile(): void {
+    this.notificationsOpen = false;
+    this.router.navigateByUrl(this.role === 'STUDENT' ? '/profile' : '/dashboard');
+  }
+
   markAllAsRead(): void {
     this.notificationsService.markAllAsRead();
   }
@@ -487,12 +522,5 @@ export class Topbar implements OnInit, OnDestroy {
   @HostListener('document:click')
   onDocumentClick(): void {
     this.notificationsOpen = false;
-  }
-
-  logout(): void {
-    this.notificationsService.stopPolling();
-    localStorage.clear();
-    sessionStorage.clear();
-    this.router.navigateByUrl('/login');
   }
 }

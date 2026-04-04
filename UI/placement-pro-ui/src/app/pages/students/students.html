@@ -4,7 +4,7 @@
   <div class="page-header">
     <h1 class="page-title">Student Master Data</h1>
     <button class="export-btn" (click)="exportCSV()" [disabled]="!searched || filteredStudents.length === 0">
-      ⬇ Export CSV
+      Export CSV
     </button>
   </div>
 
@@ -15,29 +15,23 @@
 
       <input
         type="text"
-        placeholder="🔍 Search by Name, PRN or Email"
+        placeholder="Search by Name, PRN or Email"
         [(ngModel)]="searchTerm"
+        (ngModelChange)="onFiltersChanged()"
         (keyup.enter)="triggerSearch()"
       />
 
-      <select [(ngModel)]="programFilter">
+      <select [(ngModel)]="programFilter" (ngModelChange)="onFiltersChanged()">
         <option value="">All Programs</option>
-        <option>MBA IT</option>
-        <option>MBA DT</option>
-        <option>MSC CA</option>
-        <option>BCA</option>
-        <option>BBA</option>
-        <option>BSE</option>
+        <option *ngFor="let program of availablePrograms" [value]="program">{{ program }}</option>
       </select>
 
-      <select [(ngModel)]="batchFilter">
+      <select [(ngModel)]="batchFilter" (ngModelChange)="onFiltersChanged()">
         <option value="">All Batches</option>
-        <option>2022-24</option>
-        <option>2023-25</option>
-        <option>2024-26</option>
+        <option *ngFor="let batch of availableBatches" [value]="batch">{{ batch }}</option>
       </select>
 
-      <select [(ngModel)]="statusFilter">
+      <select [(ngModel)]="statusFilter" (ngModelChange)="onFiltersChanged()">
         <option value="">All Status</option>
         <option value="PLACED">Placed</option>
         <option value="NOT_PLACED">Not Placed</option>
@@ -52,25 +46,25 @@
 
     <div class="academic-panel" *ngIf="showAcademicFilters">
       <label class="filter-switch">
-        <input type="checkbox" [(ngModel)]="useAcademicFilters" />
+        <input type="checkbox" [(ngModel)]="useAcademicFilters" (ngModelChange)="onFiltersChanged()" />
         <span>Enable academic performance filtering</span>
       </label>
 
       <div class="filter-hint">
-        Overall Academic Threshold checks all available academic records. GPA/CGPA values are compared as percentage equivalents using `x10`.
+        Overall Academic Threshold checks all available academic records. Students without academic values are excluded when this threshold is enabled, and GPA/CGPA values are compared as percentage equivalents using x10.
       </div>
 
       <div class="filter-grid academic-row">
-        <input type="number" placeholder="Overall Academic Threshold" step="0.1" [(ngModel)]="overallAcademicThreshold" [disabled]="!useAcademicFilters" />
-        <input type="number" placeholder="Min UG CGPA" step="0.1" [(ngModel)]="ugCgpaFilter" [disabled]="!useAcademicFilters" />
-        <input type="number" placeholder="Min Std XII CGPA" step="0.1" [(ngModel)]="stdXiiCgpaFilter" [disabled]="!useAcademicFilters" />
-        <input type="number" placeholder="Min Std X CGPA" step="0.1" [(ngModel)]="stdXCgpaFilter" [disabled]="!useAcademicFilters" />
-        <input type="number" placeholder="Min Sem 1 GPA" step="0.1" [(ngModel)]="sem1GpaFilter" [disabled]="!useAcademicFilters" />
-        <input type="number" placeholder="Min Sem 2 GPA" step="0.1" [(ngModel)]="sem2GpaFilter" [disabled]="!useAcademicFilters" />
-        <input type="number" placeholder="Min Sem 3 GPA" step="0.1" [(ngModel)]="sem3GpaFilter" [disabled]="!useAcademicFilters" />
-        <input type="number" placeholder="Min UG %" step="0.1" [(ngModel)]="ugPercentageFilter" [disabled]="!useAcademicFilters" />
-        <input type="number" placeholder="Min Std XII %" step="0.1" [(ngModel)]="stdXiiPercentageFilter" [disabled]="!useAcademicFilters" />
-        <input type="number" placeholder="Min Std X %" step="0.1" [(ngModel)]="stdXPercentageFilter" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Overall Academic Threshold" step="0.1" [(ngModel)]="overallAcademicThreshold" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min UG CGPA" step="0.1" [(ngModel)]="ugCgpaFilter" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Std XII CGPA" step="0.1" [(ngModel)]="stdXiiCgpaFilter" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Std X CGPA" step="0.1" [(ngModel)]="stdXCgpaFilter" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Sem 1 GPA" step="0.1" [(ngModel)]="sem1GpaFilter" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Sem 2 GPA" step="0.1" [(ngModel)]="sem2GpaFilter" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Sem 3 GPA" step="0.1" [(ngModel)]="sem3GpaFilter" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min UG %" step="0.1" [(ngModel)]="ugPercentageFilter" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Std XII %" step="0.1" [(ngModel)]="stdXiiPercentageFilter" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
+        <input type="number" placeholder="Min Std X %" step="0.1" [(ngModel)]="stdXPercentageFilter" (ngModelChange)="onFiltersChanged()" [disabled]="!useAcademicFilters" />
       </div>
     </div>
 

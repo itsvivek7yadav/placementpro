@@ -1,9 +1,9 @@
 <div class="page-container" *ngIf="!loading">
 
   <div class="page-header">
-    <button class="back-btn" (click)="goBack()">← Back</button>
+    <button class="back-btn" (click)="goBack()">Back</button>
     <div class="header-text">
-      <h1 class="page-title">{{ isReopen ? '🔓 Reopen Drive' : '✏️ Edit Drive' }}</h1>
+      <h1 class="page-title">{{ isReopen ? 'Reopen Drive' : 'Edit Drive' }}</h1>
       <p class="page-subtitle" *ngIf="!isReopen">Update drive details. A new deadline is required.</p>
       <p class="page-subtitle reopen-sub" *ngIf="isReopen">
         Enter a new deadline to reopen. The drive will go LIVE immediately.
@@ -11,15 +11,14 @@
     </div>
   </div>
 
-  <div class="success-msg" *ngIf="successMessage">✅ {{ successMessage }}</div>
-  <div class="error-msg"   *ngIf="errorMessage">❌ {{ errorMessage }}</div>
+  <div class="success-msg" *ngIf="successMessage">{{ successMessage }}</div>
+  <div class="error-msg"   *ngIf="errorMessage">{{ errorMessage }}</div>
 
   <form [formGroup]="driveForm" (ngSubmit)="submit()" class="drive-form">
 
     <!-- ── Basic Info ── -->
     <div class="form-section">
       <div class="section-title">
-        <span class="section-icon">🏢</span>
         <h3>Basic Information</h3>
       </div>
       <div class="section-body">
@@ -62,7 +61,6 @@
     <!-- ── Eligibility ── -->
     <div class="form-section">
       <div class="section-title">
-        <span class="section-icon">🎓</span>
         <h3>Eligibility Criteria</h3>
       </div>
       <div class="section-body">
@@ -110,7 +108,6 @@
     <!-- ── Deadline — highlighted, always required ── -->
     <div class="form-section deadline-section">
       <div class="section-title">
-        <span class="section-icon">📅</span>
         <h3>Application Deadline *</h3>
         <span class="deadline-note" *ngIf="!isReopen">Drive auto-closes when this time is reached</span>
         <span class="deadline-note reopen-note" *ngIf="isReopen">Must enter a future date to reopen</span>
@@ -128,11 +125,40 @@
       </div>
     </div>
 
+    <div class="form-section">
+      <div class="section-title">
+        <h3>Drive Document</h3>
+      </div>
+      <div class="section-body">
+        <div class="document-card" *ngIf="currentDocumentUrl && !removeCurrentDocument">
+          <div class="document-copy">
+            <strong>Current attachment</strong>
+            <a [href]="currentDocumentUrl" target="_blank" rel="noopener noreferrer">{{ currentDocumentName }}</a>
+          </div>
+          <button type="button" class="remove-link-btn" (click)="removeAttachment()">Remove attachment</button>
+        </div>
+
+        <label class="upload-dropzone" for="editDriveDocument">
+          <input
+            id="editDriveDocument"
+            type="file"
+            accept=".pdf,.doc,.docx,.ppt,.pptx"
+            (change)="onDocumentSelected($event)" />
+          <div class="upload-title">{{ selectedDocumentName || 'Choose a replacement document' }}</div>
+          <div class="upload-subtitle">PDF, DOC, DOCX, PPT or PPTX up to 10 MB</div>
+        </label>
+
+        <small>
+          Uploading a new file replaces the current attachment. Removing it will save the drive without any attachment.
+        </small>
+      </div>
+    </div>
+
     <div class="form-footer">
       <button type="button" class="cancel-btn" (click)="goBack()">Cancel</button>
       <button class="submit-btn" type="submit" [disabled]="driveForm.invalid || saving">
         <span class="btn-spinner" *ngIf="saving"></span>
-        <span *ngIf="!saving">{{ isReopen ? '🔓 Reopen Drive' : '💾 Save Changes' }}</span>
+        <span *ngIf="!saving">{{ isReopen ? 'Reopen Drive' : 'Save Changes' }}</span>
         <span *ngIf="saving">{{ isReopen ? 'Reopening…' : 'Saving…' }}</span>
       </button>
     </div>

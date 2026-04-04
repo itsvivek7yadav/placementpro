@@ -58,6 +58,9 @@ export interface Applicant {
   total_work_experience?: number | null;
   last_company_name?: string | null;
   last_company_industry?: string | null;
+  applied_cv_slot?: number | null;
+  applied_cv_name?: string | null;
+  applied_cv_link?: string | null;
   status: string;
   result: 'PENDING' | 'SELECTED' | 'REJECTED' | 'ABSENT';
   current_round_id: number | null;

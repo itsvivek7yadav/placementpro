@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AppShell } from './layout/app-shell/app-shell';
 import { ResumeBuilderComponent } from './features/resume-builder/resume-builder';
 import { BulkEmail } from './features/tpo/bulk-email/bulk-email';
+import { studentOnlyGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
 
@@ -164,7 +165,8 @@ export const routes: Routes = [
       // Resume Builder
       {
         path: 'resume-builder',
-        component: ResumeBuilderComponent
+        component: ResumeBuilderComponent,
+        canActivate: [studentOnlyGuard]
       },
 
       // TPO Bulk Email

@@ -1,9 +1,9 @@
 .progress-page {
-  max-width: 1360px;
+  max-width: var(--page-max-width);
   margin: 0 auto;
-  padding: 28px 28px 40px;
+  padding: var(--page-padding-y) var(--page-padding-x) 40px;
   display: grid;
-  gap: 22px;
+  gap: 24px;
   color: #1f2937;
 }
 
@@ -25,7 +25,8 @@
 
 .page-head {
   align-items: flex-start;
-  padding: 4px 2px;
+  padding: 6px 2px 2px;
+  flex-wrap: wrap;
 }
 
 .page-copy,
@@ -51,11 +52,12 @@ p {
 }
 
 .page-head h1 {
-  font-size: 34px;
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  font-size: var(--title-1);
+  font-weight: 750;
+  line-height: var(--heading-line);
+  letter-spacing: var(--heading-tight);
   margin-bottom: 10px;
+  color: #136089;
 }
 
 .page-head p,
@@ -141,20 +143,6 @@ p {
   font-size: 15px;
 }
 
-.avatar {
-  width: 62px;
-  height: 62px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #1d4ed8, #38bdf8);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-size: 24px;
-  font-weight: 700;
-  flex-shrink: 0;
-  box-shadow: 0 14px 28px rgba(29, 78, 216, 0.2);
-}
-
 .meta-label,
 .stat-card span,
 .insight-card span,
@@ -231,6 +219,21 @@ p {
 .head-actions {
   align-items: flex-end;
   flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .page-head,
+  .head-actions {
+    align-items: flex-start;
+  }
+
+  .banner-grid,
+  .stats-grid,
+  .insights-grid,
+  .visual-grid,
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .status-pill,

@@ -64,6 +64,12 @@ export class Students implements OnInit {
     this.applyFilters();
   }
 
+  onFiltersChanged() {
+    if (this.searched) {
+      this.applyFilters();
+    }
+  }
+
   // ── Apply all active filters ──
   applyFilters() {
     let list = [...this.students];
@@ -113,7 +119,7 @@ export class Students implements OnInit {
       ].filter(value => Number.isFinite(value));
 
       if (academicValues.length === 0) {
-        return true;
+        return false;
       }
 
       return academicValues.every(value => value >= threshold);
@@ -185,6 +191,26 @@ export class Students implements OnInit {
 
   toggleAcademicFilters() {
     this.showAcademicFilters = !this.showAcademicFilters;
+  }
+
+  get availablePrograms(): string[] {
+    return Array.from(
+      new Set(
+        this.students
+          .map(student => String(student?.program_name ?? '').trim())
+          .filter(Boolean)
+      )
+    ).sort((a, b) => a.localeCompare(b));
+  }
+
+  get availableBatches(): string[] {
+    return Array.from(
+      new Set(
+        this.students
+          .map(student => String(student?.program_batch ?? '').trim())
+          .filter(Boolean)
+      )
+    ).sort((a, b) => a.localeCompare(b));
   }
 
   exportCSV() {

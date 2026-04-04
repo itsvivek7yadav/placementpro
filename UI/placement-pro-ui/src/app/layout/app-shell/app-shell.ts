@@ -105,6 +105,10 @@ import { LayoutStateService } from '../layout-state.service';
       .sidebar-panel.mobile-open {
         transform: translateX(0);
       }
+
+      .content {
+        height: auto;
+      }
     }
   `]
 })

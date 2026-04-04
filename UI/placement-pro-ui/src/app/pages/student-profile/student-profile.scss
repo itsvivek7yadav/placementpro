@@ -27,21 +27,7 @@
 .profile-hero {
   display: flex;
   align-items: center;
-  gap: 18px;
-}
-
-.avatar-circle {
-  width: 60px;
-  height: 60px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 700;
-  color: white;
-  flex-shrink: 0;
+  gap: 0;
 }
 
 .hero-name {

@@ -1,8 +1,22 @@
 <div class="page">
 
   <div class="page-header">
-    <h2>Open Placement Drives</h2>
-    <span class="drive-count" *ngIf="!loading">{{ drives.length }} Active</span>
+    <h2 class="page-heading">Open Placement Drives</h2>
+    <span class="drive-count" *ngIf="!loading">{{ filteredDrives.length }} Active</span>
+  </div>
+
+  <div class="filter-bar" *ngIf="!loading && drives.length > 0">
+    <select [(ngModel)]="selectedProgram" aria-label="Filter by program">
+      <option value="">All Programs</option>
+      <option *ngFor="let program of availablePrograms" [value]="program">{{ program }}</option>
+    </select>
+
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      placeholder="Search company, role, or keyword"
+      aria-label="Search drives"
+    />
   </div>
 
   <div class="loading-state" *ngIf="loading">
@@ -10,16 +24,14 @@
     <span>Loading drives…</span>
   </div>
 
-  <div class="empty-state" *ngIf="!loading && drives.length === 0">
-    <div class="empty-icon">📋</div>
+  <div class="empty-state" *ngIf="!loading && filteredDrives.length === 0">
     <p>No open drives at the moment.</p>
   </div>
 
-  <div class="drives-grid" *ngIf="!loading && drives.length > 0">
-    <div class="drive-card" *ngFor="let drive of drives">
+  <div class="drives-grid" *ngIf="!loading && filteredDrives.length > 0">
+    <div class="drive-card" *ngFor="let drive of filteredDrives">
 
       <div class="card-header">
-        <div class="company-logo">{{ drive.company_name?.charAt(0) }}</div>
         <div class="company-info">
           <h3 class="company-name">{{ drive.company_name }}</h3>
           <p class="job-role">{{ drive.job_role }}</p>
@@ -58,7 +70,7 @@
             [class.urgent]="isDeadlineSoon(drive.application_deadline)"
             [class.passed]="isDeadlinePassed(drive.application_deadline)">
             {{ drive.application_deadline | date:'dd MMM yyyy, hh:mm a' }}
-            <span class="deadline-pill" *ngIf="isDeadlineSoon(drive.application_deadline)">⚠ Closing soon</span>
+            <span class="deadline-pill" *ngIf="isDeadlineSoon(drive.application_deadline)">Closing soon</span>
             <span class="deadline-pill expired-pill" *ngIf="isDeadlinePassed(drive.application_deadline)">Expired</span>
           </span>
         </div>
@@ -68,15 +80,15 @@
 
       <div class="actions">
         <button class="btn btn-applicants" (click)="viewApplicants(drive.drive_id)">
-          👥 Applicants
+          Applicants
           <span class="count-pill" *ngIf="drive.total_applicants > 0">{{ drive.total_applicants }}</span>
         </button>
         <button class="btn btn-edit" (click)="editDrive(drive.drive_id)">
-          ✏️ Edit
+          Edit
         </button>
         <button class="btn btn-close" (click)="closeDrive(drive.drive_id)"
           [disabled]="closingId === drive.drive_id">
-          {{ closingId === drive.drive_id ? '⏳ Closing…' : '🔒 Close Drive' }}
+          {{ closingId === drive.drive_id ? 'Closing…' : 'Close Drive' }}
         </button>
       </div>
 

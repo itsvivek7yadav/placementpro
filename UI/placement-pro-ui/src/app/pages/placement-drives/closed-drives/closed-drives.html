@@ -2,7 +2,26 @@
 
   <div class="page-header">
     <h2>Closed Placement Drives</h2>
-    <span class="drive-count" *ngIf="!loading">{{ drives.length }} Closed</span>
+    <span class="drive-count" *ngIf="!loading">{{ filteredDrives.length }} Closed</span>
+  </div>
+
+  <div class="filter-bar" *ngIf="!loading && drives.length > 0">
+    <select [(ngModel)]="selectedProgram" aria-label="Filter by program">
+      <option value="">All Programs</option>
+      <option *ngFor="let program of availablePrograms" [value]="program">{{ program }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedBatch" aria-label="Filter by batch">
+      <option value="">All Batches</option>
+      <option *ngFor="let batch of availableBatches" [value]="batch">{{ batch }}</option>
+    </select>
+
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      placeholder="Search company, role, or keyword"
+      aria-label="Search drives"
+    />
   </div>
 
   <div class="loading-state" *ngIf="loading">
@@ -10,22 +29,20 @@
     <span>Loading drives…</span>
   </div>
 
-  <div class="empty-state" *ngIf="!loading && drives.length === 0">
-    <div class="empty-icon">🗂️</div>
+  <div class="empty-state" *ngIf="!loading && filteredDrives.length === 0">
     <p>No closed drives yet.</p>
   </div>
 
-  <div class="drives-grid" *ngIf="!loading && drives.length > 0">
-    <div class="drive-card" *ngFor="let drive of drives">
+  <div class="drives-grid" *ngIf="!loading && filteredDrives.length > 0">
+    <div class="drive-card" *ngFor="let drive of filteredDrives">
 
       <div class="card-header">
-        <div class="company-logo">{{ drive.company_name?.charAt(0) }}</div>
         <div class="company-info">
           <h3 class="company-name">{{ drive.company_name }}</h3>
           <p class="job-role">{{ drive.job_role }}</p>
         </div>
         <div class="badge-stack">
-          <span class="closed-badge">🔒 Closed</span>
+          <span class="closed-badge">Closed</span>
           <span class="close-type-badge" [ngClass]="drive.close_type === 'MANUAL' ? 'manual' : 'auto'">
             {{ drive.close_type === 'MANUAL' ? 'Manual' : 'Auto-expired' }}
           </span>
@@ -61,10 +78,10 @@
 
       <div class="actions">
         <button class="btn btn-reopen" (click)="reopenDrive(drive.drive_id)">
-          🔓 Reopen Drive
+          Reopen Drive
         </button>
         <button class="btn btn-view" (click)="viewApplicants(drive.drive_id)">
-          👥 Applicants
+          Applicants
         </button>
       </div>
 

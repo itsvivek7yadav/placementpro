@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../../auth/auth';
 import { NotificationsService } from '../../../services/notifications.service';
+import { buildApiUrl } from '../../../api.config';
 
 interface StudentStats {
   eligibleDrives: number;
@@ -39,6 +40,7 @@ interface Application {
 })
 export class StudentDashboard implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  private readonly apiBase = buildApiUrl();
 
 studentName = '';
 studentProgram = '';
@@ -141,7 +143,7 @@ placementStatus = 'SEEKING';
       });
     this.notificationsService.refresh();
 
-    this.http.get<any>('/api/student/applications/my', {
+    this.http.get<any>(`${this.apiBase}/applications/my`, {
       headers: this.authService.getAuthHeaders()
     }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {

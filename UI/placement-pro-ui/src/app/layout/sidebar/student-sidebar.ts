@@ -26,7 +26,6 @@ import { takeUntil } from 'rxjs/operators';
 export class StudentSidebar implements OnInit, OnDestroy {
   // User Properties
   userName: string = '';
-  userInitial: string = '';
   program: string = '';
   
   // Navigation Properties
@@ -64,7 +63,6 @@ export class StudentSidebar implements OnInit, OnDestroy {
 
       const user = JSON.parse(userJson);
       this.userName = this.sanitizeInput(user.name) || 'Student';
-      this.userInitial = this.userName.charAt(0).toUpperCase() || 'S';
       this.program = this.sanitizeInput(user.program_name) || 'Student';
       this.placementStatus = this.validatePlacementStatus(user.placement_status);
       this.eligibleCount = Number.isInteger(user.eligible_count) ? user.eligible_count : 0;
@@ -81,7 +79,6 @@ export class StudentSidebar implements OnInit, OnDestroy {
    */
   private setDefaultUserData(): void {
     this.userName = 'Student';
-    this.userInitial = 'S';
     this.program = 'Student';
     this.placementStatus = 'SEEKING';
     this.eligibleCount = 0;

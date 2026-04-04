@@ -10,7 +10,7 @@
     <small *ngIf="studentProgram" class="program">
       ({{ studentProgram }})
     </small>
-  </span> 👋
+</span>
 </h1>
       <p class="dash-subtitle">{{ today }} · Your placement overview</p>
     </div>
@@ -143,7 +143,6 @@
 
       <div class="app-list" *ngIf="applications.length > 0">
         <div class="app-item" *ngFor="let app of applications">
-          <div class="app-avatar">{{ app.company.charAt(0) }}</div>
           <div class="app-info">
             <div class="app-company">{{ app.company }}</div>
             <div class="app-role">{{ app.role }}</div>

@@ -53,28 +53,7 @@
 }
 
 // Company row
-.card-company-row { display: flex; gap: 12px; align-items: flex-start; }
-
-.co-avatar {
-  width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 700; background: #e0e7ff; color: #3730a3;
-
-  // Letter-based colors
-  &[data-letter="A"],&[data-letter="N"]{ background:#fce7f3;color:#be185d }
-  &[data-letter="B"],&[data-letter="O"]{ background:#dcfce7;color:#15803d }
-  &[data-letter="C"],&[data-letter="P"]{ background:#fef9c3;color:#854d0e }
-  &[data-letter="D"],&[data-letter="Q"]{ background:#ede9fe;color:#6d28d9 }
-  &[data-letter="E"],&[data-letter="R"]{ background:#dcfce7;color:#15803d }
-  &[data-letter="F"],&[data-letter="S"]{ background:#fef9c3;color:#a16207 }
-  &[data-letter="G"],&[data-letter="T"]{ background:#e0e7ff;color:#3730a3 }
-  &[data-letter="H"],&[data-letter="U"]{ background:#fce7f3;color:#9d174d }
-  &[data-letter="I"],&[data-letter="V"]{ background:#f0fdf4;color:#166534 }
-  &[data-letter="J"],&[data-letter="W"]{ background:#fff7ed;color:#c2410c }
-  &[data-letter="K"],&[data-letter="X"]{ background:#f5f3ff;color:#5b21b6 }
-  &[data-letter="L"],&[data-letter="Y"]{ background:#fef9c3;color:#854d0e }
-  &[data-letter="M"],&[data-letter="Z"]{ background:#fce7f3;color:#be185d }
-}
+.card-company-row { display: flex; gap: 0; align-items: flex-start; }
 
 .co-info { flex: 1; min-width: 0; }
 .card-title {

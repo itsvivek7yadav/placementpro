@@ -25,10 +25,9 @@
 
   <!-- Drives Grid -->
   <div class="drives-grid" *ngIf="!loading && drives.length > 0">
-    <div class="drive-card" *ngFor="let drive of drives">
+      <div class="drive-card" *ngFor="let drive of drives">
 
       <div class="drive-card-header">
-        <div class="company-avatar">{{ drive.company_name.charAt(0) }}</div>
         <div class="drive-meta">
           <div class="company-name">{{ drive.company_name }}</div>
           <div class="job-role">{{ drive.job_role }}</div>

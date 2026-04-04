@@ -1,7 +1,7 @@
 <div class="progress-page" *ngIf="!loading && progress as data; else loadingBlock">
   <div class="page-head">
     <div class="page-copy">
-      <div class="eyebrow">{{ isTpoView ? 'Student Progress View' : 'Performance Snapshot' }}</div>
+      <div class="eyebrow" *ngIf="isTpoView">Student Progress View</div>
       <h1>{{ headerTitle }}</h1>
       <p>{{ headerSubtitle }}</p>
     </div>
@@ -17,7 +17,6 @@
   <div class="banner-grid">
     <div class="profile-card card">
       <div class="profile-main">
-        <div class="avatar">{{ data.student.name.charAt(0) }}</div>
         <div class="profile-copy">
           <h2>{{ data.student.name }}</h2>
           <p>{{ data.student.program_name }} • {{ data.student.program_batch }}</p>

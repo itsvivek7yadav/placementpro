@@ -2,8 +2,6 @@
 //  my-tests.scss  (Student)
 // ═══════════════════════════════════════════════
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-
 $primary:      #2563eb;
 $primary-soft: #eff6ff;
 $success:      #16a34a;
@@ -16,9 +14,8 @@ $radius:       12px;
 
 // ── Page ─────────────────────────────────────────
 .page-container {
-  padding: 28px 24px 60px;
-  font-family: 'DM Sans', sans-serif;
-  max-width: 1000px;
+  padding: var(--page-padding-y) var(--page-padding-x);
+  max-width: var(--page-max-width);
   margin: 0 auto;
 }
 
@@ -27,10 +24,12 @@ $radius:       12px;
 }
 
 .page-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: $text-dark;
+  font-size: var(--title-1);
+  font-weight: 750;
+  color: #136089;
   margin: 0 0 4px;
+  line-height: var(--heading-line);
+  letter-spacing: var(--heading-tight);
 }
 
 .page-sub {

@@ -220,19 +220,8 @@
 .student-cell {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0;
   min-width: 220px;
-}
-
-.student-avatar {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #0f766e, #2563eb);
-  color: #fff;
-  font-weight: 700;
 }
 
 .student-name {
@@ -243,6 +232,19 @@
 .student-meta {
   font-size: 0.84rem;
   color: var(--muted);
+}
+
+.student-resume-link {
+  display: inline-flex;
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.student-resume-link:hover {
+  text-decoration: underline;
 }
 
 .round-header {

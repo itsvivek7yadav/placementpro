@@ -69,12 +69,12 @@
         <button class="btn-results"
           *ngIf="t.status !== 'DRAFT'"
           (click)="viewResults(t.test_id)">
-          📊 Results
+          Results
         </button>
         <button class="btn-close"
           *ngIf="t.status === 'LIVE'"
           (click)="closeTest(t.test_id)">
-          🔒 Close
+          Close
         </button>
         <button class="btn-delete"
           *ngIf="t.status === 'DRAFT'"

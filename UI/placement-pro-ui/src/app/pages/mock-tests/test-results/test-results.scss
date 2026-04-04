@@ -311,19 +311,8 @@
 .student-cell {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 0;
   min-width: 220px;
-}
-
-.student-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--brand), var(--accent));
-  color: #fff;
-  font-weight: 800;
 }
 
 .student-name {

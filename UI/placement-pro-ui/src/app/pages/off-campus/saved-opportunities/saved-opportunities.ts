@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OffCampusService } from '../../../services/offcampus.service';
+import { OpportunityCardComponent } from '../../../components/opportunity-card/opportunity-card';
 
 @Component({
   selector: 'app-saved-opportunities',
@@ -14,7 +15,8 @@ import { OffCampusService } from '../../../services/offcampus.service';
     CommonModule,
     MatIconModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    OpportunityCardComponent
   ],
   templateUrl: './saved-opportunities.html',
   styleUrl: './saved-opportunities.scss'

@@ -7,7 +7,7 @@
   <ng-container *ngIf="view === 'list'">
 
     <div class="page-header">
-      <h2 class="title">📧 Bulk Email Campaigns</h2>
+      <h2 class="title">Bulk Email Campaigns</h2>
       <button class="btn primary" (click)="openUploadForm()">
         + New Campaign
       </button>
@@ -41,7 +41,7 @@
 
         <div class="campaign-card-right">
           <span class="status-badge" [ngClass]="c.status">
-            {{ c.status === 'in_progress' ? '⏳ In Progress' : '✅ Completed' }}
+            {{ c.status === 'in_progress' ? 'In Progress' : 'Completed' }}
           </span>
           <span class="arrow">›</span>
         </div>
@@ -100,7 +100,7 @@
       </div>
 
       <div class="error-banner" *ngIf="uploadError">
-        ⚠️ {{ uploadError }}
+        {{ uploadError }}
       </div>
 
       <div class="actions">
@@ -109,7 +109,7 @@
           (click)="uploadCampaign()"
           [disabled]="uploading"
         >
-          {{ uploading ? 'Uploading...' : '📤 Upload & Start Campaign' }}
+          {{ uploading ? 'Uploading...' : 'Upload & Start Campaign' }}
         </button>
         <button class="btn secondary" (click)="goToList()">Cancel</button>
       </div>
@@ -129,7 +129,7 @@
       <div class="detail-title-block">
         <h2 class="title">{{ selectedCampaign.campaign_name }}</h2>
         <span class="status-badge" [ngClass]="stats.status">
-          {{ isInProgress ? '⏳ In Progress' : '✅ Completed' }}
+          {{ isInProgress ? 'In Progress' : 'Completed' }}
         </span>
       </div>
     </div>

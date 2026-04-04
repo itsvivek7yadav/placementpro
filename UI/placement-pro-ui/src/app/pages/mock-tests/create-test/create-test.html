@@ -8,14 +8,14 @@
     <button class="btn-secondary" (click)="cancel()">← Back</button>
   </div>
 
-  <div class="alert-success" *ngIf="successMsg">✅ {{ successMsg }}</div>
-  <div class="alert-error"   *ngIf="errorMsg">❌ {{ errorMsg }}</div>
+  <div class="alert-success" *ngIf="successMsg">{{ successMsg }}</div>
+  <div class="alert-error"   *ngIf="errorMsg">{{ errorMsg }}</div>
 
   <form [formGroup]="testForm">
 
     <!-- ── SECTION 1: Test Details ── -->
     <div class="form-section">
-      <div class="section-title">📋 Test Details</div>
+      <div class="section-title">Test Details</div>
       <div class="form-grid">
 
         <div class="form-group full">
@@ -82,14 +82,14 @@
 
     <!-- ── SECTION 2: Upload Questions ── -->
     <div class="form-section">
-      <div class="section-title">📂 Upload Questions</div>
+      <div class="section-title">Upload Questions</div>
 
       <div class="template-row">
         <span class="template-hint">
           Download the template, fill your questions and upload below
         </span>
         <button type="button" class="btn-template" (click)="downloadTemplate()">
-          ⬇ Download Template
+          Download Template
         </button>
       </div>
 
@@ -104,19 +104,19 @@
                style="display:none" (change)="onFileSelect($event)"/>
 
         <div *ngIf="!uploadedFile" class="drop-content">
-          <span class="drop-icon">📊</span>
+          <span class="drop-icon">File</span>
           <p>Click or drag your Excel file here</p>
           <small>.xlsx or .xls — max 5MB</small>
         </div>
 
         <div *ngIf="uploadedFile && uploadErrors.length === 0" class="drop-content success">
-          <span class="drop-icon">✅</span>
+          <span class="drop-icon">Ready</span>
           <p>{{ uploadedFile.name }}</p>
           <small>{{ previewQuestions.length }} questions loaded — click to replace</small>
         </div>
 
         <div *ngIf="uploadedFile && uploadErrors.length > 0" class="drop-content error">
-          <span class="drop-icon">❌</span>
+          <span class="drop-icon">Error</span>
           <p>{{ uploadedFile.name }}</p>
           <small>{{ uploadErrors.length }} error(s) found — click to replace</small>
         </div>
@@ -124,14 +124,14 @@
 
       <!-- Upload Errors -->
       <div class="error-list" *ngIf="uploadErrors.length > 0">
-        <div class="error-item" *ngFor="let err of uploadErrors">⚠ {{ err }}</div>
+        <div class="error-item" *ngFor="let err of uploadErrors">{{ err }}</div>
       </div>
     </div>
 
     <!-- ── SECTION 3: Preview ── -->
     <div class="form-section" *ngIf="previewQuestions.length > 0">
       <div class="section-title">
-        👁 Question Preview
+        Question Preview
         <span class="q-count">{{ previewQuestions.length }} questions</span>
       </div>
 
@@ -173,12 +173,12 @@
       <button type="button" class="btn-draft"
         [disabled]="loading || testForm.invalid || previewQuestions.length === 0"
         (click)="submit(false)">
-        {{ loading ? 'Saving...' : '💾 Save as Draft' }}
+        {{ loading ? 'Saving...' : 'Save as Draft' }}
       </button>
       <button type="button" class="btn-publish"
         [disabled]="loading || testForm.invalid || previewQuestions.length === 0"
         (click)="submit(true)">
-        {{ loading ? 'Publishing...' : '🚀 Publish Now' }}
+        {{ loading ? 'Publishing...' : 'Publish Now' }}
       </button>
     </div>
 

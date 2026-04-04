@@ -1,46 +1,23 @@
-/**
- * TPO Sidebar Component Styles
- * 
- * Comprehensive styling for the TPO admin sidebar navigation.
- * Features:
- * - Dark theme with blue accent color (differentiated from Student sidebar)
- * - Collapsible submenu for Placement Drives
- * - Responsive design with proper accessibility
- * - Smooth transitions and hover states
- * 
- * Design Tokens:
- * - Primary Accent: Blue (#3b82f6)
- * - Text Light: #f1f5f9
- * - Background Dark: #0f172a
- */
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
-// ===== DESIGN TOKENS =====
 $color-accent: #3b82f6;
-$color-accent-dark: #2563eb;
 $color-accent-light: #93c5fd;
 $color-bg-dark: #0f172a;
 $color-text-primary: #f1f5f9;
-$color-text-secondary: #94a3b8;
-$color-text-muted: #475569;
-$color-text-accent: #e2e8f0;
+$color-text-secondary: #ffffff;
+$color-text-muted: #ffffff;
+$color-text-accent: #f8fbff;
 $color-border: rgba(255, 255, 255, 0.07);
-$color-border-light: rgba(255, 255, 255, 0.06);
 $color-hover-bg: rgba(255, 255, 255, 0.05);
 $color-active-bg: rgba(59, 130, 246, 0.12);
 $color-submenu-active: rgba(59, 130, 246, 0.08);
 $font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-$transition-fast: all 0.15s ease;
-$transition-normal: all 0.2s ease;
 
-// ===== HOST & ROOT =====
 :host {
   display: block;
-  height: calc(100vh - 60px); // Account for fixed topbar
+  height: 100%;
 }
 
-// ===== SIDEBAR CONTAINER =====
 .sidebar {
   width: 240px;
   height: 100%;
@@ -49,185 +26,119 @@ $transition-normal: all 0.2s ease;
   display: flex;
   flex-direction: column;
   font-family: $font-family;
-  position: sticky;
-  top: 60px; // Stick below the topbar
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sidebar-scroll {
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  flex-shrink: 0;
-
-  // Custom scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 4px;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.12);
-    }
-  }
-
-  // Firefox scrollbar
+  padding: 16px 0 18px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
 }
 
-// ===== HEADER SECTION =====
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 20px 16px 16px;
-  border-bottom: 1px solid $color-border-light;
-  margin-bottom: 8px;
-  flex-shrink: 0;
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
 }
 
-.institute-badge {
-  width: 34px;
-  height: 34px;
-  min-width: 34px;
-  background: linear-gradient(135deg, $color-accent, $color-accent-dark);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 700;
-  color: white;
-  flex-shrink: 0;
-  user-select: none;
-  letter-spacing: -0.5px;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
 }
 
-.institute-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0; // Ensure text truncation works
+.menu-group + .menu-group {
+  margin-top: 16px;
 }
 
-.institute-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: $color-text-primary;
-  letter-spacing: 0.2px;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.institute-sub {
-  font-size: 11px;
-  color: $color-text-muted;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-// ===== NAV LABEL =====
 .nav-label {
+  padding: 0 18px 7px;
   font-size: 10.5px;
   font-weight: 600;
-  color: #334155;
+  color: #8fa2bf;
   text-transform: uppercase;
   letter-spacing: 0.9px;
-  padding: 10px 18px 6px;
   user-select: none;
 }
 
-// ===== MENU =====
 .menu {
   list-style: none;
   padding: 0 8px;
   margin: 0;
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 2px;
+}
+
+.menu-item,
+.submenu-item {
+  text-decoration: none;
+  list-style: none;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-height: 40px;
   padding: 9px 10px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 13.5px;
   font-weight: 400;
-  color: #e8ebee;
-  transition: $transition-fast;
-  margin-bottom: 1px;
+  color: #ffffff;
+  transition: all 0.2s ease;
   position: relative;
   user-select: none;
-  text-decoration: none;
-  list-style: none;
   border: none;
   background: none;
   text-align: left;
   font-family: inherit;
+}
 
-  &:hover {
-    background: $color-hover-bg;
-    color: $color-text-accent;
+.menu-item:hover {
+  background: $color-hover-bg;
+  color: #ffffff;
+}
 
-    .menu-icon {
-      color: $color-accent;
-    }
-  }
+.menu-item:hover .menu-icon {
+  color: $color-accent;
+}
 
-  &:active {
-    background: rgba(59, 130, 246, 0.08);
-  }
+.menu-item.active {
+  background: rgba(59, 130, 246, 0.16);
+  color: #ffffff;
+  font-weight: 500;
+}
 
-  &:focus-visible {
-    outline: 2px solid $color-accent;
-    outline-offset: -2px;
-  }
+.menu-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: $color-accent;
+  border-radius: 0 3px 3px 0;
+}
 
-  &.active {
-    background: $color-active-bg;
-    color: $color-accent-light;
-    font-weight: 500;
+.menu-item.active .menu-icon {
+  color: $color-accent;
+}
 
-    .menu-icon {
-      color: $color-accent;
-    }
+.menu-item span {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 3px;
-      height: 60%;
-      background: $color-accent;
-      border-radius: 0 3px 3px 0;
-    }
-  }
-
-  &.parent {
-    span {
-      font-weight: 500;
-      color: #cbd5e1;
-      flex: 1;
-    }
-
-    &:hover span {
-      color: $color-text-primary;
-    }
-  }
+.menu-item.parent span {
+  color: #ffffff;
+  font-weight: 500;
 }
 
 .menu-icon {
@@ -237,14 +148,14 @@ $transition-normal: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $color-text-muted;
+  color: #ffffff;
   flex-shrink: 0;
-  transition: color 0.15s ease;
+  transition: color 0.2s ease;
+}
 
-  svg {
-    width: 100%;
-    height: 100%;
-  }
+.menu-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .chevron {
@@ -254,182 +165,94 @@ $transition-normal: all 0.2s ease;
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease;
-  flex-shrink: 0;
-
-  svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  &.rotated {
-    transform: rotate(180deg);
-  }
 }
 
-// ===== SUBMENU =====
+.chevron.rotated {
+  transform: rotate(180deg);
+}
+
 .submenu {
   list-style: none;
-  padding: 0 8px 0 16px;
+  padding: 2px 8px 0 22px;
   margin: 0;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
   opacity: 0;
+  transition: max-height 0.24s ease, opacity 0.2s ease, margin 0.24s ease;
+}
 
-  &.expanded {
-    max-height: 300px;
-    opacity: 1;
-    margin-bottom: 4px;
-  }
+.submenu.expanded {
+  max-height: 220px;
+  opacity: 1;
+  margin-bottom: 8px;
 }
 
 .submenu-item {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-height: 36px;
   padding: 8px 10px;
-  border-radius: 7px;
+  margin-left: 2px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 400;
-  color: #64748b;
-  transition: $transition-fast;
-  margin-bottom: 1px;
-  position: relative;
-  text-decoration: none;
-  list-style: none;
-  border: none;
-  background: none;
-  text-align: left;
-  font-family: inherit;
+  font-size: 12.75px;
+  color: rgba(255, 255, 255, 0.96);
+  transition: all 0.2s ease;
+}
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.04);
-    color: $color-text-secondary;
+.submenu-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+}
 
-    .submenu-dot {
-      background: $color-accent;
-    }
-  }
-
-  &:active {
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  &:focus-visible {
-    outline: 2px solid $color-accent;
-    outline-offset: -2px;
-  }
-
-  &.active {
-    color: $color-accent-light;
-    background: $color-submenu-active;
-
-    .submenu-dot {
-      background: $color-accent;
-    }
-  }
+.submenu-item.active {
+  background: $color-submenu-active;
+  color: #ffffff;
 }
 
 .submenu-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #334155;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
   flex-shrink: 0;
-  transition: background 0.15s ease;
 }
 
-// ===== FOOTER SECTION =====
+.submenu-item.active .submenu-dot {
+  background: $color-accent;
+}
+
 .sidebar-footer {
-  padding: 12px 8px 16px;
-  border-top: 1px solid $color-border-light;
-  margin-top: auto;
-  flex-shrink: 0;
+  padding: 12px 10px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(15, 23, 42, 0.96);
 }
 
 .logout-btn {
   width: 100%;
-  display: flex;
+  min-height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #ffffff;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 10px;
-  border-radius: 8px;
-  border: none;
-  background: transparent;
-  color: #64748b;
-  font-family: $font-family;
-  font-size: 13.5px;
-  font-weight: 400;
+  padding: 9px 12px;
   cursor: pointer;
-  transition: $transition-fast;
-  text-align: left;
-  user-select: none;
-
-  svg {
-    flex-shrink: 0;
-  }
-
-  &:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #f87171;
-  }
-
-  &:active {
-    background: rgba(239, 68, 68, 0.15);
-  }
-
-  &:focus-visible {
-    outline: 2px solid #ef4444;
-    outline-offset: -2px;
-  }
+  font: inherit;
+  transition: all 0.2s ease;
 }
 
-// ===== RESPONSIVE DESIGN =====
-@media (max-width: 1024px) {
-  :host {
-    height: calc(100vh - 50px); // Adjust for smaller topbar
-  }
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: #fca5a5;
+}
 
+@media (max-width: 900px) {
   .sidebar {
-    width: 220px;
-    top: 50px;
-  }
-
-  .institute-name {
-    max-width: 130px;
-  }
-
-  .menu-item span {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 768px) {
-  :host {
-    display: block;
+    width: min(82vw, 280px);
     height: 100%;
-    width: 100%;
   }
-
-  .sidebar {
-    width: 100%;
-    height: 100%;
-    top: 0;
-    border-right: none;
-  }
-}
-
-// ===== ACCESSIBILITY =====
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-// ===== FOCUS MANAGEMENT FOR KEYBOARD NAVIGATION =====
-@media (prefers-color-scheme: dark) {
-  // Already implemented as dark theme
 }

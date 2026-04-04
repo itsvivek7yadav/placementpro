@@ -27,8 +27,6 @@
   <div class="applications-list" *ngIf="!loading && applications.length > 0">
     <div class="app-row" *ngFor="let app of applications">
 
-      <div class="app-avatar">{{ app.company_name.charAt(0) }}</div>
-
       <div class="app-info">
         <div class="app-company">{{ app.company_name }}</div>
         <div class="app-role">{{ app.job_role }}</div>
@@ -67,7 +65,7 @@
                'result-rejected': app.result === 'REJECTED' || app.result === 'ABSENT'
              }">
           <span class="rdot"></span>
-          {{ app.result === 'PENDING' ? 'Awaiting Result' : app.result === 'SELECTED' ? '🎉 Selected' : app.result === 'ABSENT' ? 'Absent' : 'Rejected' }}
+          {{ app.result === 'PENDING' ? 'Awaiting Result' : app.result === 'SELECTED' ? 'Selected' : app.result === 'ABSENT' ? 'Absent' : 'Rejected' }}
         </div>
         <div class="drive-status-note">
           Drive: {{ app.drive_status === 'LIVE' ? 'Open' : 'Closed' }}
