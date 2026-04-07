@@ -35,15 +35,19 @@ async function getEligibleUsersForDrive(driveId, connection = db) {
   const [rows] = await connection.query(
     `SELECT DISTINCT u.user_id
      FROM placement_drives pd
-     JOIN drive_program_mapping dpm ON dpm.drive_id = pd.drive_id
-     JOIN programs p ON p.program_id = dpm.program_id
      JOIN students s
-       ON s.program_name = p.program_name
-      AND s.program_batch = pd.eligible_batch
+       ON s.program_batch = pd.eligible_batch
      JOIN users u ON u.user_id = s.user_id
      WHERE pd.drive_id = ?
        AND COALESCE(s.placement_status, 'NOT_PLACED') <> 'PLACED'
-       AND (pd.min_cgpa IS NULL OR COALESCE(s.cgpa, 0) >= pd.min_cgpa)`,
+       AND (pd.min_cgpa IS NULL OR COALESCE(s.cgpa, 0) >= pd.min_cgpa)
+       AND EXISTS (
+         SELECT 1
+         FROM drive_program_mapping dpm
+         JOIN programs p ON p.program_id = dpm.program_id
+         WHERE dpm.drive_id = pd.drive_id
+           AND p.program_name = s.program_name
+       )`,
     [driveId]
   );
 

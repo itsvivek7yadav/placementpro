@@ -45,11 +45,32 @@ export class EligibleDrives implements OnInit {
     this.router.navigate(['/drives', driveId]);
   }
 
-applyNow(driveId: number) {
-  this.router.navigate(['/drives', driveId], { queryParams: { apply: 'true' } });
-}
+  applyNow(driveId: number) {
+    this.router.navigate(['/drives', driveId], { queryParams: { apply: 'true' } });
+  }
 
+  getCompensationLabel(drive: any): string {
+    if (drive.compensation_label) {
+      return drive.compensation_label;
+    }
 
+    if (drive.job_type === 'FTE') {
+      if (!drive.ctc_disclosed) return 'CTC not disclosed';
+      if (drive.ctc_min != null && drive.ctc_max != null) return `${drive.ctc_min} - ${drive.ctc_max} LPA`;
+      return drive.ctc_min != null ? `${drive.ctc_min} LPA` : 'CTC not disclosed';
+    }
 
+    if (drive.job_type === 'INTERNSHIP') {
+      return drive.stipend_amount != null ? `Rs. ${drive.stipend_amount} / monthly` : 'Stipend not disclosed';
+    }
 
+    if (drive.job_type === 'INTERNSHIP_PPO') {
+      const stipend = drive.stipend_amount != null ? `Rs. ${drive.stipend_amount} / monthly` : 'Stipend not disclosed';
+      if (!drive.ppo_ctc_disclosed) return `${stipend} | PPO CTC not disclosed`;
+      if (drive.ppo_ctc_min != null && drive.ppo_ctc_max != null) return `${stipend} | PPO ${drive.ppo_ctc_min} - ${drive.ppo_ctc_max} LPA`;
+      return stipend;
+    }
+
+    return 'Not disclosed';
+  }
 }

@@ -60,6 +60,7 @@ export class DriveApplicants implements OnInit {
   exportZipLoading = false;
   sendingAnnouncement = false;
   announcementAudience: 'APPLICANTS' | 'ELIGIBLE' = 'APPLICANTS';
+  announcementLinkType: 'DRIVE' | 'APPLICATIONS' | 'CUSTOM' = 'DRIVE';
   announcementTitle = '';
   announcementMessage = '';
   announcementLink = '';
@@ -215,6 +216,13 @@ export class DriveApplicants implements OnInit {
     this.applyFilters();
   }
 
+  onAnnouncementAudienceChange(value: 'APPLICANTS' | 'ELIGIBLE'): void {
+    this.announcementAudience = value;
+    if (value === 'ELIGIBLE' && this.announcementLinkType === 'APPLICATIONS') {
+      this.announcementLinkType = 'DRIVE';
+    }
+  }
+
   get bulkTargetApplicants(): Applicant[] {
     return this.selectedApplicants.length > 0 ? this.selectedApplicants : this.filteredApplicants;
   }
@@ -343,13 +351,14 @@ export class DriveApplicants implements OnInit {
       audience: this.announcementAudience,
       title,
       message,
-      link: this.announcementLink.trim() || `/drives/${this.driveId}`
+      link: this.getAnnouncementLink()
     }).subscribe({
       next: (response: any) => {
         this.sendingAnnouncement = false;
         this.announcementTitle = '';
         this.announcementMessage = '';
         this.announcementLink = '';
+        this.announcementLinkType = 'DRIVE';
         this.showToast(`Notification sent to ${response?.created ?? 0} student(s)`, 'success');
       },
       error: (err) => {
@@ -388,6 +397,22 @@ export class DriveApplicants implements OnInit {
 
   trackByRoundId(_index: number, round: DriveRound): number {
     return round.round_id;
+  }
+
+  get shouldShowCustomAnnouncementLink(): boolean {
+    return this.announcementLinkType === 'CUSTOM';
+  }
+
+  private getAnnouncementLink(): string {
+    if (this.announcementLinkType === 'APPLICATIONS') {
+      return '/applications';
+    }
+
+    if (this.announcementLinkType === 'CUSTOM') {
+      return this.announcementLink.trim() || `/drives/${this.driveId}`;
+    }
+
+    return `/drives/${this.driveId}`;
   }
 
   private splitStudentName(applicant: Applicant): { first: string; middle: string; last: string } {

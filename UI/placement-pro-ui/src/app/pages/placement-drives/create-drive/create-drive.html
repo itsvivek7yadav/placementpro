@@ -42,14 +42,8 @@
             <select formControlName="job_type">
               <option value="FTE">Full-Time (FTE)</option>
               <option value="INTERNSHIP">Internship</option>
-              <option value="INTERNSHIP+PPO">Internship + PPO</option>
+              <option value="INTERNSHIP_PPO">Internship + PPO</option>
             </select>
-          </div>
-
-          <div class="form-group">
-            <label>CTC / Stipend *</label>
-            <input type="text" formControlName="ctc" placeholder="e.g. 6 LPA – 8 LPA" />
-            <small>You can enter a range using '–' if needed</small>
           </div>
 
           <div class="form-group full-width">
@@ -60,6 +54,82 @@
           </div>
 
         </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-title">
+        <h3>Compensation Details</h3>
+      </div>
+      <div class="section-body">
+        <div class="form-grid" *ngIf="isFte">
+          <label class="checkbox-row full-width">
+            <input type="checkbox" formControlName="ctc_disclosed" />
+            <span>CTC disclosed</span>
+          </label>
+
+          <div class="form-group">
+            <label>CTC Min (LPA)</label>
+            <input type="number" step="0.01" formControlName="ctc_min" placeholder="e.g. 6" />
+            <small>Use the same min and max if the exact CTC is fixed.</small>
+          </div>
+
+          <div class="form-group">
+            <label>CTC Max (LPA)</label>
+            <input type="number" step="0.01" formControlName="ctc_max" placeholder="e.g. 10" />
+            <small>Keep both equal when one exact offer amount is known.</small>
+          </div>
+        </div>
+
+        <div class="form-grid" *ngIf="isInternship">
+          <div class="form-group">
+            <label>Stipend Amount (₹)</label>
+            <input type="number" step="1" formControlName="stipend_amount" placeholder="e.g. 20000" />
+          </div>
+
+          <div class="form-group">
+            <label>Period</label>
+            <select formControlName="stipend_period">
+              <option value="MONTHLY">Monthly</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid" *ngIf="isInternshipPpo">
+          <div class="form-group">
+            <label>Stipend Amount (₹)</label>
+            <input type="number" step="1" formControlName="stipend_amount" placeholder="e.g. 20000" />
+          </div>
+
+          <div class="form-group">
+            <label>Period</label>
+            <select formControlName="stipend_period">
+              <option value="MONTHLY">Monthly</option>
+            </select>
+          </div>
+
+          <div class="ppo-group full-width">
+            <div class="ppo-title">PPO Offer</div>
+            <label class="checkbox-row">
+              <input type="checkbox" formControlName="ppo_ctc_disclosed" />
+              <span>PPO CTC disclosed</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label>PPO CTC Min (LPA)</label>
+            <input type="number" step="0.01" formControlName="ppo_ctc_min" placeholder="e.g. 6" />
+            <small>Use the same min and max if the PPO offer is fixed.</small>
+          </div>
+
+          <div class="form-group">
+            <label>PPO CTC Max (LPA)</label>
+            <input type="number" step="0.01" formControlName="ppo_ctc_max" placeholder="e.g. 10" />
+            <small>Keep both equal when one exact PPO amount is known.</small>
+          </div>
+        </div>
+
+        <small *ngIf="driveForm.hasError('compensationRequired')">Complete the compensation details for the selected job type.</small>
       </div>
     </div>
 

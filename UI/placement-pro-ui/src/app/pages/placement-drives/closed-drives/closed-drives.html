@@ -55,8 +55,8 @@
           <span class="meta-value">{{ drive.job_type }}</span>
         </div>
         <div class="meta-item">
-          <span class="meta-label">CTC / Stipend</span>
-          <span class="meta-value">{{ drive.ctc || '—' }}</span>
+          <span class="meta-label">Compensation</span>
+          <span class="meta-value">{{ getCompensationLabel(drive) }}</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Batch</span>

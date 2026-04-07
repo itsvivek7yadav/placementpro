@@ -65,6 +65,35 @@ export class DriveDetail implements OnInit {
     return buildBackendUrl(this.drive.drive_document_url);
   }
 
+  get compensationLabel(): string {
+    if (!this.drive) {
+      return 'Not disclosed';
+    }
+
+    if (this.drive.compensation_label) {
+      return this.drive.compensation_label;
+    }
+
+    if (this.drive.job_type === 'FTE') {
+      if (!this.drive.ctc_disclosed) return 'CTC not disclosed';
+      if (this.drive.ctc_min != null && this.drive.ctc_max != null) return `${this.drive.ctc_min} - ${this.drive.ctc_max} LPA`;
+      return this.drive.ctc_min != null ? `${this.drive.ctc_min} LPA` : 'CTC not disclosed';
+    }
+
+    if (this.drive.job_type === 'INTERNSHIP') {
+      return this.drive.stipend_amount != null ? `Rs. ${this.drive.stipend_amount} / monthly` : 'Stipend not disclosed';
+    }
+
+    if (this.drive.job_type === 'INTERNSHIP_PPO') {
+      const stipend = this.drive.stipend_amount != null ? `Rs. ${this.drive.stipend_amount} / monthly` : 'Stipend not disclosed';
+      if (!this.drive.ppo_ctc_disclosed) return `${stipend} | PPO CTC not disclosed`;
+      if (this.drive.ppo_ctc_min != null && this.drive.ppo_ctc_max != null) return `${stipend} | PPO ${this.drive.ppo_ctc_min} - ${this.drive.ppo_ctc_max} LPA`;
+      return stipend;
+    }
+
+    return 'Not disclosed';
+  }
+
   get selectedResume(): { slot: number; name: string; path: string } | undefined {
     return this.resumeOptions.find((resume) => resume.slot === this.selectedResumeSlot);
   }

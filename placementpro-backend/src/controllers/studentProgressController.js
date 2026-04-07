@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const { normalizePlacementType } = require('../services/placementSyncService');
+const { formatCompensationLabel, normalizeJobType } = require('../utils/driveCompensation');
 
 async function getStudentByUserId(userId) {
   const [rows] = await db.query(
@@ -15,8 +17,8 @@ async function getStudentByUserId(userId) {
         s.placement_status,
         s.placed_company,
         s.placement_mode,
+        s.placement_type,
         s.placement_package,
-        s.placed_at,
         s.college_email,
         s.personal_email,
         s.phone_number,
@@ -47,8 +49,8 @@ async function getStudentById(studentId) {
         s.placement_status,
         s.placed_company,
         s.placement_mode,
+        s.placement_type,
         s.placement_package,
-        s.placed_at,
         s.college_email,
         s.personal_email,
         s.phone_number,
@@ -173,8 +175,8 @@ function buildProgressResponse(student, applications, tests) {
       placement_status: student.placement_status,
       placed_company: student.placed_company,
       placement_mode: student.placement_mode,
+      placement_type: student.placement_type,
       placement_package: student.placement_package,
-      placed_at: student.placed_at,
       college_email: student.college_email,
       personal_email: student.personal_email,
       phone_number: student.phone_number || student.email || null
@@ -220,8 +222,8 @@ function buildProgressResponse(student, applications, tests) {
       drive_id: app.drive_id,
       company_name: app.company_name,
       job_role: app.job_role,
-      job_type: app.job_type,
-      ctc: app.ctc,
+      job_type: normalizeJobType(app.job_type),
+      compensation_label: formatCompensationLabel(app),
       drive_status: app.drive_status,
       application_status: app.status,
       result: app.result,
@@ -266,7 +268,14 @@ async function getApplicationsByStudentId(studentId) {
         pd.company_name,
         pd.job_role,
         pd.job_type,
-        pd.ctc,
+        pd.ctc_min,
+        pd.ctc_max,
+        pd.ctc_disclosed,
+        pd.stipend_amount,
+        pd.stipend_period,
+        pd.ppo_ctc_min,
+        pd.ppo_ctc_max,
+        pd.ppo_ctc_disclosed,
         pd.application_deadline,
         pd.status AS drive_status
      FROM applications a
@@ -363,8 +372,8 @@ exports.updatePlacementStatus = async (req, res) => {
       placement_status,
       placed_company,
       placement_mode,
-      placement_package,
-      placed_at
+      placement_type,
+      placement_package
     } = req.body;
     const allowedPlacementModes = ['ON_CAMPUS', 'OFF_CAMPUS', 'FAMILY_BUSINESS', 'HIGHER_STUDIES', 'NOT_PLACED'];
 
@@ -382,6 +391,10 @@ exports.updatePlacementStatus = async (req, res) => {
 
     if (placement_status === 'PLACED' && placement_mode === 'NOT_PLACED') {
       return res.status(400).json({ message: 'placement_mode cannot be NOT_PLACED when placement_status is PLACED' });
+    }
+
+    if (placement_status === 'PLACED' && !normalizePlacementType(placement_type)) {
+      return res.status(400).json({ message: 'placement_type is required when marking a student placed' });
     }
 
     const normalizedPackage = placement_package === '' || placement_package == null
@@ -407,24 +420,23 @@ exports.updatePlacementStatus = async (req, res) => {
     const nextPlacementPackage = placement_status === 'PLACED'
       ? normalizedPackage
       : null;
-    const nextPlacedAt = placement_status === 'PLACED'
-      ? (placed_at || null)
+    const nextPlacementType = placement_status === 'PLACED'
+      ? normalizePlacementType(placement_type)
       : null;
-
     await db.query(
       `UPDATE students
        SET placement_status = ?,
            placed_company = ?,
            placement_mode = ?,
-           placement_package = ?,
-           placed_at = ?
+           placement_type = ?,
+           placement_package = ?
        WHERE student_id = ?`,
       [
         placement_status,
         nextPlacedCompany,
         nextPlacementMode,
+        nextPlacementType,
         nextPlacementPackage,
-        nextPlacedAt,
         req.params.student_id
       ]
     );
@@ -435,8 +447,8 @@ exports.updatePlacementStatus = async (req, res) => {
       placement_status,
       placed_company: nextPlacedCompany,
       placement_mode: nextPlacementMode,
-      placement_package: nextPlacementPackage,
-      placed_at: nextPlacedAt
+      placement_type: nextPlacementType,
+      placement_package: nextPlacementPackage
     });
   } catch (err) {
     console.error('Update Placement Status Error:', err);

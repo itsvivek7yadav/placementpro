@@ -33,7 +33,7 @@
         <div class="app-meta">
           Applied {{ app.applied_at | date:'dd MMM yyyy' }}
           · {{ app.job_type === 'FTE' ? 'Full-Time' : app.job_type }}
-          <span *ngIf="app.ctc"> · {{ app.ctc }}</span>
+          <span *ngIf="getCompensationLabel(app)"> · {{ getCompensationLabel(app) }}</span>
         </div>
         <div class="app-resume" *ngIf="app.applied_cv_name">
           Resume used: {{ app.applied_cv_name }}

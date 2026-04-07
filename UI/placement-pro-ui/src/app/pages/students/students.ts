@@ -36,6 +36,7 @@ export class Students implements OnInit {
   stdXiiPercentageFilter = '';
   stdXPercentageFilter = '';
   statusFilter  = '';
+  prnSortDirection: '' | 'asc' | 'desc' = '';
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -164,6 +165,25 @@ export class Students implements OnInit {
       list = list.filter(s => s.placement_status === this.statusFilter);
     }
 
+    if (this.prnSortDirection) {
+      list.sort((a, b) => {
+        const prnA = String(a?.prn ?? '').trim();
+        const prnB = String(b?.prn ?? '').trim();
+        const numericA = Number(prnA);
+        const numericB = Number(prnB);
+
+        let comparison = 0;
+
+        if (Number.isFinite(numericA) && Number.isFinite(numericB)) {
+          comparison = numericA - numericB;
+        } else {
+          comparison = prnA.localeCompare(prnB, undefined, { numeric: true, sensitivity: 'base' });
+        }
+
+        return this.prnSortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
     this.filteredStudents = list;
   }
 
@@ -185,8 +205,23 @@ export class Students implements OnInit {
     this.stdXiiPercentageFilter = '';
     this.stdXPercentageFilter = '';
     this.statusFilter  = '';
+    this.prnSortDirection = '';
     this.searched      = false;
     this.filteredStudents = [];
+  }
+
+  togglePrnSort() {
+    if (this.prnSortDirection === '') {
+      this.prnSortDirection = 'asc';
+    } else if (this.prnSortDirection === 'asc') {
+      this.prnSortDirection = 'desc';
+    } else {
+      this.prnSortDirection = '';
+    }
+
+    if (this.searched) {
+      this.applyFilters();
+    }
   }
 
   toggleAcademicFilters() {

@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { notifyEligibleStudentsForDrive } = require('../services/notificationService');
+const { validateAndNormalizeCompensation, toDatabaseJobType } = require('../utils/driveCompensation');
 
 function normalizeProgramIds(value) {
   if (Array.isArray(value)) {
@@ -20,7 +21,6 @@ exports.createDrive = async (req, res) => {
     job_role,
     description,
     job_type,
-    ctc,
     eligible_batch,
     application_deadline,
     min_cgpa,
@@ -41,6 +41,11 @@ exports.createDrive = async (req, res) => {
     });
   }
 
+  const compensation = validateAndNormalizeCompensation(req.body);
+  if (compensation.error) {
+    return res.status(400).json({ message: compensation.error });
+  }
+
   const created_by = req.user.user_id;
 
   const deadline =
@@ -55,15 +60,25 @@ exports.createDrive = async (req, res) => {
     // ✅ NO eligible_programs column here
     const [driveResult] = await connection.query(
       `INSERT INTO placement_drives
-      (company_name, job_role, description, job_type, ctc,
+      (company_name, job_role, description, job_type,
+       ctc_min, ctc_max, ctc_disclosed,
+       stipend_amount, stipend_period,
+       ppo_ctc_min, ppo_ctc_max, ppo_ctc_disclosed,
        eligible_batch, application_deadline, min_cgpa, created_by, drive_document_url)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         company_name,
         job_role,
         description,
-        job_type,
-        ctc,
+        toDatabaseJobType(compensation.value.job_type),
+        compensation.value.ctc_min,
+        compensation.value.ctc_max,
+        compensation.value.ctc_disclosed,
+        compensation.value.stipend_amount,
+        compensation.value.stipend_period,
+        compensation.value.ppo_ctc_min,
+        compensation.value.ppo_ctc_max,
+        compensation.value.ppo_ctc_disclosed,
         eligible_batch,
         deadline,
         min_cgpa,

@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { notifyRoundStatusUpdate } = require('../services/notificationService');
+const { syncStudentsPlacementFromApplications } = require('../services/placementSyncService');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -152,6 +153,18 @@ async function syncApplicationsForDrive(connection, driveId, applicationIds = nu
          status = CASE application_id ${caseStatus} ELSE status END
      WHERE application_id IN (${buildInClause(updates.map((update) => update.application_id))})`,
     updateParams
+  );
+
+  const [studentRows] = await connection.query(
+    `SELECT DISTINCT student_id
+     FROM applications
+     WHERE application_id IN (${buildInClause(targetApplications)})`,
+    targetApplications
+  );
+
+  await syncStudentsPlacementFromApplications(
+    connection,
+    studentRows.map((row) => row.student_id)
   );
 }
 

@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { notifyEligibleStudentsForDrive } = require('../services/notificationService');
+const { validateAndNormalizeCompensation, formatCompensationLabel, normalizeJobType, toDatabaseJobType } = require('../utils/driveCompensation');
 
 function normalizeProgramIds(value) {
   if (Array.isArray(value)) {
@@ -31,6 +32,14 @@ function getDriveDocumentUpdateClause(req) {
   return { clause: '', values: [] };
 }
 
+function normalizeDriveResponse(drive) {
+  return {
+    ...drive,
+    job_type: normalizeJobType(drive.job_type),
+    compensation_label: formatCompensationLabel(drive)
+  };
+}
+
 // ── GET OPEN DRIVES ────────────────────────────────────────
 exports.getOpenDrives = async (req, res) => {
   try {
@@ -46,7 +55,7 @@ exports.getOpenDrives = async (req, res) => {
        GROUP BY pd.drive_id
        ORDER BY pd.application_deadline ASC`
     );
-    res.json({ drives });
+    res.json({ drives: drives.map(normalizeDriveResponse) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to fetch drives' });
@@ -68,7 +77,7 @@ exports.getClosedDrives = async (req, res) => {
        GROUP BY pd.drive_id
        ORDER BY pd.closed_at DESC`
     );
-    res.json({ drives });
+    res.json({ drives: drives.map(normalizeDriveResponse) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to fetch closed drives' });
@@ -102,7 +111,7 @@ exports.getDriveById = async (req, res) => {
     );
 
     res.json({
-      drive,
+      drive: normalizeDriveResponse(drive),
       selectedProgramIds: programIds.map(r => r.program_id)
     });
 
@@ -120,7 +129,7 @@ exports.updateDrive = async (req, res) => {
     const driveId = req.params.id;
     const {
       company_name, job_role, description, job_type,
-      ctc, eligible_batch, application_deadline,
+      eligible_batch, application_deadline,
       min_cgpa, eligible_programs
     } = req.body;
     const documentUpdate = getDriveDocumentUpdateClause(req);
@@ -130,6 +139,11 @@ exports.updateDrive = async (req, res) => {
       return res.status(400).json({ message: 'Application deadline is required' });
     }
 
+    const compensation = validateAndNormalizeCompensation(req.body);
+    if (compensation.error) {
+      return res.status(400).json({ message: compensation.error });
+    }
+
     const deadline = application_deadline.replace('T', ' ') + ':00';
 
     await connection.beginTransaction();
@@ -137,12 +151,17 @@ exports.updateDrive = async (req, res) => {
     await connection.query(
       `UPDATE placement_drives SET
           company_name = ?, job_role = ?, description = ?,
-          job_type = ?, ctc = ?, eligible_batch = ?,
+          job_type = ?, ctc_min = ?, ctc_max = ?, ctc_disclosed = ?,
+          stipend_amount = ?, stipend_period = ?,
+          ppo_ctc_min = ?, ppo_ctc_max = ?, ppo_ctc_disclosed = ?, eligible_batch = ?,
           application_deadline = ?, min_cgpa = ?
           ${documentUpdate.clause}
        WHERE drive_id = ? AND status = 'LIVE'`,
-      [company_name, job_role, description, job_type,
-       ctc, eligible_batch, deadline, min_cgpa, ...documentUpdate.values, driveId]
+      [company_name, job_role, description, toDatabaseJobType(compensation.value.job_type),
+       compensation.value.ctc_min, compensation.value.ctc_max, compensation.value.ctc_disclosed,
+       compensation.value.stipend_amount, compensation.value.stipend_period,
+       compensation.value.ppo_ctc_min, compensation.value.ppo_ctc_max, compensation.value.ppo_ctc_disclosed,
+       eligible_batch, deadline, min_cgpa, ...documentUpdate.values, driveId]
     );
 
     if (normalizedPrograms.length > 0) {
@@ -184,7 +203,7 @@ exports.reopenDrive = async (req, res) => {
     const driveId = req.params.id;
     const {
       company_name, job_role, description, job_type,
-      ctc, eligible_batch, application_deadline,
+      eligible_batch, application_deadline,
       min_cgpa, eligible_programs
     } = req.body;
     const documentUpdate = getDriveDocumentUpdateClause(req);
@@ -194,6 +213,11 @@ exports.reopenDrive = async (req, res) => {
       return res.status(400).json({ message: 'New application deadline is required to reopen' });
     }
 
+    const compensation = validateAndNormalizeCompensation(req.body);
+    if (compensation.error) {
+      return res.status(400).json({ message: compensation.error });
+    }
+
     const deadline = application_deadline.replace('T', ' ') + ':00';
 
     await connection.beginTransaction();
@@ -201,13 +225,18 @@ exports.reopenDrive = async (req, res) => {
     await connection.query(
       `UPDATE placement_drives SET
           company_name = ?, job_role = ?, description = ?,
-          job_type = ?, ctc = ?, eligible_batch = ?,
-          application_deadline = ?, min_cgpa = ?,
+          job_type = ?, ctc_min = ?, ctc_max = ?, ctc_disclosed = ?,
+          stipend_amount = ?, stipend_period = ?,
+          ppo_ctc_min = ?, ppo_ctc_max = ?, ppo_ctc_disclosed = ?, eligible_batch = ?,
+          application_deadline = ?, min_cgpa = ?
           ${documentUpdate.clause}
           status = 'LIVE', closed_at = NULL, close_type = NULL
        WHERE drive_id = ?`,
-      [company_name, job_role, description, job_type,
-       ctc, eligible_batch, deadline, min_cgpa, ...documentUpdate.values, driveId]
+      [company_name, job_role, description, toDatabaseJobType(compensation.value.job_type),
+       compensation.value.ctc_min, compensation.value.ctc_max, compensation.value.ctc_disclosed,
+       compensation.value.stipend_amount, compensation.value.stipend_period,
+       compensation.value.ppo_ctc_min, compensation.value.ppo_ctc_max, compensation.value.ppo_ctc_disclosed,
+       eligible_batch, deadline, min_cgpa, ...documentUpdate.values, driveId]
     );
 
     if (normalizedPrograms.length > 0) {

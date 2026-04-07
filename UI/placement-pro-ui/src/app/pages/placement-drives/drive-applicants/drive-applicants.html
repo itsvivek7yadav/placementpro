@@ -36,9 +36,18 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Audience</mat-label>
-      <mat-select [(ngModel)]="announcementAudience">
+      <mat-select [ngModel]="announcementAudience" (ngModelChange)="onAnnouncementAudienceChange($event)">
         <mat-option value="APPLICANTS">All applicants</mat-option>
         <mat-option value="ELIGIBLE">All eligible students</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Link Type</mat-label>
+      <mat-select [(ngModel)]="announcementLinkType">
+        <mat-option value="DRIVE">Drive details page</mat-option>
+        <mat-option value="APPLICATIONS" *ngIf="announcementAudience === 'APPLICANTS'">Applications page</mat-option>
+        <mat-option value="CUSTOM">Custom link</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -52,8 +61,8 @@
       <textarea matInput rows="3" [(ngModel)]="announcementMessage" placeholder="Write the notification message"></textarea>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Optional Link</mat-label>
+    <mat-form-field appearance="outline" *ngIf="shouldShowCustomAnnouncementLink">
+      <mat-label>Custom Link</mat-label>
       <input matInput [(ngModel)]="announcementLink" placeholder="/applications or external URL" />
     </mat-form-field>
 

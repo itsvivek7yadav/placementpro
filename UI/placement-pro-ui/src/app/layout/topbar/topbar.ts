@@ -157,7 +157,7 @@ import { NotificationItem, NotificationsService } from '../../services/notificat
     }
 
     .brand-name span {
-      color: #1d4ed8;
+      color: #3364eb;
     }
 
     .brand-role {

@@ -76,6 +76,31 @@ export class MyApplications implements OnInit {
     return `${orderLabel}: ${app.current_round_name} • ${this.formatRoundStatus(app.current_round_status)}`;
   }
 
+  getCompensationLabel(app: any): string {
+    if (app.compensation_label) {
+      return app.compensation_label;
+    }
+
+    if (app.job_type === 'FTE') {
+      if (!app.ctc_disclosed) return 'CTC not disclosed';
+      if (app.ctc_min != null && app.ctc_max != null) return `${app.ctc_min} - ${app.ctc_max} LPA`;
+      return app.ctc_min != null ? `${app.ctc_min} LPA` : '';
+    }
+
+    if (app.job_type === 'INTERNSHIP') {
+      return app.stipend_amount != null ? `Rs. ${app.stipend_amount} / monthly` : '';
+    }
+
+    if (app.job_type === 'INTERNSHIP_PPO') {
+      const stipend = app.stipend_amount != null ? `Rs. ${app.stipend_amount} / monthly` : '';
+      if (!app.ppo_ctc_disclosed) return stipend;
+      if (app.ppo_ctc_min != null && app.ppo_ctc_max != null) return `${stipend} · PPO ${app.ppo_ctc_min} - ${app.ppo_ctc_max} LPA`;
+      return stipend;
+    }
+
+    return '';
+  }
+
   withdraw(applicationId: number) {
     if (!confirm('Withdraw this application?')) return;
 

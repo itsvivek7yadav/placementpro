@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { notifyApplicationResultUpdate } = require('../services/notificationService');
+const { syncStudentsPlacementFromApplications } = require('../services/placementSyncService');
 
 // ── Get all applications for a drive ──────────────────────
 exports.getApplicationsByDrive = async (req, res) => {
@@ -59,7 +60,7 @@ exports.updateApplicationResult = async (req, res) => {
     }
 
     const [rows] = await db.query(
-      `SELECT application_id, result FROM applications WHERE application_id = ?`,
+      `SELECT application_id, result, student_id FROM applications WHERE application_id = ?`,
       [application_id]
     );
 
@@ -75,6 +76,8 @@ exports.updateApplicationResult = async (req, res) => {
       `UPDATE applications SET result = ? WHERE application_id = ?`,
       [result, application_id]
     );
+
+    await syncStudentsPlacementFromApplications(db, [rows[0].student_id]);
 
     try {
       await notifyApplicationResultUpdate(Number(application_id), result);
@@ -100,7 +103,7 @@ exports.bulkUpdateResult = async (req, res) => {
     }
 
     const [pendingApplications] = await db.query(
-      `SELECT application_id
+      `SELECT application_id, student_id
        FROM applications
        WHERE drive_id = ? AND result = 'PENDING'`,
       [drive_id]
@@ -111,6 +114,11 @@ exports.bulkUpdateResult = async (req, res) => {
        SET result = ?
        WHERE drive_id = ? AND result = 'PENDING'`,
       [result, drive_id]
+    );
+
+    await syncStudentsPlacementFromApplications(
+      db,
+      pendingApplications.map((application) => application.student_id)
     );
 
     for (const application of pendingApplications) {

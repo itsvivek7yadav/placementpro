@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { notifyApplicationSubmitted } = require('../services/notificationService');
+const { formatCompensationLabel, normalizeJobType } = require('../utils/driveCompensation');
 
 async function attachRoundDetails(applications) {
   if (!applications.length) {
@@ -210,7 +211,14 @@ exports.getMyApplications = async (req, res) => {
          pd.company_name,
          pd.job_role,
          pd.job_type,
-         pd.ctc,
+         pd.ctc_min,
+         pd.ctc_max,
+         pd.ctc_disclosed,
+         pd.stipend_amount,
+         pd.stipend_period,
+         pd.ppo_ctc_min,
+         pd.ppo_ctc_max,
+         pd.ppo_ctc_disclosed,
          a.applied_cv_slot,
          a.applied_cv_name,
          a.applied_cv_link,
@@ -225,7 +233,13 @@ exports.getMyApplications = async (req, res) => {
 
     const applicationsWithRounds = await attachRoundDetails(applications);
 
-    res.json({ applications: applicationsWithRounds });
+    const normalizedApplications = applicationsWithRounds.map((application) => ({
+      ...application,
+      job_type: normalizeJobType(application.job_type),
+      compensation_label: formatCompensationLabel(application)
+    }));
+
+    res.json({ applications: normalizedApplications });
 
   } catch (err) {
     console.error('Get My Applications Error:', err);

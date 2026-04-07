@@ -40,7 +40,7 @@
           [ngClass]="{
             'fte':        drive.job_type === 'FTE',
             'internship': drive.job_type === 'INTERNSHIP',
-            'ppo':        drive.job_type === 'INTERNSHIP+PPO'
+            'ppo':        drive.job_type === 'INTERNSHIP_PPO'
           }">
           {{ drive.job_type === 'FTE' ? 'Full-Time' :
              drive.job_type === 'INTERNSHIP' ? 'Internship' : 'Intern + PPO' }}
@@ -49,8 +49,8 @@
 
       <div class="card-meta">
         <div class="meta-item">
-          <span class="meta-label">CTC / Stipend</span>
-          <span class="meta-value">{{ drive.ctc || '—' }}</span>
+          <span class="meta-label">Compensation</span>
+          <span class="meta-value">{{ getCompensationLabel(drive) }}</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Batch</span>

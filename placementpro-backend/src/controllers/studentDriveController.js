@@ -1,4 +1,13 @@
 const db = require('../config/db');
+const { normalizeJobType, formatCompensationLabel } = require('../utils/driveCompensation');
+
+function normalizeDriveResponse(drive) {
+  return {
+    ...drive,
+    job_type: normalizeJobType(drive.job_type),
+    compensation_label: formatCompensationLabel(drive)
+  };
+}
 exports.getDriveDetail = async (req, res) => {
   try {
     const driveId = req.params.id;
@@ -33,7 +42,7 @@ exports.getDriveDetail = async (req, res) => {
 
     if (!drive) return res.status(404).json({ message: 'Drive not found' });
 
-    res.json({ drive });
+    res.json({ drive: normalizeDriveResponse(drive) });
 
   } catch (err) {
     console.error(err);
@@ -87,7 +96,7 @@ exports.getEligibleDrives = async (req, res) => {
       ]
     );
 
-    res.json({ drives });
+    res.json({ drives: drives.map(normalizeDriveResponse) });
 
   } catch (error) {
     console.error(error);

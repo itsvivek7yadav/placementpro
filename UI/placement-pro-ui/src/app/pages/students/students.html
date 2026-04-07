@@ -97,7 +97,15 @@
           <th>Batch</th>
           <th>Status</th>
           <th>College Email</th>
-          <th>PRN</th>
+          <th class="sortable-th">
+            <button type="button" class="sort-btn" (click)="togglePrnSort()">
+              <span>PRN</span>
+              <span class="sort-indicator" [class.active]="prnSortDirection !== ''">
+                <span [class.selected]="prnSortDirection === 'asc'">▲</span>
+                <span [class.selected]="prnSortDirection === 'desc'">▼</span>
+              </span>
+            </button>
+          </th>
           <th>First Name</th>
           <th>Middle Name</th>
           <th>Last Name</th>

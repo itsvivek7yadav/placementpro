@@ -72,7 +72,7 @@ function buildAcademicYearClause(filters, studentAlias = 's', applicationAlias =
   }
 
   return {
-    clause: `YEAR(COALESCE(${applicationAlias}.applied_at, ${studentAlias}.placed_at, ${driveAlias}.application_deadline)) = ?`,
+    clause: `YEAR(COALESCE(${applicationAlias}.applied_at, ${driveAlias}.application_deadline)) = ?`,
     params: [filters.academicYear]
   };
 }
@@ -84,6 +84,12 @@ function normalizeJobType(jobType) {
   if (normalized.includes('intern')) return 'Internship';
   return 'FTE';
 }
+
+const DRIVE_PACKAGE_SQL = `CASE
+  WHEN pd.job_type = 'FTE' AND COALESCE(pd.ctc_disclosed, 0) = 1 THEN COALESCE(pd.ctc_max, pd.ctc_min)
+  WHEN pd.job_type = 'INTERNSHIP_PPO' AND COALESCE(pd.ppo_ctc_disclosed, 0) = 1 THEN COALESCE(pd.ppo_ctc_max, pd.ppo_ctc_min)
+  ELSE NULL
+END`;
 
 async function getFilterOptions() {
   const [[batchRows], [programRows], [yearRows]] = await Promise.all([
@@ -100,11 +106,11 @@ async function getFilterOptions() {
        ORDER BY program_name ASC`
     ),
     db.query(
-      `SELECT DISTINCT YEAR(COALESCE(s.placed_at, a.applied_at, pd.application_deadline)) AS academic_year
+      `SELECT DISTINCT YEAR(COALESCE(a.applied_at, pd.application_deadline)) AS academic_year
        FROM students s
        LEFT JOIN applications a ON a.student_id = s.student_id
        LEFT JOIN placement_drives pd ON pd.drive_id = a.drive_id
-       WHERE COALESCE(s.placed_at, a.applied_at, pd.application_deadline) IS NOT NULL
+       WHERE COALESCE(a.applied_at, pd.application_deadline) IS NOT NULL
        ORDER BY academic_year DESC`
     )
   ]);
@@ -157,13 +163,13 @@ exports.getTpoPlacementReport = async (req, res) => {
 
     const [summaryRows] = await db.query(
       `SELECT
-          COUNT(DISTINCT CASE WHEN a.result = 'SELECTED' THEN a.student_id END) AS totalStudentsPlaced,
+          COUNT(DISTINCT CASE WHEN s.placement_status = 'PLACED' THEN s.student_id END) AS totalStudentsPlaced,
           COUNT(CASE WHEN a.result = 'SELECTED' THEN 1 END) AS totalOffersMade,
           COUNT(DISTINCT CASE WHEN a.result = 'PENDING' THEN a.student_id END) AS studentsAwaitingResult,
           COUNT(CASE WHEN a.result = 'ABSENT' THEN 1 END) AS absentApplications,
           COUNT(DISTINCT CASE WHEN a.result = 'ABSENT' THEN a.student_id END) AS studentsMarkedAbsent,
-          AVG(CASE WHEN a.result = 'SELECTED' THEN pd.ctc END) AS averagePackage,
-          MAX(CASE WHEN a.result = 'SELECTED' THEN pd.ctc END) AS highestPackage,
+          AVG(CASE WHEN s.placement_status = 'PLACED' THEN s.placement_package END) AS averagePackage,
+          MAX(CASE WHEN s.placement_status = 'PLACED' THEN s.placement_package END) AS highestPackage,
           COUNT(DISTINCT pd.company_name) AS totalCompaniesVisited,
           COUNT(DISTINCT CASE WHEN a.result = 'SELECTED' THEN pd.company_name END) AS recruitersWithSelections
        FROM students s
@@ -174,22 +180,23 @@ exports.getTpoPlacementReport = async (req, res) => {
     );
 
     const [packageRows] = await db.query(
-      `SELECT pd.ctc
+      `SELECT s.placement_package AS package_value
        FROM students s
-       JOIN applications a ON a.student_id = s.student_id
-       JOIN placement_drives pd ON pd.drive_id = a.drive_id
-       ${applicationWhere ? `${applicationWhere} AND` : 'WHERE'} a.result = 'SELECTED' AND pd.ctc IS NOT NULL
-       ORDER BY pd.ctc ASC`,
+       LEFT JOIN applications a ON a.student_id = s.student_id
+       LEFT JOIN placement_drives pd ON pd.drive_id = a.drive_id
+       ${applicationWhere ? `${applicationWhere} AND` : 'WHERE'} s.placement_status = 'PLACED' AND s.placement_package IS NOT NULL
+       GROUP BY s.student_id, s.placement_package
+       ORDER BY s.placement_package ASC`,
       applicationParams
     );
 
     const [jobTypeRows] = await db.query(
-      `SELECT pd.job_type, COUNT(*) AS offers
+      `SELECT s.placement_type AS job_type, COUNT(*) AS offers
        FROM students s
-       JOIN applications a ON a.student_id = s.student_id
-       JOIN placement_drives pd ON pd.drive_id = a.drive_id
-       ${applicationWhere ? `${applicationWhere} AND` : 'WHERE'} a.result = 'SELECTED'
-       GROUP BY pd.job_type`,
+       LEFT JOIN applications a ON a.student_id = s.student_id
+       LEFT JOIN placement_drives pd ON pd.drive_id = a.drive_id
+       ${applicationWhere ? `${applicationWhere} AND` : 'WHERE'} s.placement_status = 'PLACED' AND s.placement_type IS NOT NULL
+       GROUP BY s.placement_type`,
       applicationParams
     );
 
@@ -198,8 +205,8 @@ exports.getTpoPlacementReport = async (req, res) => {
           pd.company_name,
           COUNT(a.application_id) AS totalApplications,
           COUNT(CASE WHEN a.result = 'SELECTED' THEN 1 END) AS offers,
-          AVG(CASE WHEN a.result = 'SELECTED' THEN pd.ctc END) AS avgPackage,
-          MAX(CASE WHEN a.result = 'SELECTED' THEN pd.ctc END) AS highestPackage
+          AVG(CASE WHEN a.result = 'SELECTED' THEN ${DRIVE_PACKAGE_SQL} END) AS avgPackage,
+          MAX(CASE WHEN a.result = 'SELECTED' THEN ${DRIVE_PACKAGE_SQL} END) AS highestPackage
        FROM students s
        JOIN applications a ON a.student_id = s.student_id
        JOIN placement_drives pd ON pd.drive_id = a.drive_id
@@ -211,14 +218,14 @@ exports.getTpoPlacementReport = async (req, res) => {
 
     const [trendRows] = await db.query(
       `SELECT
-          DATE_FORMAT(COALESCE(a.applied_at, s.placed_at, pd.application_deadline), '%Y-%m') AS period,
+          DATE_FORMAT(COALESCE(a.applied_at, pd.application_deadline), '%Y-%m') AS period,
           COUNT(CASE WHEN a.result = 'SELECTED' THEN 1 END) AS offers,
-          COUNT(DISTINCT CASE WHEN a.result = 'SELECTED' THEN a.student_id END) AS placedStudents,
-          AVG(CASE WHEN a.result = 'SELECTED' THEN pd.ctc END) AS averagePackage
+          COUNT(DISTINCT CASE WHEN s.placement_status = 'PLACED' THEN s.student_id END) AS placedStudents,
+          AVG(CASE WHEN s.placement_status = 'PLACED' THEN s.placement_package END) AS averagePackage
        FROM students s
        JOIN applications a ON a.student_id = s.student_id
        LEFT JOIN placement_drives pd ON pd.drive_id = a.drive_id
-       ${applicationWhere ? `${applicationWhere} AND` : 'WHERE'} COALESCE(a.applied_at, s.placed_at, pd.application_deadline) IS NOT NULL
+       ${applicationWhere ? `${applicationWhere} AND` : 'WHERE'} COALESCE(a.applied_at, pd.application_deadline) IS NOT NULL
        GROUP BY period
        ORDER BY period ASC`,
       applicationParams
@@ -228,7 +235,7 @@ exports.getTpoPlacementReport = async (req, res) => {
       `SELECT
           s.program_name,
           COUNT(DISTINCT s.student_id) AS eligibleStudents,
-          COUNT(DISTINCT CASE WHEN a.result = 'SELECTED' THEN s.student_id END) AS placedStudents
+          COUNT(DISTINCT CASE WHEN s.placement_status = 'PLACED' THEN s.student_id END) AS placedStudents
        FROM students s
        LEFT JOIN applications a
          ON a.student_id = s.student_id
@@ -253,15 +260,15 @@ exports.getTpoPlacementReport = async (req, res) => {
           COUNT(CASE WHEN a.result = 'SELECTED' THEN 1 END) AS offerCount,
           COUNT(CASE WHEN a.result = 'PENDING' THEN 1 END) AS pendingCount,
           COUNT(CASE WHEN a.result = 'ABSENT' THEN 1 END) AS absentCount,
-          MAX(CASE WHEN a.result = 'SELECTED' THEN pd.company_name END) AS selectedCompany,
-          MAX(CASE WHEN a.result = 'SELECTED' THEN pd.job_type END) AS selectedJobType,
-          MAX(CASE WHEN a.result = 'SELECTED' THEN pd.ctc END) AS bestPackage,
+          COALESCE(s.placed_company, MAX(CASE WHEN a.result = 'SELECTED' THEN pd.company_name END)) AS selectedCompany,
+          COALESCE(s.placement_type, MAX(CASE WHEN a.result = 'SELECTED' THEN pd.job_type END)) AS selectedJobType,
+          COALESCE(s.placement_package, MAX(CASE WHEN a.result = 'SELECTED' THEN ${DRIVE_PACKAGE_SQL} END)) AS bestPackage,
           MAX(a.applied_at) AS lastAppliedAt
        FROM students s
        LEFT JOIN applications a ON a.student_id = s.student_id
        LEFT JOIN placement_drives pd ON pd.drive_id = a.drive_id
        ${applicationWhere}
-       GROUP BY s.student_id, s.first_name, s.middle_name, s.last_name, s.prn, s.program_name, s.program_batch, s.placement_status
+       GROUP BY s.student_id, s.first_name, s.middle_name, s.last_name, s.prn, s.program_name, s.program_batch, s.placement_status, s.placed_company, s.placement_type, s.placement_package
        ORDER BY bestPackage DESC, offerCount DESC, student_name ASC`,
       applicationParams
     );
@@ -273,7 +280,7 @@ exports.getTpoPlacementReport = async (req, res) => {
     const totalOffersMade = Number(summary.totalOffersMade || 0);
     const averagePackage = roundTo(summary.averagePackage);
     const highestPackage = roundTo(summary.highestPackage);
-    const medianPackage = computeMedian(packageRows.map((row) => Number(row.ctc)));
+    const medianPackage = computeMedian(packageRows.map((row) => Number(row.package_value)));
     const totalCompaniesVisited = Number(summary.totalCompaniesVisited || 0);
     const studentsAwaitingResult = Number(summary.studentsAwaitingResult || 0);
     const studentsMarkedAbsent = Number(summary.studentsMarkedAbsent || 0);

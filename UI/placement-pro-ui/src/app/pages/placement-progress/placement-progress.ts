@@ -19,8 +19,8 @@ interface ProgressStudent {
   placement_status: 'PLACED' | 'NOT_PLACED';
   placed_company?: string | null;
   placement_mode?: 'ON_CAMPUS' | 'OFF_CAMPUS' | 'FAMILY_BUSINESS' | 'HIGHER_STUDIES' | 'NOT_PLACED' | null;
+  placement_type?: 'FTE' | 'Internship' | 'Internship + PPO' | null;
   placement_package?: number | null;
-  placed_at?: string | null;
   college_email?: string;
   personal_email?: string;
   phone_number?: string;
@@ -109,6 +109,10 @@ export class PlacementProgress implements OnInit {
     { value: 'FAMILY_BUSINESS', label: 'Family Business' },
     { value: 'HIGHER_STUDIES', label: 'Higher Studies' }
   ] as const;
+  readonly placementTypeOptions = [
+    { value: 'FTE', label: 'FTE' },
+    { value: 'Internship + PPO', label: 'Internship + PPO' }
+  ] as const;
 
   loading = true;
   savingPlacement = false;
@@ -117,9 +121,9 @@ export class PlacementProgress implements OnInit {
   isTpoView = false;
   selectedPlacementStatus: 'PLACED' | 'NOT_PLACED' = 'NOT_PLACED';
   selectedPlacementMode: 'ON_CAMPUS' | 'OFF_CAMPUS' | 'FAMILY_BUSINESS' | 'HIGHER_STUDIES' | 'NOT_PLACED' = 'NOT_PLACED';
+  selectedPlacementType: 'FTE' | 'Internship' | 'Internship + PPO' | '' = '';
   placedCompany = '';
   placementPackage: number | null = null;
-  placedAt = '';
   showApplications = false;
   showTests = false;
 
@@ -154,9 +158,9 @@ export class PlacementProgress implements OnInit {
         this.progress = res;
         this.selectedPlacementStatus = res.student.placement_status || 'NOT_PLACED';
         this.selectedPlacementMode = res.student.placement_mode || 'NOT_PLACED';
+        this.selectedPlacementType = res.student.placement_type || '';
         this.placedCompany = res.student.placed_company || '';
         this.placementPackage = res.student.placement_package ?? null;
-        this.placedAt = res.student.placed_at ? String(res.student.placed_at).slice(0, 10) : '';
         this.loading = false;
       },
       error: (err) => {
@@ -180,8 +184,8 @@ export class PlacementProgress implements OnInit {
       placement_status: 'PLACED' | 'NOT_PLACED';
       placed_company?: string | null;
       placement_mode?: 'ON_CAMPUS' | 'OFF_CAMPUS' | 'FAMILY_BUSINESS' | 'HIGHER_STUDIES' | 'NOT_PLACED' | null;
+      placement_type?: 'FTE' | 'Internship' | 'Internship + PPO' | null;
       placement_package?: number | null;
-      placed_at?: string | null;
       message: string;
     }>(
       `${this.apiUrl}/${this.progress.student.student_id}/placement-status`,
@@ -189,8 +193,10 @@ export class PlacementProgress implements OnInit {
         placement_status: this.selectedPlacementStatus,
         placed_company: this.selectedPlacementStatus === 'PLACED' ? this.placedCompany.trim() : null,
         placement_mode: this.selectedPlacementStatus === 'PLACED' ? this.selectedPlacementMode : 'NOT_PLACED',
-        placement_package: this.selectedPlacementStatus === 'PLACED' ? this.placementPackage : null,
-        placed_at: this.selectedPlacementStatus === 'PLACED' ? this.placedAt || null : null
+        placement_type: this.selectedPlacementStatus === 'PLACED'
+          ? this.selectedPlacementType
+          : null,
+        placement_package: this.selectedPlacementStatus === 'PLACED' ? this.placementPackage : null
       },
       { headers: this.authService.getAuthHeaders('application/json') }
     ).subscribe({
@@ -199,8 +205,8 @@ export class PlacementProgress implements OnInit {
           this.progress.student.placement_status = res.placement_status;
           this.progress.student.placed_company = res.placed_company ?? null;
           this.progress.student.placement_mode = res.placement_mode ?? null;
+          this.progress.student.placement_type = res.placement_type ?? null;
           this.progress.student.placement_package = res.placement_package ?? null;
-          this.progress.student.placed_at = res.placed_at ?? null;
         }
         this.successMessage = res.message || 'Placement status updated successfully.';
         this.savingPlacement = false;
@@ -255,13 +261,17 @@ export class PlacementProgress implements OnInit {
 
     if (this.selectedPlacementStatus === 'NOT_PLACED') {
       this.selectedPlacementMode = 'NOT_PLACED';
+      this.selectedPlacementType = '';
       this.placedCompany = '';
       this.placementPackage = null;
-      this.placedAt = '';
     }
   }
 
   get isPlacedSelection(): boolean {
+    return this.selectedPlacementStatus === 'PLACED';
+  }
+
+  get shouldShowPlacementType(): boolean {
     return this.selectedPlacementStatus === 'PLACED';
   }
 
@@ -273,8 +283,8 @@ export class PlacementProgress implements OnInit {
     const bits = [
       this.progress.student.placed_company,
       this.formatPlacementMode(this.progress.student.placement_mode),
-      this.progress.student.placement_package != null ? `${this.progress.student.placement_package} LPA` : null,
-      this.progress.student.placed_at ? `Placed on ${new Date(this.progress.student.placed_at).toLocaleDateString('en-IN')}` : null
+      this.progress.student.placement_type,
+      this.progress.student.placement_package != null ? `${this.progress.student.placement_package} LPA` : null
     ].filter(Boolean);
 
     return bits.length ? bits.join(' • ') : 'Student is marked placed. Add outcome details for better reporting.';

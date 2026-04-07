@@ -179,6 +179,34 @@
   small { font-size: 12px; color: var(--text-muted); }
 }
 
+.checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+  }
+}
+
+.ppo-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ppo-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 /* ── Multi-select ── */
 .custom-multi-select { position: relative; }
 
